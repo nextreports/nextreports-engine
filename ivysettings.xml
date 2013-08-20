@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivysettings>
+
+    <properties file="${ivy.settings.dir}/ivysettings.properties"/>
+
+    <settings defaultResolver="main"/>
+
+    <resolvers>        
+        <chain name="main">
+            <filesystem name="local">
+                <artifact pattern="${repo.dir}/[organisation]/[artifact]-[revision].[ext]"/>
+                <ivy pattern="${repo.dir}/[organisation]/[module]-[revision].xml"/>
+            </filesystem>
+            
+            <ibiblio name="public" root="http://repo1.maven.org/maven2" m2compatible="true"/>
+        </chain>
+    </resolvers>
+    
+</ivysettings>

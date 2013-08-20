@@ -1,0 +1,13 @@
+ro/nextreports/engine/Runner.java
+ro/nextreports/engine/ReportRunner.java
+ro/nextreports/engine/FluentReportRunner.java
+ro/nextreports/engine/Report.java
+ro/nextreports/engine/chart/ChartRunner.java
+ro/nextreports/engine/chart/FluentChartRunner.java
+ro/nextreports/engine/chart/Chart.java
+ro/nextreports/engine/chart/ChartTitle.java
+ro/nextreports/engine/chart/ChartType.java
+ro/nextreports/engine/util/ReportUtil.java
+ro/nextreports/engine/util/ParameterUtil.java
+ro/nextreports/engine/queryexec/QueryParameter.java
+ro/nextreports/engine/queryexec/IdName.java

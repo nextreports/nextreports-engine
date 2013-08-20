@@ -1,0 +1,251 @@
+<?xml version="1.0"?>
+
+<!-- ===================================================================
+Build file for 'nextreports-engine' application
+
+Most useful targets:
+
+  - compile -> compile all java sources
+  - jar     -> creates the application's jar file
+  - clean   -> removes all the generated files and directories
+  - release -> creates the artifacts  
+
+Authors:
+  Decebal Suiu <decebal.suiu@asf.ro>
+
+Copyright:
+  Copyright (c) 2006-2013, The NextReports team. All rights reserved.
+==================================================================== -->
+
+<project name="nextreports-engine" default="release" xmlns:ivy="antlib:org.apache.ivy.ant">
+
+    <property file="local.properties"/>
+    <property file="build.properties"/>
+    
+    <property name="integration.name" value="nextreports-integration-demo"/>
+    <property name="integration.zip.dir" location="${app.target}/${app.version}/${integration.name}"/>
+    <property name="integration.zip" value="${app.target}/${integration.name}-${app.version}.zip"/>
+        
+    <property name="ivy.lib.dir" value="${app.lib}"/>
+        
+    <import file="ivy-build.xml"/>
+    
+    <path id="ivy.lib.path">
+        <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+    </path>
+
+    <!-- Classpath -->
+    <path id="classpath">
+        <fileset dir="${app.lib}" includes="*.jar"/>
+        <fileset dir="${app.ant-tasks}" includes="*.jar"/>
+    </path>
+
+    <target name="ivy.init" depends="ivy.download">
+        <path id="ivy.lib.path">
+              <pathelement location="${ivy.jar.file}"/>
+        </path>
+        <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+    </target>
+                
+    <!-- ================================================================== -->
+    <!-- I V Y . R E S O L V E                                              -->
+    <!-- ================================================================== -->
+
+    <!-- resolve dependent libraries -->
+    <target name="ivy.resolve" depends="ivy.init">      
+        <ivy:configure file="ivysettings.xml"/>
+        <ivy:resolve file="ivy.xml"/>
+        <!--
+        <ivy:retrieve pattern="${ivy.lib.dir}/[artifact].[ext]" conf="runtime"/>
+        -->
+        <ivy:retrieve sync="true"/>
+        
+        <mkdir dir="ivy-report"/>
+        <ivy:report todir="ivy-report"/>
+    </target>
+
+    <!-- ================================================================== -->
+    <!-- C O M P I L E                                                      -->
+    <!-- ================================================================== -->
+
+    <target name="compile" depends="ivy.resolve,version">
+        <!-- Create the ${app.classes} directory -->
+        <mkdir dir="${app.classes}"/>        
+
+        <!-- Compile the java code from ${app.src} into ${app.classes} -->
+        <javac
+            srcdir="${app.src}"
+            destdir="${app.classes}"
+            debug="${javac.debug}"
+            verbose="${javac.verbose}"
+            deprecation="${javac.deprecation}"
+            classpathref="classpath"
+        />       
+    </target>
+
+    <!-- ================================================================== -->
+    <!-- J A R                                                              -->
+    <!-- ================================================================== -->
+
+    <target name="jar" depends="compile">
+        <delete file="${app.target}/${app.jar}"/>
+
+        <!-- Create jar file  -->
+        <jar jarfile="${app.target}/${app.jar}" compress="true" >
+            <fileset dir="${app.classes}" includes="ro/nextreports/engine/**/*.class"/>
+            <manifest>
+                <attribute name="Built-By" value="${user.name}"/>
+                <attribute name="Implementation-Version" value="${app.version}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <!-- ================================================================== -->
+    <!-- D E M O                                                            -->
+    <!-- ================================================================== -->
+
+    <target name="demo" depends="jar,javadoc">
+        <!-- Create temporary dir -->
+        <mkdir dir="${integration.zip.dir}"/>
+
+        <!-- Copy integration readme file -->
+        <copy file="integration-readme.txt" tofile="${integration.zip.dir}/readme.txt"/>
+        
+        <!-- Copy some file in temporary dir -->
+        <copy todir="${integration.zip.dir}/src">
+            <fileset dir="${app.src}" includes="ro/nextreports/integration/**"/>
+        </copy>
+        <copy todir="${integration.zip.dir}/lib">
+            <fileset dir="${app.target}" includes="${app.jar}"/>
+            <fileset dir="${app.lib}">
+                <include name="commons-logging-*.jar"/>
+                <include name="commons-jexl-*.jar"/>                
+                <include name="xstream-*.jar"/>
+                <include name="poi-*.jar"/>
+                <include name="itext*.jar"/>
+                <include name="jcalendar-*.jar"/>
+                <include name="winstone*.jar"/>
+                <include name="jofc2*.jar"/>
+                <include name="jfreechart*.jar"/>
+                <include name="jcommon*.jar"/>
+                <include name="derby-*.jar"/>
+            </fileset>
+        </copy>
+
+        <!-- Copy files needed for chart demo -->
+        <unzip src="${app.src}/chart-webroot.zip" dest="${integration.zip.dir}/chart-webroot">
+            <patternset>
+                <exclude name="**/data.json"/>
+            </patternset>
+        </unzip>
+
+        <!-- Copy engine javadoc -->
+        <copy todir="${integration.zip.dir}/javadoc">
+            <fileset dir="${app.target}/javadoc"/>
+        </copy>
+        
+        <!-- Create the zip with dist -->
+        <zip destfile="${integration.zip}" basedir="${app.target}/${app.version}"/>
+
+        <!-- Delete the temporary dir -->
+        <delete dir="${app.target}/${app.version}"/>
+    </target>
+
+    <!-- ================================================================== -->
+    <!-- V E R S I O N                                                      -->
+    <!-- ================================================================== -->
+
+    <target name="version">
+        <!-- Add ant task -->
+        <taskdef
+            name="jreleaseinfo"
+            classname="ch.oscg.jreleaseinfo.anttask.JReleaseInfoAntTask"
+            classpath="ant-tasks/jreleaseinfo-1.3.0.jar"
+        />
+
+        <property name="app.src.dir" location="${app.src}"/>
+
+        <property environment="env"/>
+        <!-- 'BUILD_NUMBER' variable is created by HUDSON CI SERVER before each build run -->
+        <property name="env.BUILD_NUMBER" value="0"/>
+        <property name="build.number" value="${env.BUILD_NUMBER}"/>
+
+        <!-- Create release info -->
+        <jreleaseinfo
+            classname="ReleaseInfo"         
+            packagename="ro.nextreports.engine"
+            targetdir="${app.src.dir}"
+            project="NextReports"
+            version="${app.version}">
+                <parameter name="company" value="NextReports"/>
+                <parameter name="home" value="www.next-reports.com"/>
+                <parameter name="buildNumber" value="${build.number}" type="int"/>
+                <parameter name="copyright" value="${app.copyright}"/>
+        </jreleaseinfo>
+    </target>
+
+    <!-- ================================================================== -->
+    <!-- J A V A D O C                                                      -->
+    <!-- ================================================================== -->
+    
+    <target name="javadoc">
+        <mkdir dir="${app.target}/javadoc"/>
+
+        <javadoc packagenames="ro.nextreports.engine"
+               sourcepath="src"
+               destdir="${app.target}/javadoc" 
+               classpathref="classpath" 
+               author="false">
+            <doctitle><![CDATA[<h1>NextReports Integration ${app.version}</h1>]]></doctitle>
+            <fileset dir="${app.src}">
+                <includesfile name="integration-javadoc.txt"/>
+            </fileset>
+            <doclet name="org.umlgraph.doclet.UmlGraphDoc" path="${app.lib}/doclet-5.1.jar">
+                <param name="-verbose"/>
+                <param name="-attributes"/>
+                <param name="-operations"/>
+                <param name="-qualify"/>
+                <param name="-types"/>
+                <param name="-visibility"/>
+            </doclet>
+        </javadoc>
+
+        <!-- Create uml diagrams -->
+        <!-- YOU MUST HAVE INSTALLED GRAPHVIZ (http://www.graphviz.org/) -->
+        <apply executable="dot" dest="${app.target}/javadoc" parallel="false" verbose="true">
+            <arg value="-v"/>
+            <arg value="-Tpng"/>
+            <arg value="-o"/>
+            <targetfile/>
+            <srcfile/>
+            <fileset dir="${app.target}/javadoc" includes="*.dot"/>
+            <mapper type="glob" from="*.dot" to="*.png"/>
+        </apply>
+        
+        <!-- Delete some temporary files-->
+        <delete>
+            <fileset dir="${app.target}/javadoc" includes="**/*.dot,**/*.map"/>
+        </delete>
+    </target>
+    
+    <!-- ================================================================== -->
+    <!-- R E L E A S E                                                      -->
+    <!-- ================================================================== -->
+
+    <target name="release" depends="demo">
+        <copy todir="${app.artifacts}" file="${app.target}/${app.jar}"/>
+        <copy todir="${app.artifacts}" file="${integration.zip}"/>
+    </target>
+
+    <!-- ================================================================== -->
+    <!-- C L E A N                                                          -->
+    <!-- ================================================================== -->
+
+    <target name="clean">
+        <delete dir="${app.target}"/>
+        <delete dir="${app.dist}"/>
+        <delete dir="${app.artifacts}"/>
+        <delete dir="${ivy.lib.dir}"/>
+    </target>
+    
+</project>

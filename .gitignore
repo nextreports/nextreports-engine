@@ -1,6 +1,6 @@
-*.class
+target/
 
-# Package Files #
-*.jar
-*.war
-*.ear
+# CVS legacy #
+CVS/
+src/ro/nextreports/engine/.cvsignore
+
