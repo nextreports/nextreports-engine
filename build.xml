@@ -28,8 +28,12 @@ Copyright:
         
     <property name="ivy.lib.dir" value="${app.lib}"/>
         
-    <import file="ivy-build.xml"/>
-    
+    <import file="ivy-build.xml"/>    
+
+    <path id="ant.tasks.path">
+        <fileset dir="${ant.tasks.dir}" includes="*.jar"/>
+    </path>
+
     <path id="ivy.lib.path">
         <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
     </path>
@@ -37,16 +41,21 @@ Copyright:
     <!-- Classpath -->
     <path id="classpath">
         <fileset dir="${app.lib}" includes="*.jar"/>
-        <fileset dir="${app.ant-tasks}" includes="*.jar"/>
+        <fileset dir="${ant.tasks.dir}" includes="*.jar"/>
     </path>
+                
+    <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ant.tasks.path"/>
+
+    <!-- ================================================================== -->
+    <!-- I V Y . I N I T                                                    -->
+    <!-- ================================================================== -->
 
     <target name="ivy.init" depends="ivy.download">
         <path id="ivy.lib.path">
               <pathelement location="${ivy.jar.file}"/>
         </path>
-        <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
     </target>
-                
+
     <!-- ================================================================== -->
     <!-- I V Y . R E S O L V E                                              -->
     <!-- ================================================================== -->
@@ -160,7 +169,7 @@ Copyright:
         <taskdef
             name="jreleaseinfo"
             classname="ch.oscg.jreleaseinfo.anttask.JReleaseInfoAntTask"
-            classpath="ant-tasks/jreleaseinfo-1.3.0.jar"
+            classpath="${ant.tasks.dir}/jreleaseinfo-1.3.0.jar"
         />
 
         <property name="app.src.dir" location="${app.src}"/>
