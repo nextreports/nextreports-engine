@@ -34,26 +34,23 @@ Copyright:
         <fileset dir="${ant.tasks.dir}" includes="*.jar"/>
     </path>
 
-    <path id="ivy.lib.path">
-        <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
-    </path>
-
     <!-- Classpath -->
     <path id="classpath">
         <fileset dir="${app.lib}" includes="*.jar"/>
         <fileset dir="${ant.tasks.dir}" includes="*.jar"/>
-    </path>
-                
-    <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ant.tasks.path"/>
+    </path>                
 
     <!-- ================================================================== -->
     <!-- I V Y . I N I T                                                    -->
     <!-- ================================================================== -->
 
     <target name="ivy.init" depends="ivy.download">
+        <!-- Download the ivy jar and defines ivy tasks -->
         <path id="ivy.lib.path">
               <pathelement location="${ivy.jar.file}"/>
         </path>
+        <!-- The ivy tasks are dependent by ivy.lib.path declared above -->
+        <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ant.tasks.path"/>
     </target>
 
     <!-- ================================================================== -->
