@@ -2,6 +2,10 @@ target/
 .classpath
 .project
 
+/src/ro/nextreports/engine/ReleaseInfo.java
+ivy-lib/
+ivy-report/
+
 # CVS legacy #
 CVS/
 src/ro/nextreports/engine/.cvsignore
