@@ -3,6 +3,20 @@ Current build status: [![Build Status](https://buildhive.cloudbees.com/job/nextr
 -->
 Current build status: [![Build Status](https://travis-ci.org/nextreports/nextreports-engine.png?branch=master)](https://travis-ci.org/nextreports/nextreports-engine)
 
+How to build
+-------------------
+Requirements: 
+- [Git](http://git-scm.com/) 
+- JDK 1.6 (test with `java -version`)
+- [Apache Ant](http://ant.apache.org/) (test with `ant -version`)
+
+Steps:
+- create a local clone of this repository (with `git clone https://github.com/nextreports/nextreports-engine.git`)
+- go to project's folder (with `cd nextreports-engine`) 
+- build the artifacts (with `ant clean release`)
+
+After above steps a folder _artifacts_ is created and all goodies are in that folder.
+
 Using Maven
 -------------------
 In your pom.xml you must define the dependencies to nextreports-engine artifacts with:
