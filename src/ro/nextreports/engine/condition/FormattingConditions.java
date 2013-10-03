@@ -28,6 +28,8 @@ import java.util.LinkedList;
 public class FormattingConditions implements Serializable {
 	
 	private static final long serialVersionUID = -203403968663601670L;
+	
+	private String cellExpressionText;
 
     private List<BandElementCondition> conditions;
 
@@ -42,20 +44,30 @@ public class FormattingConditions implements Serializable {
     public List<BandElementCondition> getConditions() {
         return conditions;
     }
+        
+    public String getCellExpressionText() {
+		return cellExpressionText;
+	}
 
-    public boolean equals(Object o) {
+	public void setCellExpressionText(String cellExpressionText) {
+		this.cellExpressionText = cellExpressionText;
+	}
+
+	public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
         FormattingConditions that = (FormattingConditions) o;
 
+        if (cellExpressionText != null ? !cellExpressionText.equals(that.cellExpressionText) : that.cellExpressionText != null) return false;
         if (conditions != null ? !conditions.equals(that.conditions) : that.conditions != null) return false;
 
         return true;
     }
 
     public int hashCode() {
-        return (conditions != null ? conditions.hashCode() : 0);
+    	int result = (cellExpressionText != null ? cellExpressionText.hashCode() : 0);
+        return 31 * result + (conditions != null ? conditions.hashCode() : 0);
     }
 
 

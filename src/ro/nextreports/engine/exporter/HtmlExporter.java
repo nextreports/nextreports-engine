@@ -176,7 +176,7 @@ public class HtmlExporter extends ResultExporter {
         // if render conditions we cannot use the class anymore, but an inline style
         if (hasRenderConditions(bandElement, value) || hasRowRenderConditions(bandElement, gridRow, value)) {
             sb.append("style=\"");
-            sb.append(renderCssCode(bandElement, value, gridRow, j, colSpan));
+            sb.append(renderCssCode(bandElement, value, gridRow, j, colSpan, true));
             sb.append("\"");
         } else {
             sb.append("class='");
@@ -247,12 +247,14 @@ public class HtmlExporter extends ResultExporter {
     }
 
     private String renderCssCode(BandElement be, int gridRow, int gridColumn, int colSpan) {
-        return renderCssCode(be, null, gridRow, gridColumn, colSpan);
+    	// this method is run in init code and we cannot overwrite cell render conditions here
+    	// the overwrite is done in getTD method
+        return renderCssCode(be, null, gridRow, gridColumn, colSpan, false);
     }
 
-    private String renderCssCode(BandElement be, Object value, int gridRow, int gridColumn, int colSpan) {
+    private String renderCssCode(BandElement be, Object value, int gridRow, int gridColumn, int colSpan, boolean overwriteCellRenderCond) {
         Map<String, Object> style = null;
-        style = buildCellStyleMap(be, value, gridRow, gridColumn, colSpan);
+        style = buildCellStyleMap(be, value, gridRow, gridColumn, colSpan, overwriteCellRenderCond);
         
         // to see a background image all cells must not have any background!
         if (bean.getReportLayout().getBackgroundImage() != null) {

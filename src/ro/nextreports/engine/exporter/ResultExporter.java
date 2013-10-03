@@ -377,8 +377,11 @@ public abstract class ResultExporter {
         return format;
     }   
     
-
     protected Map<String, Object> buildCellStyleMap(BandElement bandElement, Object value, int gridRow, int gridColumn, int colSpan) {
+    	return buildCellStyleMap(bandElement, value, gridRow, gridColumn, colSpan, true);
+    }
+
+    protected Map<String, Object> buildCellStyleMap(BandElement bandElement, Object value, int gridRow, int gridColumn, int colSpan, boolean overwriteCellRenderCond) {
         Map<String, Object> format = new HashMap<String, Object>();                     
                 
         if (bandElement == null) {
@@ -404,8 +407,24 @@ public abstract class ResultExporter {
         }
 
         // overwrite with cell render conditions
-        FormattingConditions renderConditions = bandElement.getFormattingConditions();
-        putFormattingConditions(format, renderConditions, gridRow, gridColumn, (Serializable) value, colSpan, false);
+		if (overwriteCellRenderCond) {
+			FormattingConditions renderConditions = bandElement.getFormattingConditions();
+			if (renderConditions != null) {
+				String cellExpressionText = renderConditions.getCellExpressionText();
+				if (cellExpressionText == null) {
+					putFormattingConditions(format, renderConditions, gridRow, gridColumn, (Serializable) value, colSpan, false);
+				} else {
+					try {
+						Serializable expEval = (Serializable) evaluateExpression("", cellExpressionText,
+								getBand(getReportLayout(), gridRow).getName(), null);
+						putFormattingConditions(format, renderConditions, gridRow, gridColumn, expEval, colSpan, true);
+					} catch (QueryException e) {
+						e.printStackTrace();
+						LOG.error(e.getMessage(), e);
+					}
+				}
+			}
+		}
 
         return format;
     }
@@ -1908,5 +1927,18 @@ public abstract class ResultExporter {
 		return ReportUtil.foundFunctionInHeader(bean.getReportLayout()) ||
 			   ReportUtil.foundFunctionInAnyGroupHeader(bean.getReportLayout());
 	}	
+	
+	private Band getBand(ReportLayout layout, int gridRow) {
+        List<Band> bands = layout.getBands();
+        int currentRow = 0;
+        for (Band band : bands) {
+            int rows = band.getRowCount();
+            currentRow += rows;
+            if (gridRow < currentRow) {
+                return band;
+            }
+        }
+        return null;
+    }
        
 }
