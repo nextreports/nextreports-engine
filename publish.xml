@@ -21,7 +21,7 @@
 
     <target name="pom" depends="ivy.resolve">
         <!-- put in pom dependencies only for compile and runtime conf -->
-        <ivy:makepom ivyfile="ivy.xml" pomfile="${pom}" conf="runtime,allruntime">
+        <ivy:makepom templatefile="pom-template.xml" ivyfile="ivy.xml" pomfile="${pom}" conf="runtime,allruntime">
             <mapping conf="runtime" scope="runtime"/>
             <mapping conf="allruntime" scope="runtime"/>
         </ivy:makepom>

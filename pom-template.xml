@@ -1,0 +1,46 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>ro.nextreports</groupId>
+    <artifactId>${app.name}</artifactId>
+    <version>${app.version}</version>
+    <packaging>jar</packaging>
+
+    <name>NextReports Engine</name>
+    <url>https://github.com/nextreports/nextreports-engine</url>
+
+    <description>
+        NextReports Engine is a lightweight Java platform development library which 
+        can be used to run NextReports inside your applications.
+    </description>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:https://github.com/nextreports/${app.name}.git</connection>
+        <developerConnection>scm:git:https://github.com/nextreports/${app.name}.git</developerConnection>
+        <url>git@github.com/nextreports/${app.name}.git</url>
+    </scm>
+  
+    <developers>
+        <developer>
+            <id>decebals</id>
+            <name>Decebal Suiu</name>
+            <email>decebal.suiu@gmail.com</email>
+        </developer>
+        <developer>
+            <id>dpmihai</id>
+            <name>Mihai Dinca-Panaitescu</name>
+            <email>dpmihai@yahoo.com</email>            
+        </developer>
+    </developers>
+
+</project>
+
+
