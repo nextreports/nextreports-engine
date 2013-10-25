@@ -1313,9 +1313,26 @@ public abstract class ResultExporter {
         return value;
     }
     
+    protected String getBandElementValueAsString(BandElement bandElement) {
+    	String pattern = getPattern(bandElement);
+    	if (bandElement instanceof ExpressionBandElement) {    		
+    		Object value = null;
+			try {
+				value = evaluateExpression((ExpressionBandElement)bandElement, currentBandName);
+			} catch (QueryException e) {
+				LOG.error(e.getMessage(), e);
+			}    		
+            return StringUtil.getValueAsString(value, pattern);
+    	} else if (bandElement instanceof VariableBandElement) {
+    		return getStringValue((VariableBandElement)bandElement, currentBandName);    	
+    	} else {
+    		return getStringValue(bandElement, pattern);
+    	}
+    }
+    
     protected Object evaluateExpression(ExpressionBean bean) throws QueryException {
         return evaluateExpression(bean.getBandElement().getExpressionName(), bean.getBandElement().getExpression(), bean.getBandName(), bean.getBandElement().getPattern());
-    }
+    }       
 
     protected Object evaluateExpression(ExpressionBandElement bandElement, String bandName) throws QueryException {
         return evaluateExpression(bandElement.getExpressionName(), bandElement.getExpression(), bandName, bandElement.getPattern());
