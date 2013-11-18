@@ -45,6 +45,7 @@ import ro.nextreports.engine.querybuilder.sql.dialect.ConnectionUtil;
 import ro.nextreports.engine.querybuilder.sql.dialect.Dialect;
 import ro.nextreports.engine.querybuilder.sql.dialect.DialectException;
 import ro.nextreports.engine.querybuilder.sql.dialect.OracleDialect;
+import ro.nextreports.engine.querybuilder.sql.dialect.SQLiteDialect;
 import ro.nextreports.engine.queryexec.util.StringUtil;
 import ro.nextreports.engine.util.DialectUtil;
 import ro.nextreports.engine.util.ParameterUtil;
@@ -285,14 +286,17 @@ public class QueryExecutor implements Runnable {
 				// execute query
 				try {
 					executeTime = System.currentTimeMillis();
+					
+					Dialect dialect = null;
+                    try {
+                        dialect = DialectUtil.getDialect(conn);
+                    } catch (DialectException e) {
+                        e.printStackTrace();
+                        LOG.error(e.getMessage(), e);
+                    }
+					
                     if (QueryUtil.isProcedureCall(query.getText()))  {
-                        resultSet = inputWrapper.statement.executeQuery();
-                        Dialect dialect = null;
-                        try {
-                            dialect = DialectUtil.getDialect(conn);
-                        } catch (DialectException e) {
-                            e.printStackTrace();
-                        }
+                        resultSet = inputWrapper.statement.executeQuery();                        
                         if (dialect instanceof OracleDialect) {
                             resultSet = (ResultSet)((CallableStatement)inputWrapper.statement).getObject(outputParameterPosition);
                         } 
@@ -331,11 +335,16 @@ public class QueryExecutor implements Runnable {
                         
                         if (!cancelRequest) {
                             resultSet = inputWrapper.statement.executeQuery();
-
+                            
                             if (useLast && !cancelRequest && computeCount) {
-                                resultSet.last();
-                                count = resultSet.getRow();
-                                resultSet.beforeFirst();
+                            	if (dialect instanceof SQLiteDialect) {
+                            		// resultSet is forward only
+                            		count = -1;
+                            	} else {
+                            		resultSet.last();
+                            		count = resultSet.getRow();
+                            		resultSet.beforeFirst();
+                            	}
                             }
                         }
                     }
