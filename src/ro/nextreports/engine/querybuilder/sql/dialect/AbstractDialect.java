@@ -71,7 +71,8 @@ public abstract class AbstractDialect implements Dialect {
      */
     public final int getJdbcType(String type, int precision, int scale)  throws DialectException {
     	// TODO ?!
-    	if (type == null) {
+    	// SQLite returns "null" for type if we use rsmd.getColumnTypeName
+    	if ((type == null) || "null".equals(type))  {
     		return Types.OTHER;
     	}
     	
