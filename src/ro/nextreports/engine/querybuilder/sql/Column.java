@@ -36,6 +36,7 @@ public class Column implements Outputable {
     protected boolean output = true;
     private boolean fKey;
     private boolean pKey;
+    private boolean iKey;
     
     protected transient String type;
     private transient boolean useTableName;
@@ -97,8 +98,16 @@ public class Column implements Outputable {
     public void setfKey(boolean fKey) {
         this.fKey = fKey;
     }
+        
+    public boolean isiKey() {
+		return iKey;
+	}
 
-    public boolean ispKey() {
+	public void setiKey(boolean iKey) {
+		this.iKey = iKey;
+	}
+
+	public boolean ispKey() {
         return pKey;
     }
 
