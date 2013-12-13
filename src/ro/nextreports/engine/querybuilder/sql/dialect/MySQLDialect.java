@@ -37,6 +37,7 @@ public class MySQLDialect extends AbstractDialect {
         registerColumnType("smallint", Types.SMALLINT);
         registerColumnType("smallint unsigned", Types.SMALLINT);
         registerColumnType("tinyint", Types.TINYINT);
+        registerColumnType("tinyint unsigned", Types.TINYINT);
         registerColumnType("integer", Types.INTEGER);
         registerColumnType("integer unsigned", Types.BIGINT);
         registerColumnType("int", Types.INTEGER);
