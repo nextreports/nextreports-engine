@@ -40,6 +40,11 @@
         <!-- JFreeChart -->
         <dependency org="jfree" name="jfreechart" rev="1.0.12" conf="chart, allruntime"/>
         
+        <!-- Jackson Json library -->
+        <dependency org="com.fasterxml.jackson.core" name="jackson-core" rev="2.3.0" conf="chart, allruntime"/>   
+        <dependency org="com.fasterxml.jackson.core" name="jackson-annotations" rev="2.3.0" conf="chart, allruntime"/>
+        <dependency org="com.fasterxml.jackson.core" name="jackson-databind" rev="2.3.0" conf="chart, allruntime"/>        
+        
         <!-- POI -->
         <dependency org="org.apache.poi" name="poi" rev="3.7" conf="excel, allruntime"/>        
         
