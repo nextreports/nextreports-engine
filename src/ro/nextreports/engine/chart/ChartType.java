@@ -30,11 +30,14 @@ public class ChartType implements Serializable {
     // types
     public static transient final byte NONE = 0;
     public static transient final byte BAR = 1;
-    public static transient final byte HORIZONTAL_BAR = 2;
+    public static transient final byte HORIZONTAL_BAR = 2;    
     public static transient final byte STACKED_BAR = 5;
+    public static transient final byte HORIZONTAL_STACKED_BAR = 6;
     public static transient final byte PIE = 10;
     public static transient final byte LINE = 20;
     public static transient final byte AREA = 50;
+    public static transient final byte BAR_COMBO = 60;
+    public static transient final byte STACKED_BAR_COMBO = 61;
 
     // style for all types
     public static transient final byte STYLE_NORMAL = 1;
@@ -87,15 +90,35 @@ public class ChartType implements Serializable {
 
         return true;
     }
+    
+    public boolean isLine() {
+        return (type == LINE);
+    }
+    
+    public boolean isPie() {
+        return (type == PIE);
+    }
 
     public boolean isHorizontal() {
-        return (type == HORIZONTAL_BAR);
+        return (type == HORIZONTAL_BAR) || (type == HORIZONTAL_STACKED_BAR);
     }
 
     public boolean isStacked() {
-        return (type == STACKED_BAR);
+        return (type == STACKED_BAR) || (type == HORIZONTAL_STACKED_BAR) || (type == STACKED_BAR_COMBO);
+    }
+    
+    public boolean isHorizontalStacked() {
+        return (type == HORIZONTAL_STACKED_BAR);
+    }
+    
+    public static boolean isCombo(byte type) {
+    	return (type == BAR_COMBO) || (type == STACKED_BAR_COMBO);
     }
 
+    public static boolean hasNoFlashSupport(byte type) {
+    	return (type == HORIZONTAL_STACKED_BAR) || isCombo(type);
+    }
+    
     public int hashCode() {
         int result;
         result = (int) type;

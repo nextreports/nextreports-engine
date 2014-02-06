@@ -579,7 +579,7 @@ public class JsonExporter implements ChartExporter {
     		} catch (UnsupportedEncodingException e) {
     			e.printStackTrace();
     		}        	
-            function = StringUtil.replace(drillFunction, "\\$\\{" + X_KEY + "\\}", text);
+            function = StringUtil.replace(drillFunction, "\\$\\{" + X_KEY + "\\}", text);            
         }                
 
         if (chart instanceof BarChart) {            

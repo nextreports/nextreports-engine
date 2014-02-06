@@ -49,8 +49,14 @@ public class ChartRunner implements Runner {
     public static final String GRAPHIC_FORMAT = "GRAPHIC";    
     public static final String TABLE_FORMAT = "TABLE";
     public static final String IMAGE_FORMAT = "IMAGE";
+    
+    // type for GRAPHIC_FORMAT
+    public static final byte NO_TYPE = 0;
+    public static final byte FLASH_TYPE = 1;
+    public static final byte HTML5_TYPE = 2;
 
     private String format = GRAPHIC_FORMAT;
+    private byte graphicType = FLASH_TYPE;
 
     private Connection connection;
     private Dialect dialect;
@@ -64,7 +70,7 @@ public class ChartRunner implements Runner {
     private int imageWidth;
     private int imageHeight;
     private boolean csv = false;
-    
+                
     /**
 	 * Get database connection
 	 * 
@@ -164,8 +170,25 @@ public class ChartRunner implements Runner {
     public void setFormat(String format) {
         this.format = format;
     }
+    
+    
+    /** Get graphic type
+    *
+    * @return graphic type
+    */
+    public byte getGraphicType() {
+		return graphicType;
+	}
 
-    /**
+    /** Set graphic type (one of FLASH_TYPE or HTML5_TYPE)
+     * 
+     * @param type graphic type
+     */
+	public void setGraphicType(byte graphicType) {
+		this.graphicType = graphicType;
+	}
+
+	/**
 	 * Get parameters values
 	 * 
 	 * @return parameters values
@@ -343,7 +366,12 @@ public class ChartRunner implements Runner {
         	exporter = new JFreeChartExporter(parameterValues, qr, chart, imagePath, imageName, imageWidth, imageHeight);     
         	
         } else {
-            exporter = new JsonExporter(parameterValues, qr, stream, chart, drillFunction);
+        	if (graphicType == HTML5_TYPE) {
+        		exporter = new JsonHTML5Exporter(parameterValues, qr, stream, chart, drillFunction);
+        	} else {
+        		// FLASH_TYPE
+        		exporter = new JsonExporter(parameterValues, qr, stream, chart, drillFunction);
+        	}
         }
     }
     

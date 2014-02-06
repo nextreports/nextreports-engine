@@ -22,6 +22,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.FieldPosition;
 import java.util.HashMap;
@@ -37,11 +38,14 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.DatasetRenderingOrder;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.category.AreaRenderer;
 import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.LineAndShapeRenderer;
+import org.jfree.chart.renderer.category.StandardBarPainter;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.title.TextTitle;
 import org.jfree.data.Range;
@@ -74,6 +78,7 @@ public class JFreeChartExporter implements ChartExporter {
     private boolean integerXValue = true;
     private DefaultCategoryDataset barDataset;
     private DefaultPieDataset pieDataset;
+    private DefaultCategoryDataset lineBarDataset;
     private String path;    
     private int width;
     private int height;
@@ -83,6 +88,7 @@ public class JFreeChartExporter implements ChartExporter {
     private static final int DEFAULT_HEIGHT = 300;
     private Map<String, Integer> xValueSerie = new HashMap<String, Integer>();
     private float transparency = 0.7f;
+    private boolean isLineCombo = false;
     
     public JFreeChartExporter(Map<String, Object> parameterValues, QueryResult result, Chart chart) {
     	this(parameterValues, result, chart, ".", DEFAULT_WIDTH, DEFAULT_HEIGHT);
@@ -136,10 +142,16 @@ public class JFreeChartExporter implements ChartExporter {
         	jfreechart = createLineChart();
         } else if (ChartType.BAR == type) {
         	jfreechart = createBarChart(false, false);
+        } else if (ChartType.BAR_COMBO == type) {
+        	jfreechart = createBarChart(false, false, true);	
         } else if (ChartType.HORIZONTAL_BAR == type) {
         	jfreechart = createBarChart(true, false);
         } else if (ChartType.STACKED_BAR == type) {
         	jfreechart = createBarChart(false, true);
+        } else if (ChartType.STACKED_BAR_COMBO == type) {
+        	jfreechart = createBarChart(false, true, true);	
+        } else if (ChartType.HORIZONTAL_STACKED_BAR == type) {
+        	jfreechart = createBarChart(true, true);
         } else if (ChartType.PIE == type) {
         	jfreechart = createPieChart();
         } else if (ChartType.AREA == type) {
@@ -346,10 +358,29 @@ public class JFreeChartExporter implements ChartExporter {
 	}
 	
 	private JFreeChart createBarChart(boolean horizontal, boolean stacked) throws QueryException {
+		return createBarChart(horizontal, stacked, false);
+	}
+	
+	private JFreeChart createBarChart(boolean horizontal, boolean stacked, boolean isCombo) throws QueryException {
 		barDataset = new DefaultCategoryDataset();
 		String chartTitle = replaceParameters(chart.getTitle().getTitle());
-		Object[] charts = new Object[chart.getYColumns().size()];
-		List<String> legends = chart.getYColumnsLegends();
+		Object[] charts;
+		List<String> legends;
+		Object[] lineCharts = null;
+		String lineLegend = null;
+		if (isCombo) {			 
+			 lineCharts = new Object[1];
+			 if (chart.getYColumnsLegends().size() < chart.getYColumns().size()) {
+				 lineLegend = "";
+			 } else {
+				 lineLegend = chart.getYColumnsLegends().get(chart.getYColumns().size()-1);
+			 }
+			 charts = new Object[chart.getYColumns().size()-1];
+			 legends = chart.getYColumnsLegends().subList(0, chart.getYColumns().size()-1);			 			 
+		} else {
+			 charts = new Object[chart.getYColumns().size()];
+			 legends = chart.getYColumnsLegends();
+		}
 		boolean hasLegend = false;
 		for (int i = 0; i < charts.length; i++) {			
 			String legend = "";
@@ -366,6 +397,13 @@ public class JFreeChartExporter implements ChartExporter {
 			}
 			charts[i] = legend;			
 		}		
+		if (isCombo) {
+			String leg = "";
+			if (lineLegend != null) {
+				leg = replaceParameters(lineLegend);
+			}
+			lineCharts[0] = leg;
+		}
 						
 		byte style = chart.getType().getStyle();
 		JFreeChart jfreechart;
@@ -504,6 +542,13 @@ public class JFreeChartExporter implements ChartExporter {
         	plot.getRangeAxis().setTickMarksVisible(false);
         }       
         
+        if (chart.getType().getStyle() == ChartType.STYLE_NORMAL) {
+            // no shadow
+        	renderer.setShadowVisible(false);
+        	// no gradient
+        	renderer.setBarPainter(new StandardBarPainter());
+        }
+        
         // label orientation
         CategoryAxis domainAxis = plot.getDomainAxis();        
         if (chart.getXorientation() == Chart.VERTICAL) {
@@ -518,12 +563,75 @@ public class JFreeChartExporter implements ChartExporter {
         domainAxis.setTickLabelFont(chart.getXLabelFont());
         plot.getRangeAxis().setTickLabelFont(chart.getYLabelFont());        
 		
-		createChart(plot.getRangeAxis(), charts);              
+		createChart(plot.getRangeAxis(), charts);           
+		
+		if (isCombo) {			
+			addLineChartOverBar(jfreechart, lineCharts, lineLegend);
+		}
 		
 		return jfreechart;
 	}
 	
-	
+	// see http://www.java2s.com/Code/Java/Chart/JFreeChartOverlaidBarChartDemo.htm
+	private JFreeChart addLineChartOverBar(JFreeChart jfreechart, Object[] lineCharts, String lineLegend) throws QueryException {
+		// first we read data for bar series, so we have to go back at the start of the result set
+		try {
+			result.getResultSet().beforeFirst();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		isLineCombo = true;
+		lineBarDataset =  new DefaultCategoryDataset();						
+		boolean hasLegend = false;
+		for (int i = 0; i < lineCharts.length; i++) {
+			String legend = "";
+			try {
+				legend = replaceParameters(lineLegend);
+			} catch (IndexOutOfBoundsException ex){
+				// no legend set
+			}
+			if ((legend != null) && !"".equals(legend.trim())) {
+				hasLegend = true;
+			}						
+			lineCharts[i] = legend;			
+		}
+									
+		int index = chart.getYColumns().size()-1;
+		CategoryPlot plot = jfreechart.getCategoryPlot();  		
+        final LineAndShapeRenderer renderer2 = new LineAndShapeRenderer();       
+        plot.setRenderer(1, renderer2);
+        renderer2.setSeriesPaint(0, chart.getForegrounds().get(index));
+                  		     		     		
+	    final ValueAxis axis2 = new NumberAxis("");	    
+	    plot.setRangeAxis(1, axis2);
+	    plot.setDataset(1, lineBarDataset);
+	    plot.mapDatasetToRangeAxis(1, 1);
+	    plot.setDatasetRenderingOrder(DatasetRenderingOrder.FORWARD);
+	    
+	    boolean showValues = (chart.getShowYValuesOnChart() == null) ? false : chart.getShowYValuesOnChart();
+ 		DecimalFormat decimalFormat;
+ 		DecimalFormat percentageFormat;
+ 		if (chart.getYTooltipPattern() == null) {
+ 			decimalFormat = new DecimalFormat("#");
+ 			percentageFormat = new DecimalFormat("0.00%");
+ 		} else {
+ 			decimalFormat = new DecimalFormat(chart.getYTooltipPattern());
+ 			percentageFormat = decimalFormat;
+ 		}
+ 		if (showValues) {
+ 			renderer2.setSeriesItemLabelsVisible(0, true); 
+ 			renderer2.setSeriesItemLabelGenerator(0, new StandardCategoryItemLabelGenerator("{2}", decimalFormat, percentageFormat));
+			// increase a little bit the range axis to view all item label values over points
+			plot.getRangeAxis(1).setUpperMargin(0.2);
+		}
+					                
+        final HashMap<String, String> formatValues = createChart(chart.getYColumns().subList(index, index+1), plot.getRangeAxis(1), lineCharts);                        
+        
+        isLineCombo = false;
+        return jfreechart;               
+	}
+		
 	private JFreeChart createAreaChart() throws QueryException {
 		barDataset = new DefaultCategoryDataset();
 		String chartTitle = replaceParameters(chart.getTitle().getTitle());
@@ -688,6 +796,10 @@ public class JFreeChartExporter implements ChartExporter {
 		// legend label will contain the text and the value
 		plot.setLegendLabelGenerator(new StandardPieSectionLabelGenerator("{0} = {1}"));
 		
+		// no shadow
+		plot.setShadowXOffset(0);
+		plot.setShadowYOffset(0);
+		
 		DecimalFormat decimalformat;
 		DecimalFormat percentageFormat;
 		if (chart.getYTooltipPattern() == null) {
@@ -733,7 +845,11 @@ public class JFreeChartExporter implements ChartExporter {
 		jfreechart.setTitle(title);
 	}
 	
-	private HashMap<String, String> createChart(ValueAxis rangeAxis, Object[] charts) throws QueryException {       
+	private HashMap<String, String> createChart(ValueAxis rangeAxis, Object[] charts) throws QueryException {   
+		return createChart(chart.getYColumns(), rangeAxis, charts);
+	}
+	
+	private HashMap<String, String> createChart(List<String> yColumns, ValueAxis rangeAxis, Object[] charts) throws QueryException {       
         int row = 0;
         Object previous = null;
         String xColumn = chart.getXColumn();
@@ -750,15 +866,15 @@ public class JFreeChartExporter implements ChartExporter {
             functions[i] = FunctionFactory.getFunction(chart.getYFunction());
             index[i] = 1;
         }
-        boolean isStacked = (ChartType.STACKED_BAR == chart.getType().getType());
+        boolean isStacked = chart.getType().isStacked();
         
         while (result.hasNext()) {
         	
             Object[] objects = new Object[chartsNo];
             Number[] computedValues = new Number[chartsNo];            
             for (int i = 0; i < chartsNo; i++) {
-                if (chart.getYColumns().get(i) != null) {
-                    objects[i] = result.nextValue(chart.getYColumns().get(i));
+                if (yColumns.get(i) != null) {
+                    objects[i] = result.nextValue(yColumns.get(i));
                     Number value = null;
                     if (objects[i] instanceof Number) {
                         value = (Number) objects[i];
@@ -821,12 +937,12 @@ public class JFreeChartExporter implements ChartExporter {
                     	min = Math.min(min.doubleValue(), computedValues[i].doubleValue());
                     	max = Math.max(max.doubleValue(), computedValues[i].doubleValue());
                     } else {
-                    	sum = sum.doubleValue() + computedValues[i].doubleValue();
+                    	sum = sum.doubleValue() + computedValues[i].doubleValue();                    	
                     }
                 }       
                 if (isStacked) {
                     min = 0;
-                    max = Math.max(max.doubleValue(), sum.doubleValue());
+                    max = Math.max(max.doubleValue(), sum.doubleValue());                    
                 }
                 lastXValue = getStringValue(xColumn, xPattern);                
             }
@@ -866,29 +982,30 @@ public class JFreeChartExporter implements ChartExporter {
     }
 	
 	// take care if no function is set : every value is in a differnet category (we use an incremental integer : serie)
-	private void addValue(Object chartSerie, Number x, String lastXValue, Number y, HashMap<String, String> formatValues) {		
-		if (ChartType.LINE == chart.getType().getType()) {		
-			
+	private void addValue(Object chartSerie, Number x, String lastXValue, Number y, HashMap<String, String> formatValues) {			
+		if (chart.getType().isLine()) {					
 		   ((XYSeries)chartSerie).add(x, y);
-		   
-		} else if ((ChartType.BAR == chart.getType().getType()) || 
-				(ChartType.HORIZONTAL_BAR == chart.getType().getType()) || 
-				(ChartType.STACKED_BAR == chart.getType().getType()) || 
-				(ChartType.AREA == chart.getType().getType()) ) {
-			
-			int serie = 0;
-			Integer i = xValueSerie.get(lastXValue);
-			if (i != null) {
-				serie = i+1;
-				xValueSerie.put(lastXValue, serie);
-				barDataset.setValue(y, (String)chartSerie, lastXValue + " (" + serie + ")");		
-			} else {
+		} else if (isLineCombo) {			
+			lineBarDataset.addValue(y, (String)chartSerie, lastXValue);
+		} else if (!chart.getType().isPie()) {
+						
+			GFunction function = FunctionFactory.getFunction(chart.getYFunction());
+			if (!AbstractGFunction.NOOP.equals(function.getName())) {
 				barDataset.setValue(y, (String)chartSerie, lastXValue);
-				xValueSerie.put(lastXValue, 0);
-			}	
-			//barDataset.setValue(y, (String)chartSerie, lastXValue);
+			} else {			
+				int serie = 0;
+				Integer i = xValueSerie.get(lastXValue);
+				if (i != null) {
+					serie = i+1;
+					xValueSerie.put(lastXValue, serie);
+					barDataset.setValue(y, (String)chartSerie, lastXValue + " (" + serie + ")");		
+				} else {
+					barDataset.setValue(y, (String)chartSerie, lastXValue);
+					xValueSerie.put(lastXValue, 0);
+				}	
+			}
 			
-		} else if (ChartType.PIE == chart.getType().getType()) {
+		} else if (chart.getType().isPie()) {
 			if (AbstractGFunction.NOOP.equals(chart.getYFunction())) {
 				int serie = 0;
 				Integer i = xValueSerie.get(lastXValue);
