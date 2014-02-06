@@ -50,6 +50,7 @@ public class MySQLDialect extends AbstractDialect {
         registerColumnType("varchar", Types.VARCHAR);
         registerColumnType("text", Types.VARCHAR);
         registerColumnType("date", Types.DATE);
+        registerColumnType("time", Types.TIMESTAMP);
         registerColumnType("datetime", Types.TIMESTAMP);
         registerColumnType("timestamp", Types.TIMESTAMP);
         registerColumnType("blob", Types.BLOB);
