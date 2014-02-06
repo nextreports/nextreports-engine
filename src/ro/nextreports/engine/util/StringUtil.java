@@ -16,10 +16,13 @@
  */
 package ro.nextreports.engine.util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Writer;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -31,6 +34,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.sql.Clob;
 import java.sql.Timestamp;
 
 import ro.nextreports.engine.exporter.util.RomanNumberConverter;
@@ -63,9 +67,18 @@ public class StringUtil {
         }
         return sb.toString();
     }
-
+    
     public static void replaceInFile(File file, String oldText, String newText) {
-        Pattern p = Pattern.compile(oldText);
+    	replaceInFile(file, oldText, newText, true);
+    }
+
+    public static void replaceInFile(File file, String oldText, String newText, boolean casesensitive) {
+        Pattern p;
+        if (casesensitive) {
+        	p = Pattern.compile(oldText);
+        } else {
+        	p = Pattern.compile(oldText, Pattern.CASE_INSENSITIVE);
+        }
         Matcher m = p.matcher(getContents(file));
         StringBuffer sb = new StringBuffer();
         boolean result = m.find();
@@ -221,6 +234,43 @@ public class StringUtil {
                 return sfd.format(d);
             }
         }
+        
+		if (val instanceof Clob) {
+			Clob clob = (Clob) val;
+			InputStream is = null;
+			OutputStream os = null;
+			try {
+				is = clob.getAsciiStream();
+				byte[] buffer = new byte[4096];
+				os = new ByteArrayOutputStream();
+				while (true) {
+					int read = is.read(buffer);
+					if (read == -1) {
+						break;
+					}
+					os.write(buffer, 0, read);
+				}				
+				return os.toString();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				return "clob exception";
+			} finally {
+				if (os != null) {
+					try {
+						os.close();
+					} catch (IOException e) {					
+						e.printStackTrace();
+					}
+				}
+				if (is != null) {
+					try {
+						is.close();
+					} catch (IOException e) {					
+						e.printStackTrace();
+					}
+				}
+			}
+		}
         
         return val.toString();
     }
