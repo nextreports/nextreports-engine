@@ -10,3 +10,6 @@ ivy-report/
 CVS/
 src/ro/nextreports/engine/.cvsignore
 
+/bin
+/artifacts
+/lib
