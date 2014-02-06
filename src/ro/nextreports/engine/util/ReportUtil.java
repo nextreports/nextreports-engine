@@ -711,29 +711,84 @@ public class ReportUtil {
 	}
 
 	/**
-	 * Test if sql from a report object is valid
+	 * Test if sql from a report object and sql from all parameter sources (if any) are valid
 	 * 
-	 * @param con
-	 *            database connection
-	 * @param report
-	 *            report object
+	 * @param con database connection
+	 * @param report report object
 	 * @return true if sql is valid, false if it is not valid
 	 */
 	public static boolean isValidSql(Connection con, Report report) {
+		return (isValidSqlWithMessage(con, report) == null);
+	}
+	
+	/**
+	 * Test if sql from a report object and sql from all parameter sources (if any) are valid
+	 * 
+	 * @param con database connection
+	 * @param report report object
+	 * @return return message error if sql is not valid, null otherwise
+	 */
+	public static String isValidSqlWithMessage(Connection con, Report report) {
 		String sql = getSql(report);
+		List<QueryParameter> parameters = report.getParameters();
+		String message = isValidSqlWithMessage(con, sql, parameters);
+		if (message == null) {
+			for (QueryParameter qp : parameters) {
+				if (qp.isManualSource()) {
+					String parMessage = isValidSqlWithMessage(con, qp.getSource(), parameters);
+					if (parMessage != null) {
+						parMessage = "Parameter '" + qp.getName() + "'\n" + parMessage;
+						return parMessage;
+					}
+				}
+ 			}
+		} 
+		return message;		
+	}
+	
+	/**
+	 * Test if sql with parameters is valid
+	 * 
+	 * @param con database connection
+	 * @param sql sql
+	 * @return return message error if sql is not valid, null otherwise
+	 */
+	public static String isValidSqlWithMessage(Connection con, String sql, List<QueryParameter> parameters) {		
 		try {
 			QueryUtil qu = new QueryUtil(con, DialectUtil.getDialect(con));
-			Map<String, QueryParameter> params = new HashMap<String, QueryParameter>();
-			List<QueryParameter> parameters = report.getParameters();
+			Map<String, QueryParameter> params = new HashMap<String, QueryParameter>();			
 			for (QueryParameter qp : parameters) {
 				params.put(qp.getName(), qp);
 			}
 			qu.getColumnNames(sql, params);
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage(), ex);
-			return false;
+			return ex.getMessage();
 		}
-		return true;
+		return null;
+	}
+	
+	/**
+	 * Get subreports for a report
+	 * @param report current report
+	 * @return list of subreports
+	 */
+	public static List<Report> getSubreports(Report report) {
+		List<Report> subreports = new ArrayList<Report>();
+		
+		List<Band> bands = report.getLayout().getDocumentBands();
+		for (Band band : bands) {
+			for (int i = 0, rows = band.getRowCount(); i < rows; i++) {
+				List<BandElement> list = band.getRow(i);
+				for (int j = 0, size = list.size(); j < size; j++) {
+					BandElement be = list.get(j);
+					if (be instanceof ReportBandElement) {
+						subreports.add(((ReportBandElement)be).getReport());
+					}
+				}
+			}
+		}	
+		return subreports;
 	}
 
 	public static boolean isGroupBand(String bandName) {
