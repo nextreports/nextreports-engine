@@ -203,9 +203,14 @@ public class JsonHTML5Exporter implements ChartExporter {
         if (isCombo) {
         	// last column is line
         	size = chart.getYColumns().size()-1;
-        	List<List<Number>> lineDataList = new ArrayList<List<Number>>();        	
-        	lineDataList.add(new ArrayList<Number>());    
-        	nc.setLineData(lineDataList);
+        	if (size > 0) {
+        		List<List<Number>> lineDataList = new ArrayList<List<Number>>();        	
+        		lineDataList.add(new ArrayList<Number>());    
+        		nc.setLineData(lineDataList);
+        	} else {
+        		// is only one y column, put it to data (we cannot have a combo)        		
+                dataList.add(new ArrayList<Number>());                
+        	}
         }        
         for (int i=0; i<size; i++) {
         	dataList.add(new ArrayList<Number>());
@@ -360,7 +365,7 @@ public class JsonHTML5Exporter implements ChartExporter {
 
     private void addValue(Number value, String text, int position) {        	          
         if (ChartType.isCombo(chart.getType().getType())) {
-        	if (position == nc.getData().size()) {
+        	if ((position == nc.getData().size()) && (nc.getData().size() > 1)) {
         		nc.getLineData().get(0).add(value); 
         	} else {
         		nc.getData().get(position).add(value);  
