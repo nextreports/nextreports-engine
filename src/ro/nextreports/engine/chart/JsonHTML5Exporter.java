@@ -474,14 +474,17 @@ public class JsonHTML5Exporter implements ChartExporter {
 	
 	private void setLegends(boolean isCombo) {		
 		if ((chart.getYColumnsLegends() != null) && (chart.getYColumnsLegends().size() > 0) && 
-			!isEmpty(chart.getYColumnsLegends().get(0))) {
+			!isEmpty(chart.getYColumnsLegends().get(0))) {			
 			List<String> list = new ArrayList<String>();
 			int size = chart.getYColumnsLegends().size();
-			if (isCombo) {
+			if (chart.getYColumnsLegends().size() > chart.getYColumns().size()) {
+				size = chart.getYColumns().size();
+			}
+			if (isCombo) {				
 				if (size > 1) {
 					size--;
 					List<String> lineList = new ArrayList<String>();
-					lineList.add(replaceParameters(chart.getYColumnsLegends().get(size)));
+					lineList.add(replaceParameters(chart.getYColumnsLegends().get(size)));					
 					nc.setLineLegend(lineList);
 				}
 			}
