@@ -860,7 +860,9 @@ public class ReportUtil {
 								if (k > 0) {
 									band.insertColumn(pos);
 								}
-								Report newReport = ObjectCloner.silenceDeepCopy(report);
+								Report newReport = ObjectCloner.silenceDeepCopy(report);								
+								ReportLayout subReportLayout = ReportUtil.getReportLayoutForHeaderFunctions(newReport.getLayout());
+								newReport.setLayout(subReportLayout);
 								newReport.setName(report.getBaseName() + "_" + (k + 1) + ".report");
 								newReport.getGeneratedParamValues().put(columnName, in.getId());
 								band.setElementAt(new ReportBandElement(newReport), i, pos);
@@ -928,10 +930,12 @@ public class ReportUtil {
 	 * @return dynamic report layout
 	 * @throws Exception
 	 */
-	public static ReportLayout getDynamicReportLayout(Connection con, ReportLayout layout, ParametersBean pBean) throws Exception {
-		ReportLayout forConvertedLayout = ReportUtil.getForReportLayout(con, layout, pBean);
-        ReportLayout convertedLayout = ReportUtil.getReportLayoutForHeaderFunctions(forConvertedLayout);
-        return convertedLayout;
+	public static ReportLayout getDynamicReportLayout(Connection con, ReportLayout layout, ParametersBean pBean) throws Exception {		
+        ReportLayout convertedLayout = ReportUtil.getReportLayoutForHeaderFunctions(layout);
+        // IMPORTANT: must take for report layout at the end because we save some transient data 
+        // (see getForReportLayout: newReport.getGeneratedParamValues().put(columnName, in.getId());
+        ReportLayout forConvertedLayout = ReportUtil.getForReportLayout(con, convertedLayout, pBean);
+        return forConvertedLayout;
 	}
 	
 	/**
