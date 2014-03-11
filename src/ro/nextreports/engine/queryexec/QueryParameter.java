@@ -55,6 +55,8 @@ public class QueryParameter implements Serializable {
     public static final String SHORT_VALUE = "java.lang.Short";
     /** Value for BigDecimal java class */
     public static final String BIGDECIMAL_VALUE = "java.math.BigDecimal";
+    /** Value for BigInteger java class */
+    public static final String BIGINTEGER_VALUE = "java.math.BigInteger";
     /** Value for Object java class */
     public static final String OBJECT_VALUE = "java.lang.Object";
 
@@ -94,6 +96,7 @@ public class QueryParameter implements Serializable {
         LONG_VALUE,
         SHORT_VALUE,
         BIGDECIMAL_VALUE,
+        BIGINTEGER_VALUE,
         OBJECT_VALUE
     };
 

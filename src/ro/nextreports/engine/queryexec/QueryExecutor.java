@@ -17,6 +17,7 @@
 package ro.nextreports.engine.queryexec;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -661,6 +662,24 @@ public class QueryExecutor implements Runnable {
 					pstmt.setObject(index + 1, paramValue);
 				}
 			}
+        } else if (paramValueClass.equals(BigInteger.class)) {        	
+			if (paramValue == null) {
+				pstmt.setNull(index + 1, Types.BIGINT);
+			} else {
+				if (paramValue instanceof IdName) {
+                    Serializable ser = ((IdName) paramValue).getId();
+                    if (ser instanceof BigInteger) {
+                        pstmt.setBigDecimal(index + 1, new BigDecimal((BigInteger)(ser)));
+                    } else if (ser instanceof BigDecimal) {
+                        pstmt.setBigDecimal(index + 1, (BigDecimal)(ser));                        
+                    } else {
+                        pstmt.setInt(index + 1, (Integer)(ser));
+                    }
+                } else {
+                	// a simple value cannot be cast to BigDecimal!                	
+					pstmt.setObject(index + 1, paramValue);
+				}
+			}	
 		} else if (paramValueClass.equals(String.class)) {
 			if (paramValue == null) {
 				pstmt.setNull(index + 1, Types.VARCHAR);

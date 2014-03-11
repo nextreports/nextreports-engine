@@ -277,6 +277,8 @@ public class QueryUtil {
 			return "0";
 		} else if (QueryParameter.BIGDECIMAL_VALUE.equals(valueClassName)) {
 			return "0";
+		} else if (QueryParameter.BIGINTEGER_VALUE.equals(valueClassName)) {
+			return "0";
 		}
 
 		return "dummy";

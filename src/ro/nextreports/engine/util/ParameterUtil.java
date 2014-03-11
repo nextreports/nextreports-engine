@@ -38,6 +38,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
@@ -1062,6 +1063,8 @@ public class ParameterUtil {
                 result = Boolean.parseBoolean(value);
             } else if (QueryParameter.BIGDECIMAL_VALUE.equals(parameterClass)) {
                 result = new BigDecimal(value);
+            } else if (QueryParameter.BIGINTEGER_VALUE.equals(parameterClass)) {
+                result = new BigInteger(value);    
             } else if (QueryParameter.DATE_VALUE.equals(parameterClass)) {  
 				if (sdf == null) {
 					sdf = new SimpleDateFormat();
