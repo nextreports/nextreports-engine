@@ -160,8 +160,12 @@ public class JsonHTML5Exporter implements ChartExporter {
 			nc.setColorGridY(getHexColor(chart.getYGridColor()));
 		}
 		
-		// todo : customize tooltip message and tickCount?
+		// todo : customize tickCount?
 		nc.setTickCount(5);
+		
+		if ((chart.getTooltipMessage() != null) && ! chart.getTooltipMessage().trim().isEmpty()) {
+			nc.setMessage(chart.getTooltipMessage());
+		}
 
         boolean showXLabel = chart.getXShowLabel() == null ? false : chart.getXShowLabel();
         boolean showYLabel = chart.getYShowLabel() == null ? false : chart.getYShowLabel();
@@ -235,8 +239,7 @@ public class JsonHTML5Exporter implements ChartExporter {
         String lastXValue = "";
        
         int chartsNo = chart.getYColumns().size();  
-        boolean isStacked = nc.getType().equals(NextChart.Type.stackedbar) || nc.getType().equals(NextChart.Type.hstackedbar); 
-        boolean isPie = false; //todo
+        boolean isStacked = nc.getType().equals(NextChart.Type.stackedbar) || nc.getType().equals(NextChart.Type.hstackedbar);         
         
         GFunction[] functions = new GFunction[chartsNo];     
         for (int i = 0; i < chartsNo; i++) {
@@ -351,15 +354,13 @@ public class JsonHTML5Exporter implements ChartExporter {
             groups--;
         }               
 
-		// info labels
-		if (!isPie) {
-			for (int i = 1; i <= groups; i++) {
-				if (showXLabel) {
-					String text = infoLabels.get(i);				
-					nc.getLabels().add(text);
-				}
-			}
+		// info labels		
+		for (int i = 1; i <= groups; i++) {
+			String text = infoLabels.get(i);				
+			nc.getLabels().add(text);			
+			nc.setShowLabels(showXLabel);			
 		}
+		
     }       
    
 

@@ -75,6 +75,7 @@ public class Chart implements Serializable {
     // showYValuesOnChart has meaning for image, not for flash
     private Boolean showYValuesOnChart;
     private String yTooltipPattern;
+    private String tooltipMessage;
     private Font font;
     private Font xLabelFont;
     private Font yLabelFont;
@@ -300,8 +301,16 @@ public class Chart implements Serializable {
     public void setTransparency(byte transparency) {
         this.transparency = transparency;
     }
+        
+    public String getTooltipMessage() {
+		return tooltipMessage;
+	}
 
-    public ChartTitle getXLegend() {
+	public void setTooltipMessage(String tooltipMessage) {
+		this.tooltipMessage = tooltipMessage;
+	}
+
+	public ChartTitle getXLegend() {
         return xLegend;
     }
 
@@ -440,7 +449,7 @@ public class Chart implements Serializable {
 
         Chart chart = (Chart) o;
 
-        if (transparency != chart.transparency) return false;
+        if (transparency != chart.transparency) return false;        
         if (xorientation != chart.xorientation) return false;
         if (background != null ? !background.equals(chart.background) : chart.background != null) return false;
         if (foregrounds != null ? !foregrounds.equals(chart.foregrounds) : chart.foregrounds != null) return false;
@@ -473,6 +482,7 @@ public class Chart implements Serializable {
         if (yLabelFont != null ? !yLabelFont.equals(chart.yLabelFont) : chart.yLabelFont != null) return false;
         if (xAxisColor != null ? !xAxisColor.equals(chart.xAxisColor) : chart.xAxisColor != null) return false;
         if (yAxisColor != null ? !yAxisColor.equals(chart.yAxisColor) : chart.yAxisColor != null) return false;
+        if (tooltipMessage != null ? !tooltipMessage.equals(chart.tooltipMessage) : chart.tooltipMessage != null) return false;
 
         return true;
     }
@@ -511,6 +521,7 @@ public class Chart implements Serializable {
         result = 31 * result + (font != null ? font.hashCode() : 0);
         result = 31 * result + (xLabelFont != null ? xLabelFont.hashCode() : 0);
         result = 31 * result + (yLabelFont != null ? yLabelFont.hashCode() : 0);
+        result = 31 * result + (tooltipMessage != null ? tooltipMessage.hashCode() : 0);
         return result;
     }
 
@@ -544,6 +555,7 @@ public class Chart implements Serializable {
                 ", xShowLabel=" + xShowLabel +
                 ", yShowLabel=" + yShowLabel +
                 ", showYValuesOnChart=" + showYValuesOnChart +
+                ", tooltipMessage=" + tooltipMessage +
                 ", yTooltipPattern=" + yTooltipPattern +
                 ", font=" + font +
                 ", xLabelFont=" + xLabelFont +

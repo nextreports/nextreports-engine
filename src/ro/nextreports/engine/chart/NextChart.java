@@ -49,6 +49,7 @@ public class NextChart {
 	private String colorYaxis;
 	private boolean showGridX;
 	private boolean showGridY;
+	private boolean showLabels;
 	private String colorGridX;
 	private String colorGridY;
 	private String message;
@@ -169,6 +170,14 @@ public class NextChart {
 
 	public void setShowGridY(boolean showGridY) {
 		this.showGridY = showGridY;
+	}
+		
+	public boolean isShowLabels() {
+		return showLabels;
+	}
+
+	public void setShowLabels(boolean showLabels) {
+		this.showLabels = showLabels;
 	}
 
 	public String getColorGridX() {
