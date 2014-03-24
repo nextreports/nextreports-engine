@@ -247,18 +247,22 @@ public class JsonHTML5Exporter implements ChartExporter {
         }    
         int groups = 1;
         HashMap<Integer, String> infoLabels = new HashMap<Integer, String>();
-
+        List<String> categories = new ArrayList<String>();
         while (result.hasNext()) {        	
             Object[] objects = new Object[chartsNo];
-            Number[] computedValues = new Number[chartsNo];
+            Number[] computedValues = new Number[chartsNo];            
             for (int i = 0; i < chartsNo; i++) {
                 if (chart.getYColumns().get(i) != null) {
                     objects[i] = result.nextValue(chart.getYColumns().get(i));
                     Number value = null;
+                    String sv = null;
                     if (objects[i] instanceof Number) {
                         value = (Number) objects[i];
                     } else if (objects[i] != null) {
-                        value = 1;
+                    	if (ChartType.BUBBLE == chart.getType().getType()) {
+                    		sv = (String)objects[i];
+                    	} 
+                    	value = 1;                    	
                     }
                     if (value == null) {
                     	value = 0;
@@ -268,7 +272,10 @@ public class JsonHTML5Exporter implements ChartExporter {
                     // and bars are drawn over the title (a good stackedbarchart has not the values between "")
                     // curiously all other chart types have values between ""
                     // so here we assure that values are not BigDecimals
-                    computedValues[i] =  value.doubleValue();                                       
+                    computedValues[i] =  value.doubleValue();  
+                    if (sv != null) {
+                    	categories.add(sv);
+                    }
                 }
             }
 
@@ -361,6 +368,10 @@ public class JsonHTML5Exporter implements ChartExporter {
 			nc.setShowLabels(showXLabel);			
 		}
 		
+		if (!categories.isEmpty()) {
+			nc.setCategories(categories);
+		}
+		
     }       
    
 
@@ -434,6 +445,8 @@ public class JsonHTML5Exporter implements ChartExporter {
             nc.setType(NextChart.Type.line);
         } else if (ChartType.AREA == type) {        	
         	nc.setType(NextChart.Type.area);
+        } else if (ChartType.BUBBLE == type) {        	
+        	nc.setType(NextChart.Type.bubble);
         }                        
     }   
     

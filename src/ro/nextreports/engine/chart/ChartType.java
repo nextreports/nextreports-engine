@@ -38,6 +38,7 @@ public class ChartType implements Serializable {
     public static transient final byte AREA = 50;
     public static transient final byte BAR_COMBO = 60;
     public static transient final byte STACKED_BAR_COMBO = 61;
+    public static transient final byte BUBBLE = 70;
 
     // style for all types
     public static transient final byte STYLE_NORMAL = 1;
@@ -97,6 +98,10 @@ public class ChartType implements Serializable {
     
     public boolean isPie() {
         return (type == PIE);
+    }
+    
+    public boolean isBubble() {
+        return (type == BUBBLE);
     }
 
     public boolean isHorizontal() {

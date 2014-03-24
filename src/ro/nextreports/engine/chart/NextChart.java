@@ -28,7 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class NextChart {
 	
-	public static enum Type { bar, stackedbar, hbar, hstackedbar, line, area, pie, barcombo, stackedbarcombo };
+	public static enum Type { bar, stackedbar, hbar, hstackedbar, line, area, pie, barcombo, stackedbarcombo, bubble };
 	public static enum Style { normal, glass, cylinder, dome, parallelepiped, soliddot, hollowdot, anchordot, bowdot, stardot };
 	public static enum Orientation { horizontal, vertical, diagonal, halfdiagonal };
 	public static enum Alignment { left, center, right };
@@ -39,6 +39,7 @@ public class NextChart {
 	private Style style;
 	private String background;	
 	private List<String> labels = new ArrayList<String>();
+	private List<String> categories = new ArrayList<String>();
 	private Orientation labelOrientation;
 	private List<String> color = new ArrayList<String>();
 	private List<String> lineColor = new ArrayList<String>();
@@ -106,6 +107,14 @@ public class NextChart {
 
 	public void setLabels(List<String> labels) {
 		this.labels = labels;
+	}
+		
+	public List<String> getCategories() {
+		return categories;
+	}
+
+	public void setCategories(List<String> categories) {
+		this.categories = categories;
 	}
 
 	public Orientation getLabelOrientation() {
