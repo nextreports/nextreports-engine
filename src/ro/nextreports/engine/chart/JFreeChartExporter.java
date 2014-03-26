@@ -22,10 +22,12 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.FieldPosition;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,17 +48,22 @@ import org.jfree.chart.renderer.category.AreaRenderer;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.chart.renderer.category.StandardBarPainter;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.title.TextTitle;
 import org.jfree.data.Range;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.data.xy.DefaultXYZDataset;
+import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.HorizontalAlignment;
+import org.jfree.util.PublicCloneable;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.chart.labels.StandardXYItemLabelGenerator;
 import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
+import org.jfree.chart.labels.XYItemLabelGenerator;
 
 import ro.nextreports.engine.exporter.exception.NoDataFoundException;
 import ro.nextreports.engine.exporter.util.function.AbstractGFunction;
@@ -79,6 +86,8 @@ public class JFreeChartExporter implements ChartExporter {
     private DefaultCategoryDataset barDataset;
     private DefaultPieDataset pieDataset;
     private DefaultCategoryDataset lineBarDataset;
+    private DefaultXYZDataset bubbleDataset;    
+    private Map<String, XYZList> bubbleData = new LinkedHashMap<String, XYZList>();
     private String path;    
     private int width;
     private int height;
@@ -154,6 +163,8 @@ public class JFreeChartExporter implements ChartExporter {
         	jfreechart = createBarChart(true, true);
         } else if (ChartType.PIE == type) {
         	jfreechart = createPieChart();
+        } else if (ChartType.BUBBLE == type) {
+        	jfreechart = createBubbleChart();	
         } else if (ChartType.AREA == type) {
         	jfreechart = createAreaChart();
         } 
@@ -831,6 +842,181 @@ public class JFreeChartExporter implements ChartExporter {
 		return jfreechart;
 	}
 	
+	private JFreeChart createBubbleChart() throws QueryException {		
+		bubbleDataset = new DefaultXYZDataset();
+				
+		// x, y are inverted for jfree bubble chart!
+		// that's why we use minX & maxX values to compute Tu (tickUnit)
+		String chartTitle = replaceParameters(chart.getTitle().getTitle());
+		JFreeChart jfreechart = ChartFactory.createBubbleChart(
+				    chartTitle,
+				    replaceParameters(chart.getYLegend().getTitle()), // x-axis Label
+					replaceParameters(chart.getXLegend().getTitle()), // y-axis Label
+				    bubbleDataset, 
+				    PlotOrientation.HORIZONTAL,
+	                true, 
+	                true, 
+	                false);				
+		
+		// hide border
+		jfreechart.setBorderVisible(false);
+		
+		// title
+		setTitle(jfreechart);
+		
+		boolean showValues = (chart.getShowYValuesOnChart() == null) ? false : chart.getShowYValuesOnChart();
+		
+		XYPlot xyplot = (XYPlot) jfreechart.getPlot();
+		xyplot.setForegroundAlpha(transparency);
+		XYItemRenderer xyitemrenderer = xyplot.getRenderer();
+								
+		DecimalFormat decimalformat;   
+        DecimalFormat percentageFormat;
+        if (chart.getYTooltipPattern() == null) {
+        	decimalformat = new DecimalFormat("#");
+        	percentageFormat = new DecimalFormat("0.00%");
+		} else {
+			decimalformat = new DecimalFormat(chart.getYTooltipPattern());
+			percentageFormat = decimalformat;
+		}
+        
+        
+        if (showValues) {
+        	// increase a little bit the range axis to view all item label values over bars
+        	xyplot.getRangeAxis().setUpperMargin(0.2);
+        }
+        
+        // grid axis visibility & colors 
+        if ((chart.getXShowGrid() != null) && !chart.getXShowGrid()) {			
+        	xyplot.setDomainGridlinesVisible(false);                           
+        } else {        	
+        	if (chart.getXGridColor() != null) {        		
+        		xyplot.setDomainGridlinePaint(chart.getXGridColor());
+        	} else {        		
+        		xyplot.setDomainGridlinePaint(Color.BLACK);
+        	}
+        }
+        if ((chart.getYShowGrid() != null) && !chart.getYShowGrid()) {
+        	xyplot.setRangeGridlinesVisible(false);
+        } else {        	
+        	if (chart.getYGridColor() != null) {
+        		xyplot.setRangeGridlinePaint(chart.getYGridColor());
+        	} else {
+        		xyplot.setRangeGridlinePaint(Color.BLACK);
+        	}
+        }
+       
+        // chart background
+        xyplot.setBackgroundPaint(chart.getBackground());                
+        
+        // labels color
+        xyplot.getDomainAxis().setTickLabelPaint(chart.getXColor());
+        xyplot.getRangeAxis().setTickLabelPaint(chart.getYColor());
+        
+        // legend color
+        xyplot.getDomainAxis().setLabelPaint(chart.getXLegend().getColor());
+        xyplot.getRangeAxis().setLabelPaint(chart.getYLegend().getColor());
+        
+        // legend font
+        xyplot.getDomainAxis().setLabelFont(chart.getXLegend().getFont());
+        xyplot.getRangeAxis().setLabelFont(chart.getYLegend().getFont());
+        
+        // axis color
+        xyplot.getDomainAxis().setAxisLinePaint(chart.getxAxisColor());
+        xyplot.getRangeAxis().setAxisLinePaint(chart.getyAxisColor());
+        
+        // hide labels
+        if ((chart.getXShowLabel() != null) && !chart.getXShowLabel()) {        	
+        	xyplot.getDomainAxis().setTickLabelsVisible(false);
+        	xyplot.getDomainAxis().setTickMarksVisible(false);
+        }
+        if ((chart.getYShowLabel() != null) && !chart.getYShowLabel()) {
+        	xyplot.getRangeAxis().setTickLabelsVisible(false);
+        	xyplot.getRangeAxis().setTickMarksVisible(false);
+        }                              
+        
+        // label orientation
+        ValueAxis domainAxis = xyplot.getDomainAxis();        
+        if (chart.getXorientation() == Chart.VERTICAL) {
+        	domainAxis.setLabelAngle(Math.PI / 2);
+        } else if (chart.getXorientation() == Chart.DIAGONAL) {
+        	domainAxis.setLabelAngle(Math.PI / 4);
+        } else if (chart.getXorientation() == Chart.HALF_DIAGONAL) {
+        	domainAxis.setLabelAngle(Math.PI / 8);
+        }     
+        
+        // labels fonts
+        xyplot.getDomainAxis().setTickLabelFont(chart.getXLabelFont());
+        xyplot.getRangeAxis().setTickLabelFont(chart.getYLabelFont());
+				                                                      
+        createChart(xyplot.getRangeAxis(), new Object[4]);     
+        
+        double minX = Double.MAX_VALUE;
+        double maxX = Double.MIN_VALUE;
+        double minY = Double.MAX_VALUE;
+        double maxY = Double.MIN_VALUE;
+        double maxZ = Double.MIN_VALUE;
+        for (String serie : bubbleData.keySet()) {
+        	XYZList xyzList = bubbleData.get(serie);	
+        	List<Number> yList = xyzList.getyList();
+        	for (Number n : yList) {
+        		minY = Math.min(minY, n.doubleValue());
+        		maxY = Math.max(maxY, n.doubleValue());
+        	}    
+        	List<Number> xList = xyzList.getxList();
+        	for (Number n : xList) {
+        		minX = Math.min(minX, n.doubleValue());
+        		maxX = Math.max(maxX, n.doubleValue());
+        	}    
+        	List<Number> zList = xyzList.getzList();
+        	for (Number n : zList) {        		
+        		maxZ = Math.max(maxZ, n.doubleValue());
+        	}
+        }
+        
+        double tu = Math.floor((maxX-minX)/5 +0.5d);      
+        NumberTickUnit rUnit = new NumberTickUnit(tu);
+        ((NumberAxis) xyplot.getRangeAxis()).setTickUnit(rUnit);
+        
+        // make the bubble with text fit on X axis (which is shown vertically!)
+        xyplot.getDomainAxis().setUpperMargin(0.2);   
+        xyplot.getDomainAxis().setLowerMargin(0.2);
+        
+        for (String serie : bubbleData.keySet()) {
+			XYZList xyzList = bubbleData.get(serie);				
+			double[][] data = { getDoubleArray(xyzList.getyList()), getDoubleArray(xyzList.getxList()), getZDoubleArray(xyzList.getzList(), tu, maxZ) };
+			bubbleDataset.addSeries(serie, data);
+		}
+        
+        int series = bubbleData.keySet().size();
+        for (int i = 0; i < series; i++) {        	
+        	xyitemrenderer.setSeriesPaint(i, chart.getForegrounds().get(i));
+			if (showValues) {
+				xyitemrenderer.setSeriesItemLabelsVisible(i, true); 
+				xyitemrenderer.setSeriesItemLabelGenerator(i, new StandardXYItemLabelGenerator("{2}", decimalformat, percentageFormat));
+			}
+		}  
+
+        // show labels on bubbles
+        xyitemrenderer.setBaseItemLabelsVisible(true);
+		xyitemrenderer.setBaseItemLabelGenerator(new LegendXYItemLabelGenerator());
+		return jfreechart;
+	}
+	
+	public class LegendXYItemLabelGenerator extends StandardXYItemLabelGenerator implements XYItemLabelGenerator, Cloneable, PublicCloneable, Serializable {
+		
+		public LegendXYItemLabelGenerator() {
+		    super();		    
+		}
+		
+		@Override
+		public String generateLabel(XYDataset dataset, int series, int item) {					
+			String[] keys = new String[bubbleData.size()]; 
+			bubbleData.keySet().toArray(keys);
+			return bubbleData.get(keys[series]).getLabels().get(item);		    
+		}
+	}
+	
 	private void setTitle(JFreeChart jfreechart) {
 		TextTitle title = new TextTitle(replaceParameters(chart.getTitle().getTitle()));
 		title.setFont(chart.getTitle().getFont());
@@ -866,25 +1052,32 @@ public class JFreeChartExporter implements ChartExporter {
             functions[i] = FunctionFactory.getFunction(chart.getYFunction());
             index[i] = 1;
         }
-        boolean isStacked = chart.getType().isStacked();
-        
+        boolean isStacked = chart.getType().isStacked();        
         while (result.hasNext()) {
         	
             Object[] objects = new Object[chartsNo];
-            Number[] computedValues = new Number[chartsNo];            
+            Number[] computedValues = new Number[chartsNo];    
+            String currentCategory = null;
             for (int i = 0; i < chartsNo; i++) {
                 if (yColumns.get(i) != null) {
                     objects[i] = result.nextValue(yColumns.get(i));
                     Number value = null;
+                    String sv = null;
                     if (objects[i] instanceof Number) {
                         value = (Number) objects[i];
                     } else if (objects[i] != null){
+                    	if (ChartType.BUBBLE == chart.getType().getType()) {
+                    		sv = (String)objects[i];
+                    	} 
                         value = 1;
                         integerXValue = false;
                     } else {
                     	value = 0;
                     }
                     computedValues[i] = value;
+                    if (sv != null) {
+                    	currentCategory = sv;                      	
+                    }
                 }
             }
 
@@ -896,13 +1089,14 @@ public class JFreeChartExporter implements ChartExporter {
             } else {
                 xValue = previous;
             }            
-            Object newXValue = result.nextValue(xColumn);            
+            Object newXValue = result.nextValue(xColumn);
+            
 
             boolean add = false;
             int position = 0;
             // no function : add the value
             if (AbstractGFunction.NOOP.equals(functions[0].getName())) {        
-            	lastXValue = getStringValue(xColumn, xPattern);
+            	lastXValue = getStringValue(xColumn, xPattern);            	
                 add = true;
                 // compute function
             } else {
@@ -931,20 +1125,38 @@ public class JFreeChartExporter implements ChartExporter {
             		integerXValue = false;
             		n = index[position]++;
             	}
-                for (int i = 0; i < chartsNo; i++) {                  	
-                    addValue(charts[i], n, lastXValue, computedValues[i], formatValues);   
-                    if (!isStacked) {
-                    	min = Math.min(min.doubleValue(), computedValues[i].doubleValue());
-                    	max = Math.max(max.doubleValue(), computedValues[i].doubleValue());
-                    } else {
-                    	sum = sum.doubleValue() + computedValues[i].doubleValue();                    	
-                    }
-                }       
+            	if (chart.getType().isBubble()) {            		
+            		XYZList xyzList = bubbleData.get(currentCategory);
+            		if (xyzList == null) {
+            			xyzList = new XYZList();
+            			bubbleData.put(currentCategory, xyzList);            			
+            		}
+            		xyzList.getxList().add(computedValues[0]);
+            		xyzList.getyList().add(computedValues[1]);
+            		xyzList.getzList().add(computedValues[2]);            	    
+            		min = Math.min(min.doubleValue(), computedValues[0].doubleValue());
+                	max = Math.max(max.doubleValue(), computedValues[0].doubleValue());
+            	} else {   
+	                for (int i = 0; i < chartsNo; i++) {                  	
+	                    addValue(charts[i], n, lastXValue, computedValues[i], formatValues);   
+	                    if (!isStacked) {
+	                    	min = Math.min(min.doubleValue(), computedValues[i].doubleValue());
+	                    	max = Math.max(max.doubleValue(), computedValues[i].doubleValue());
+	                    } else {
+	                    	sum = sum.doubleValue() + computedValues[i].doubleValue();                    	
+	                    }
+	                }       
+            	}
                 if (isStacked) {
                     min = 0;
                     max = Math.max(max.doubleValue(), sum.doubleValue());                    
                 }
-                lastXValue = getStringValue(xColumn, xPattern);                
+                lastXValue = getStringValue(xColumn, xPattern);   
+                if (ChartType.BUBBLE == chart.getType().getType()) {
+                	XYZList xyzList = bubbleData.get(currentCategory);
+                	xyzList.getLabels().add(lastXValue);
+            		System.out.println("--- add label " + lastXValue);                
+                }
             }
             row++;
             previous = newXValue;            
@@ -976,8 +1188,9 @@ public class JFreeChartExporter implements ChartExporter {
             }
         }   
         
-        setAxisRange(rangeAxis, min, max);
         
+        setAxisRange(rangeAxis, min, max);
+
         return formatValues;       
     }
 	
@@ -1068,6 +1281,28 @@ public class JFreeChartExporter implements ChartExporter {
     	rangeAxis.setRange(new Range(yRange.getMin().doubleValue(), yRange.getMax().doubleValue()));
     }
     
+    private double[] getDoubleArray(List<Number> list) {
+    	double[] result = new double[list.size()];
+    	for (int i=0, size=list.size(); i<size; i++) {
+    		result[i] = list.get(i).doubleValue();
+    	}
+    	return result;
+    }
+      
     
-	
+    private double[] getZDoubleArray(List<Number> zList, double tu, double maxZ) {
+    	double[] result = new double[zList.size()];    	    	
+    	for (int i=0, size=zList.size(); i<size; i++) {
+    		result[i] = zList.get(i).doubleValue();    		
+    	}        	    		
+    	double minR = tu/12;
+		for (int i=0, size=zList.size(); i<size; i++) {			
+			result[i] = result[i] * tu / maxZ; 
+			if (result[i] < minR) {
+				result[i] = minR;
+			}					
+		}
+		return result;
+    }
+        	
 }

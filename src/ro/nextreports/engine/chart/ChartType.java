@@ -121,7 +121,7 @@ public class ChartType implements Serializable {
     }
 
     public static boolean hasNoFlashSupport(byte type) {
-    	return (type == HORIZONTAL_STACKED_BAR) || isCombo(type);
+    	return (type == HORIZONTAL_STACKED_BAR) || isCombo(type) || (type == BUBBLE);
     }
     
     public int hashCode() {
