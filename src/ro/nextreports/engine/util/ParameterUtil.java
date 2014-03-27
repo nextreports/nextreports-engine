@@ -170,6 +170,9 @@ public class ParameterUtil {
         try {
             stmt = con.createStatement();
             String sql;
+            if (columnName.contains(" ")) {
+            	columnName = dialect.getEscapedKeyWord(columnName);
+            }
             if (shownColumnName == null) {
                 sql = "SELECT DISTINCT " + columnName + " FROM " + fromTable + " WHERE " + columnName +
                         " IS NOT NULL ORDER BY " + columnName;

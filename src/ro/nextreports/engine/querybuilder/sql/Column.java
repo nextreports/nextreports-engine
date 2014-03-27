@@ -130,7 +130,11 @@ public class Column implements Outputable {
 				out.print('.');
 			}
 		}
-        out.print(getName());
+		if (getName().contains(" ") && (table.getDialect() != null)) {
+			out.print(table.getDialect().getEscapedKeyWord(getName()));
+		} else {
+			out.print(getName());
+		}
     }
 
     public String toString() {

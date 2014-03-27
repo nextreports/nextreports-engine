@@ -67,8 +67,13 @@ public class Table implements Outputable {
     public String getAlias() {
         return alias;
     }
+        
 
-    /**
+    public Dialect getDialect() {
+		return dialect;
+	}
+
+	/**
      * Get a column for a particular table.
      */
     public Column getColumn(String columnName) {
