@@ -42,6 +42,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ro.nextreports.engine.querybuilder.IdNameRenderer;
+import ro.nextreports.engine.querybuilder.sql.dialect.CSVDialect;
 import ro.nextreports.engine.querybuilder.sql.dialect.ConnectionUtil;
 import ro.nextreports.engine.querybuilder.sql.dialect.Dialect;
 import ro.nextreports.engine.querybuilder.sql.dialect.DialectException;
@@ -338,7 +339,7 @@ public class QueryExecutor implements Runnable {
                             resultSet = inputWrapper.statement.executeQuery();
                             
                             if (useLast && !cancelRequest && computeCount) {
-                            	if (dialect instanceof SQLiteDialect) {
+                            	if ((dialect instanceof SQLiteDialect) ||(dialect instanceof CSVDialect)) {
                             		// resultSet is forward only
                             		count = -1;
                             	} else {
