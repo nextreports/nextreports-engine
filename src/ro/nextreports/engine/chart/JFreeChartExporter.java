@@ -1154,8 +1154,7 @@ public class JFreeChartExporter implements ChartExporter {
                 lastXValue = getStringValue(xColumn, xPattern);   
                 if (ChartType.BUBBLE == chart.getType().getType()) {
                 	XYZList xyzList = bubbleData.get(currentCategory);
-                	xyzList.getLabels().add(lastXValue);
-            		System.out.println("--- add label " + lastXValue);                
+                	xyzList.getLabels().add(lastXValue);                
                 }
             }
             row++;
