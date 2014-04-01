@@ -110,6 +110,7 @@ import ro.nextreports.engine.queryexec.QueryExecutor;
 import ro.nextreports.engine.queryexec.QueryParameter;
 import ro.nextreports.engine.queryexec.QueryResult;
 import ro.nextreports.engine.util.PrefixSuffix;
+import ro.nextreports.engine.util.QueryUtil;
 import ro.nextreports.engine.util.ReportUtil;
 import ro.nextreports.engine.util.StringUtil;
 
@@ -720,10 +721,11 @@ public abstract class ResultExporter {
     }
 
     private void testForData() throws QueryException, NoDataFoundException {
-        // for procedure call we do not know the row count (is -1)
+        // for procedure call we do not know the row count (is -1)    	    	
         if (this.getOut() == null || this.getResult() == null
                 || getResult().getColumnCount() <= 0
-                || getResult().getRowCount() == 0) {
+                || getResult().getRowCount() == 0 
+                || getResult().isEmpty() ) {                        	
             throw new NoDataFoundException();
         }
     }
@@ -1847,8 +1849,9 @@ public abstract class ResultExporter {
 		executor.setMaxRows(0);
 		executor.setTimeout(bean.getQueryTimeout());
 		QueryResult queryResult = executor.execute();
+		boolean isProcedure = QueryUtil.isProcedureCall(sql);
 		ExporterBean eb = new ExporterBean(bean.getConnection(), bean.getQueryTimeout(), queryResult, bean.getOut(),
-				subreport.getLayout(), bean.getParametersBean(), subreport.getBaseName(), false);
+				subreport.getLayout(), bean.getParametersBean(), subreport.getBaseName(), false, isProcedure);
 		eb.setSubreport(true);
 		return eb;
 	}

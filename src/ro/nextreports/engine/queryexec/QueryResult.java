@@ -191,4 +191,19 @@ public class QueryResult {
         }
     }
     
+    /**
+     * Test if QueryResult is empty
+     * @return true if QueryResult is empty, false otherwise
+     */
+	public boolean isEmpty() {
+		try {
+			if (!resultSet.isBeforeFirst()) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+    
 }

@@ -36,16 +36,17 @@ public class ExporterBean {
 	private String fileName;
 	private boolean subreport;
 	private List<Alert> alerts;
+	private boolean isProcedure;
 	
 	public ExporterBean(Connection con, int queryTimeout, QueryResult result,
 			OutputStream out, ReportLayout reportLayout, ParametersBean pBean,
-			String fileName, boolean rawPrint) {
-		this(con, queryTimeout, result, out, reportLayout, pBean, fileName, rawPrint, null);
+			String fileName, boolean rawPrint, boolean isProcedure) {
+		this(con, queryTimeout, result, out, reportLayout, pBean, fileName, rawPrint, null, isProcedure);
 	}
 	
 	public ExporterBean(Connection con, int queryTimeout, QueryResult result,
 			OutputStream out, ReportLayout reportLayout, ParametersBean pBean,
-			String fileName, boolean rawPrint, List<Alert> alerts) {
+			String fileName, boolean rawPrint, List<Alert> alerts, boolean isProcedure) {
 		super();
 		this.con = con;
 		this.queryTimeout = queryTimeout;
@@ -56,6 +57,7 @@ public class ExporterBean {
 		this.fileName = fileName;
 		this.rawPrint = rawPrint;
 		this.alerts = alerts;
+		this.isProcedure = isProcedure;
 	}
 
 	public Connection getConnection() {
@@ -112,6 +114,14 @@ public class ExporterBean {
 	
 	public void setRawPrint(boolean rawPrint) {
 		this.rawPrint = rawPrint;
+	}
+		
+	public boolean isProcedure() {
+		return isProcedure;
+	}
+
+	public void setProcedure(boolean isProcedure) {
+		this.isProcedure = isProcedure;
 	}
 
 	public String getFileName() {

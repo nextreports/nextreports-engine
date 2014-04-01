@@ -339,8 +339,9 @@ public class ReportRunner implements Runner {
                         
             ReportLayout convertedLayout = ReportUtil.getDynamicReportLayout(connection, report.getLayout(), bean);
             
+            boolean isProcedure = QueryUtil.isProcedureCall(sql);
             createExporter( new ExporterBean(connection, queryTimeout, queryResult, stream, convertedLayout, 
-            								 bean, report.getBaseName(), false, alerts));
+            								 bean, report.getBaseName(), false, alerts, isProcedure));
 
             return exporter.export();
         } catch (NoDataFoundException e) {
