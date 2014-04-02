@@ -720,6 +720,8 @@ public abstract class ResultExporter {
         return null;
     }
 
+    // for ResultSet TYPE-FORWRD_ONLY (like Csv, SQLite) getResult().isEmpty does not work, so
+    // we also test in printContentBands to throw NoDataFoundException
     private void testForData() throws QueryException, NoDataFoundException {
         // for procedure call we do not know the row count (is -1)    	    	
         if (this.getOut() == null || this.getResult() == null
@@ -821,15 +823,17 @@ public abstract class ResultExporter {
         }
     }
 
-    private boolean printContentBands() throws QueryException {    	
+    private boolean printContentBands() throws QueryException, NoDataFoundException {    	
         int cols = getResult().getColumnCount();
         List<String> expNames = ReportUtil.getExpressionsNames(bean.getReportLayout());
         int expNo = expNames.size();
         previousRow = new Object[cols + expNo];
         int k = 0;
-        
+        boolean isEmpty = true;
         while (getResult().hasNext()) {        	        	
             
+        	isEmpty = false;
+        	
         	if (Thread.currentThread().isInterrupted() || isStopExport()) {
                 close();
                 setStopExport(false);
@@ -873,6 +877,10 @@ public abstract class ResultExporter {
             for (int i = cols; i < cols+expNo; i++) {
                 previousRow[i] = evaluateExpression(expressions.get(i-cols));
             }                               
+        }
+        
+        if (isEmpty) {
+        	throw new NoDataFoundException();
         }
 
         // footer for last groups

@@ -193,6 +193,7 @@ public class QueryResult {
     
     /**
      * Test if QueryResult is empty
+     * Should be called before starting to use the result set
      * @return true if QueryResult is empty, false otherwise
      */
 	public boolean isEmpty() {
@@ -201,6 +202,8 @@ public class QueryResult {
 				return true;
 			}
 		} catch (SQLException e) {
+			// will fail for TYPE_FORWARD_ONLY result set
+			// we will test also in ResultExporter printContentBands() to throw or not NoDataFoundException
 			e.printStackTrace();
 		}
 		return false;
