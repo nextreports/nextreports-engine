@@ -61,6 +61,7 @@ public class MSSQLDialect extends AbstractDialect {
         registerColumnType("smallmoney", Types.DECIMAL);        
         registerColumnType("blob", Types.BLOB);
         registerColumnType("varbinary", Types.BLOB);
+        registerColumnType("image", Types.BLOB);
         registerColumnType("clob", Types.CLOB);
     }
 
