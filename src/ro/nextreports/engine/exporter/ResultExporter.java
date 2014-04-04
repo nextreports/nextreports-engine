@@ -18,6 +18,7 @@ package ro.nextreports.engine.exporter;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -1510,6 +1511,20 @@ public abstract class ResultExporter {
     protected int[] getRealImageSize(String image) {
         InputStream is = getClass().getResourceAsStream("/" + image);
         int[] result = new int[2];
+        try {
+            BufferedImage img = ImageIO.read(is);
+            result[0] = img.getWidth();
+            result[1] = img.getHeight();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            LOG.error(ex.getMessage(), ex);
+        }
+        return result;
+    }
+    
+    protected int[] getRealImageSize(byte[] image) {    	    	
+    	InputStream is = new ByteArrayInputStream(image);
+    	int[] result = new int[2];
         try {
             BufferedImage img = ImageIO.read(is);
             result[0] = img.getWidth();

@@ -17,6 +17,7 @@
 package ro.nextreports.engine.exporter;
 
 import java.awt.Color;
+import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import ro.nextreports.engine.Report;
 import ro.nextreports.engine.ReportLayout;
 import ro.nextreports.engine.band.Band;
 import ro.nextreports.engine.band.BandElement;
+import ro.nextreports.engine.band.ColumnBandElement;
 import ro.nextreports.engine.band.ExpressionBandElement;
 import ro.nextreports.engine.band.Hyperlink;
 import ro.nextreports.engine.band.HyperlinkBandElement;
@@ -266,8 +268,20 @@ public class RtfExporter extends ResultExporter {
 				}
 				specialCell = true;
 			}
+		} else if ((bandElement instanceof ColumnBandElement) && (value instanceof Blob) ){
+        	try {        		
+        		String v = StringUtil.getValueAsString(value, null);
+        		if(StringUtil.BLOB.equals(v)) {
+        			cell = new RtfCell(new Phrase(StringUtil.BLOB));
+        		} else {
+	        		byte[] imageBytes = StringUtil.decodeImage(v); 									
+					cell = new RtfCell(Image.getInstance(imageBytes));
+        		}        		
+			} catch (Exception e) {						
+				cell = new RtfCell(IMAGE_NOT_LOADED);
+			}
+        	specialCell = true;
 		}
-
 		if (!specialCell) {
 			if (style.containsKey(StyleFormatConstants.PATTERN)) {
 				stringValue = StringUtil.getValueAsString(value, (String) style.get(StyleFormatConstants.PATTERN));

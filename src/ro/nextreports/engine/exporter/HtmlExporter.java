@@ -18,6 +18,7 @@ package ro.nextreports.engine.exporter;
 
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.sql.Blob;
 import java.util.Map;
 import java.util.List;
 import java.util.Set;
@@ -28,6 +29,7 @@ import ro.nextreports.engine.Report;
 import ro.nextreports.engine.ReportLayout;
 import ro.nextreports.engine.band.Band;
 import ro.nextreports.engine.band.BandElement;
+import ro.nextreports.engine.band.ColumnBandElement;
 import ro.nextreports.engine.band.Hyperlink;
 import ro.nextreports.engine.band.HyperlinkBandElement;
 import ro.nextreports.engine.band.ImageBandElement;
@@ -238,6 +240,21 @@ public class HtmlExporter extends ResultExporter {
 					eb.getResult().close();
 				}
 			}
+        } else if ((bandElement instanceof ColumnBandElement) && (value instanceof Blob) ){
+        	   		
+    		String v = StringUtil.getValueAsString(value, null);
+    		if(StringUtil.BLOB.equals(v)) {
+    			sb.append(StringUtil.BLOB);            			
+    		} else {
+        		byte[] imageBytes = StringUtil.decodeImage(v); 									
+        		sb.append("<img src=\"data:image/jpg;base64,").append(v).append("\"");
+//                if (ibe.isScaled()) {
+//                    sb.append(" width=\"").append(ibe.getWidth()).append("\"");
+//                    sb.append(" height=\"").append(ibe.getHeight()).append("\"");
+//                }
+                sb.append(" alt=\"").append(IMAGE_NOT_LOADED).append("\"></img>");
+    		}        		
+		
         } else {
             sb.append(val);
         }

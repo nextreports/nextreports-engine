@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.sql.Blob;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -63,6 +64,7 @@ import ro.nextreports.engine.ReportLayout;
 import ro.nextreports.engine.band.Band;
 import ro.nextreports.engine.band.BandElement;
 import ro.nextreports.engine.band.Border;
+import ro.nextreports.engine.band.ColumnBandElement;
 import ro.nextreports.engine.band.ExpressionBandElement;
 import ro.nextreports.engine.band.FieldBandElement;
 import ro.nextreports.engine.band.Hyperlink;
@@ -579,6 +581,37 @@ public class XlsExporter extends ResultExporter {
     					eb.getResult().close();
     				}
     			}    
+        	} else if ((bandElement instanceof ColumnBandElement) && (value instanceof Blob) ){
+            	try {        		
+            		String v = StringUtil.getValueAsString(value, null);
+            		if(StringUtil.BLOB.equals(v)) {
+            			c.setCellType(HSSFCell.CELL_TYPE_STRING);
+                        c.setCellValue(new HSSFRichTextString(StringUtil.BLOB));            			
+            		} else {
+    	        		byte[] imageBytes = StringUtil.decodeImage(v); 									
+    	        		HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, (short) sheetColumn, sheetRow,
+                                (short) (sheetColumn + colSpan), (sheetRow + rowSpan));
+                        int index = wb.addPicture(imageBytes, HSSFWorkbook.PICTURE_TYPE_JPEG);
+
+                        // image is created over the cells, so if it's height is bigger we set the row height
+                        short height = xlsRow.getHeight();
+                        int realImageHeight = getRealImageSize(imageBytes)[1];                       
+                        short imageHeight = (short)(realImageHeight * POINTS_FOR_PIXEL/2.5);                        
+                        if (imageHeight > height)  {
+                            xlsRow.setHeight(imageHeight);
+                        }
+
+                        HSSFPicture picture = patriarch.createPicture(anchor, index);
+                        picture.resize();
+                        anchor.setAnchorType(2);
+            		}        		
+    			} catch (Exception e) {		
+    				e.printStackTrace();
+    				c.setCellType(HSSFCell.CELL_TYPE_STRING);
+                    c.setCellValue(new HSSFRichTextString(IMAGE_NOT_LOADED));
+    			}
+            	
+                
             } else {
             	            	            	
                 if (value == null) {

@@ -28,6 +28,11 @@ import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.PdfPTable;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -39,6 +44,7 @@ import ro.nextreports.engine.Report;
 import ro.nextreports.engine.ReportLayout;
 import ro.nextreports.engine.band.Band;
 import ro.nextreports.engine.band.BandElement;
+import ro.nextreports.engine.band.ColumnBandElement;
 import ro.nextreports.engine.band.Hyperlink;
 import ro.nextreports.engine.band.HyperlinkBandElement;
 import ro.nextreports.engine.band.ImageBandElement;
@@ -305,7 +311,22 @@ public class PdfExporter extends ResultExporter {
 				cell = new PdfPCell(Image.getInstance(total));
 			} catch (BadElementException e) {
 				cell = new PdfPCell(new Phrase("NA"));
-			}                			    		     
+			}   
+        	
+        } else if ((bandElement instanceof ColumnBandElement) && (value instanceof Blob) ){
+        	try {        		
+        		String v = StringUtil.getValueAsString(value, null);
+        		if(StringUtil.BLOB.equals(v)) {
+        			cell = new PdfPCell(new Phrase(StringUtil.BLOB));
+        		} else {
+	        		byte[] bytes = StringUtil.decodeImage(v); 
+					Image pdfImage = Image.getInstance(bytes);				
+					cell = new PdfPCell(pdfImage);
+        		}        		
+			} catch (Exception e) {		
+				e.printStackTrace();
+				cell = new PdfPCell(new Phrase(IMAGE_NOT_LOADED));
+			}
         } else {
             String stringValue;
             if (style.containsKey(StyleFormatConstants.PATTERN)) {

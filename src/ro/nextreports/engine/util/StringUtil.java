@@ -34,8 +34,11 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Timestamp;
+
+import com.thoughtworks.xstream.core.util.Base64Encoder;
 
 import ro.nextreports.engine.exporter.util.RomanNumberConverter;
 import ro.nextreports.engine.exporter.util.StyleFormatConstants;
@@ -49,6 +52,8 @@ import ro.nextreports.engine.queryexec.IdName;
  * Time: 6:05:51 PM
  */
 public class StringUtil {
+	
+	public static String BLOB = "blob";
 
     public static String capitalize(String str) {
         StringBuilder sb = new StringBuilder();
@@ -271,6 +276,23 @@ public class StringUtil {
 				}
 			}
 		}
+		
+		// if blob is image get the bytes as Base64 String
+		if (val instanceof Blob) {
+			Blob blob = (Blob) val;
+			try {
+				byte[] bytes = blob.getBytes(1, (int)blob.length());
+				String hex = byteArrayToHex( bytes );
+				if (isImage(hex)) {
+					String ret =  encodeImage(bytes);										
+					return ret;
+				} else {					
+					return BLOB;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			} 
+		}
         
         return val.toString();
     }
@@ -313,6 +335,52 @@ public class StringUtil {
 			return new PrefixSuffix(prefix, suffix);
 		}
 		return null;
+	}
+	
+	 /**
+     * Encodes the byte array into base64 string
+     *
+     * @param imageByteArray - byte array
+     * @return String a {@link java.lang.String}
+     */
+    public static String encodeImage(byte[] imageByteArray) {
+        return new Base64Encoder().encode(imageByteArray);
+    }
+     
+    /**
+     * Decodes the base64 string into byte array
+     *
+     * @param imageDataString - a {@link java.lang.String}
+     * @return byte array
+     */
+    public static byte[] decodeImage(String imageDataString) {
+        return new Base64Encoder().decode(imageDataString);
+    }
+
+    // PNGs start with: 89 50 4E 47 0D 0A 1A 0A ; see http://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html
+    // GIFs start with 47 49 46 38 37 61 (GIF87a) or 47 49 46 38 39 61 (GIF89a) ; see http://www.fileformat.info/format/gif/egff.htm
+    // JPEGs start with FF D8 FF E0 xx xx 4A 46 49 46 00
+    private static boolean isImage(String hexString) {
+    	boolean isImage = false;
+    	//png
+    	if (hexString.startsWith("89504e470d0a1a0a")) {    		
+    		isImage = true;
+    	//gif	
+    	} else if (hexString.startsWith("474946383761") || hexString.startsWith("474946383961")) {    		
+    		isImage = true;
+    	// jpeg	
+    	} else if (hexString.startsWith("ffd8ffe0")) {    		
+    		isImage = true;
+    	}
+    	return isImage;    	
+    }
+    
+	private static String byteArrayToHex(byte[] a) {
+		StringBuilder sb = new StringBuilder();
+		for (byte b : a) {
+			sb.append(String.format("%02x", b & 0xff));
+		}	
+		return sb.toString().toLowerCase();
 	}
 
 
