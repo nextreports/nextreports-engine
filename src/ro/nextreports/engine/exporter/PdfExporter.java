@@ -28,11 +28,6 @@ import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.PdfPTable;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -44,10 +39,10 @@ import ro.nextreports.engine.Report;
 import ro.nextreports.engine.ReportLayout;
 import ro.nextreports.engine.band.Band;
 import ro.nextreports.engine.band.BandElement;
-import ro.nextreports.engine.band.ColumnBandElement;
 import ro.nextreports.engine.band.Hyperlink;
 import ro.nextreports.engine.band.HyperlinkBandElement;
 import ro.nextreports.engine.band.ImageBandElement;
+import ro.nextreports.engine.band.ImageColumnBandElement;
 import ro.nextreports.engine.band.Padding;
 import ro.nextreports.engine.band.PaperSize;
 import ro.nextreports.engine.band.ReportBandElement;
@@ -242,41 +237,8 @@ public class PdfExporter extends ResultExporter {
             } else {
                 ImageBandElement ibe = (ImageBandElement)bandElement;               
                 try {
-
                     byte[] imageBytes = getImage((String) value);
-                    Image pdfImage = Image.getInstance(imageBytes);
-                    Integer width = ibe.getWidth();
-                    Integer height = ibe.getHeight();
-                    if (ibe.isScaled()) {
-
-                        // scale image (is done in postscript points)
-                        // if use size
-                        //      if width is less than the cell width (with span)
-                        //      the image is added with its size :
-                        //              new PdfPCell(pdfImage) -> no further scale
-                        //      if width is greater than cell width (with span)
-                        //      the image will fit the cell :
-                        //              cell.setImage(pdfImage); -> does a scale to fit cell
-                        // if do not use size
-                        //      the image will be added with its size
-
-                        float factor = 72f * percentage / (getDPI() * 100);
-                        pdfImage.scaleAbsolute(width * factor, height * factor);
-
-                        int cellWidth = 0;
-                        for (int i = column; i < column + colSpan; i++) {
-                            cellWidth += headerwidths[i];
-                        }
-                        if ((width.intValue() >= cellWidth) && bean.getReportLayout().isUseSize()) {
-                            cell = new PdfPCell();
-                            cell.setImage(pdfImage);  // scale to fit cell
-                        } else {
-                            cell = new PdfPCell(pdfImage); // do not scale
-                        }
-                    } else {
-                        cell = new PdfPCell(pdfImage);
-                    }
-
+                    cell = getImageCell(ibe, imageBytes, column, colSpan);
                 } catch (Exception e) {
                     cell = new PdfPCell(new Phrase(IMAGE_NOT_LOADED));
                 }
@@ -313,15 +275,14 @@ public class PdfExporter extends ResultExporter {
 				cell = new PdfPCell(new Phrase("NA"));
 			}   
         	
-        } else if ((bandElement instanceof ColumnBandElement) && (value instanceof Blob) ){
+        } else if (bandElement instanceof ImageColumnBandElement) {
         	try {        		
         		String v = StringUtil.getValueAsString(value, null);
         		if(StringUtil.BLOB.equals(v)) {
         			cell = new PdfPCell(new Phrase(StringUtil.BLOB));
-        		} else {
-	        		byte[] bytes = StringUtil.decodeImage(v); 
-					Image pdfImage = Image.getInstance(bytes);				
-					cell = new PdfPCell(pdfImage);
+        		} else {        			
+	        		byte[] bytes = StringUtil.decodeImage(v);
+	        		cell = getImageCell(bandElement, bytes, column, colSpan);
         		}        		
 			} catch (Exception e) {		
 				e.printStackTrace();
@@ -679,6 +640,84 @@ public class PdfExporter extends ResultExporter {
     
     public PdfPTable getTable() {
     	return table;
+    }
+    
+	private PdfPCell getImageCell(BandElement bandElement, byte[] imageBytes, int column, int colSpan) {
+		PdfPCell cell;
+		try {			
+			Image pdfImage = Image.getInstance(imageBytes);
+			Integer width = getImageWidth(bandElement);
+			Integer height = getImageHeight(bandElement);
+			if (isScaled(bandElement)) {
+
+				// scale image (is done in postscript points)
+				// if use size
+				// if width is less than the cell width (with span)
+				// the image is added with its size :
+				// new PdfPCell(pdfImage) -> no further scale
+				// if width is greater than cell width (with span)
+				// the image will fit the cell :
+				// cell.setImage(pdfImage); -> does a scale to fit cell
+				// if do not use size
+				// the image will be added with its size
+
+				float factor = 72f * percentage / (getDPI() * 100);
+				pdfImage.scaleAbsolute(width * factor, height * factor);
+
+				int cellWidth = 0;
+				for (int i = column; i < column + colSpan; i++) {
+					cellWidth += headerwidths[i];
+				}
+				if ((width.intValue() >= cellWidth) && bean.getReportLayout().isUseSize()) {
+					cell = new PdfPCell();
+					cell.setImage(pdfImage); // scale to fit cell
+				} else {
+					cell = new PdfPCell(pdfImage); // do not scale
+				}
+			} else {
+				cell = new PdfPCell(pdfImage);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			cell = new PdfPCell(new Phrase(IMAGE_NOT_LOADED));
+		}
+
+		return cell;
+	}
+    
+    private int getImageWidth(BandElement be) {    	
+    	Integer width = null;
+    	if (be instanceof ImageBandElement) {
+    		width = ((ImageBandElement)be).getWidth();
+    	} else {
+    		width = ((ImageColumnBandElement)be).getWidth();
+    	}
+    	if (width == null) {
+    		width = 0;
+    	}
+    	return width;
+    }
+    
+    private int getImageHeight(BandElement be) {
+    	Integer height = null;
+    	if (be instanceof ImageBandElement) {
+    		height =  ((ImageBandElement)be).getHeight();
+    	} else {
+    		height = ((ImageColumnBandElement)be).getHeight();
+    	}
+    	if (height == null) {
+    		height = 0;
+    	}
+    	return height;
+    }
+    
+    private boolean isScaled(BandElement be) {
+    	if (be instanceof ImageBandElement) {
+    		return ((ImageBandElement)be).isScaled();
+    	} else {
+    		return ((ImageColumnBandElement)be).isScaled();
+    	}
     }
 
 }

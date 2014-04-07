@@ -70,6 +70,7 @@ import ro.nextreports.engine.band.FieldBandElement;
 import ro.nextreports.engine.band.Hyperlink;
 import ro.nextreports.engine.band.HyperlinkBandElement;
 import ro.nextreports.engine.band.ImageBandElement;
+import ro.nextreports.engine.band.ImageColumnBandElement;
 import ro.nextreports.engine.band.ReportBandElement;
 import ro.nextreports.engine.band.VariableBandElement;
 import ro.nextreports.engine.exporter.util.ExcelColorSupport;
@@ -581,21 +582,26 @@ public class XlsExporter extends ResultExporter {
     					eb.getResult().close();
     				}
     			}    
-        	} else if ((bandElement instanceof ColumnBandElement) && (value instanceof Blob) ){
+        	} else if (bandElement instanceof ImageColumnBandElement){
             	try {        		
+            		ImageColumnBandElement icbe = (ImageColumnBandElement)bandElement;
             		String v = StringUtil.getValueAsString(value, null);
             		if(StringUtil.BLOB.equals(v)) {
             			c.setCellType(HSSFCell.CELL_TYPE_STRING);
                         c.setCellValue(new HSSFRichTextString(StringUtil.BLOB));            			
             		} else {
-    	        		byte[] imageBytes = StringUtil.decodeImage(v); 									
+    	        		byte[] imageD = StringUtil.decodeImage(v);
+    	        		byte[] imageBytes = getImage(imageD, icbe.getWidth(), icbe.getHeight());
     	        		HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, (short) sheetColumn, sheetRow,
                                 (short) (sheetColumn + colSpan), (sheetRow + rowSpan));
                         int index = wb.addPicture(imageBytes, HSSFWorkbook.PICTURE_TYPE_JPEG);
 
                         // image is created over the cells, so if it's height is bigger we set the row height
                         short height = xlsRow.getHeight();
-                        int realImageHeight = getRealImageSize(imageBytes)[1];                       
+                        int realImageHeight = getRealImageSize(imageBytes)[1];   
+                        if (icbe.isScaled()) {
+                            realImageHeight = icbe.getHeight();
+                        }
                         short imageHeight = (short)(realImageHeight * POINTS_FOR_PIXEL/2.5);                        
                         if (imageHeight > height)  {
                             xlsRow.setHeight(imageHeight);

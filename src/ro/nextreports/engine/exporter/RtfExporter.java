@@ -17,7 +17,6 @@
 package ro.nextreports.engine.exporter;
 
 import java.awt.Color;
-import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,11 +27,11 @@ import ro.nextreports.engine.Report;
 import ro.nextreports.engine.ReportLayout;
 import ro.nextreports.engine.band.Band;
 import ro.nextreports.engine.band.BandElement;
-import ro.nextreports.engine.band.ColumnBandElement;
 import ro.nextreports.engine.band.ExpressionBandElement;
 import ro.nextreports.engine.band.Hyperlink;
 import ro.nextreports.engine.band.HyperlinkBandElement;
 import ro.nextreports.engine.band.ImageBandElement;
+import ro.nextreports.engine.band.ImageColumnBandElement;
 import ro.nextreports.engine.band.Padding;
 import ro.nextreports.engine.band.PaperSize;
 import ro.nextreports.engine.band.ReportBandElement;
@@ -268,13 +267,15 @@ public class RtfExporter extends ResultExporter {
 				}
 				specialCell = true;
 			}
-		} else if ((bandElement instanceof ColumnBandElement) && (value instanceof Blob) ){
+		} else if (bandElement instanceof ImageColumnBandElement){
         	try {        		
         		String v = StringUtil.getValueAsString(value, null);
         		if(StringUtil.BLOB.equals(v)) {
         			cell = new RtfCell(new Phrase(StringUtil.BLOB));
         		} else {
-	        		byte[] imageBytes = StringUtil.decodeImage(v); 									
+        			ImageColumnBandElement icbe = (ImageColumnBandElement) bandElement;
+	        		byte[] imageD = StringUtil.decodeImage(v); 			
+	        		byte[] imageBytes = getImage(imageD, icbe.getWidth(), icbe.getHeight());
 					cell = new RtfCell(Image.getInstance(imageBytes));
         		}        		
 			} catch (Exception e) {						

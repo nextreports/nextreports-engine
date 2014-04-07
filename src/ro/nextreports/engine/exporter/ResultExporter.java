@@ -1541,6 +1541,15 @@ public abstract class ResultExporter {
         if (is == null) {
             throw new IOException("Image '" + image + "' not found.");
         }
+        return getScaledImage(is, image, width, height);
+    }
+    
+    protected byte[] getScaledImage(byte[] image, int width, int height) throws IOException {
+        InputStream is = new ByteArrayInputStream(image);       
+        return getScaledImage(is, " from db ", width, height);
+    }
+    
+    protected byte[] getScaledImage(InputStream is, String name, int width, int height) throws IOException {        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             BufferedImage img = ImageIO.read(is);
@@ -1566,7 +1575,7 @@ public abstract class ResultExporter {
         } catch (IOException ex) {
             ex.printStackTrace();
             LOG.error(ex.getMessage(), ex);
-            throw new IOException("Image '" + image + "' could not be scaled.");
+            throw new IOException("Image '" + name + "' could not be scaled.");
         } finally {
             is.close();
         }
@@ -1577,6 +1586,16 @@ public abstract class ResultExporter {
         byte[] imageBytes;
         if ((width == null) || (width.intValue() == 0) || (height == null) || (height.intValue() == 0)) {
             imageBytes = getImage(image);
+        } else {
+            imageBytes = getScaledImage(image, width, height);
+        }
+        return imageBytes;
+    }
+    
+    protected byte[] getImage(byte[] image, Integer width, Integer height) throws IOException {
+        byte[] imageBytes;
+        if ((width == null) || (width.intValue() == 0) || (height == null) || (height.intValue() == 0)) {
+            imageBytes = image;
         } else {
             imageBytes = getScaledImage(image, width, height);
         }

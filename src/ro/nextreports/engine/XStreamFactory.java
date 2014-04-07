@@ -30,6 +30,7 @@ import ro.nextreports.engine.band.ForReportBandElement;
 import ro.nextreports.engine.band.FunctionBandElement;
 import ro.nextreports.engine.band.HyperlinkBandElement;
 import ro.nextreports.engine.band.ImageBandElement;
+import ro.nextreports.engine.band.ImageColumnBandElement;
 import ro.nextreports.engine.band.ParameterBandElement;
 import ro.nextreports.engine.band.ReportBandElement;
 import ro.nextreports.engine.band.RowElement;
@@ -145,6 +146,7 @@ public class XStreamFactory {
         xstream.alias("exp-band-element", ExpressionBandElement.class);
         xstream.alias("func-band-element", FunctionBandElement.class);
         xstream.alias("image-band-element", ImageBandElement.class);
+        xstream.alias("image-col-band-element", ImageColumnBandElement.class);
         xstream.alias("chart-band-element", ChartBandElement.class);
         xstream.alias("report-band-element", ReportBandElement.class);
         xstream.alias("for-report-band-element", ForReportBandElement.class);
