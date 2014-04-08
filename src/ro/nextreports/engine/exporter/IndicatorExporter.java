@@ -17,6 +17,7 @@
 package ro.nextreports.engine.exporter;
 
 import java.awt.Color;
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -81,6 +82,8 @@ public class IndicatorExporter extends ResultExporter {
                 		data.setValue((Integer)value);
                 	} else if (value instanceof Long) {
                 		data.setValue((Long)value);
+                	} else if (value instanceof BigDecimal) {
+                		data.setValue(((BigDecimal)value).doubleValue());	
                 	} else {
                 		data.setValue((Double)value);
                 	}                	
