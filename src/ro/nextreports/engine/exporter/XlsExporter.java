@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.sql.Blob;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -35,6 +34,8 @@ import java.util.HashSet;
 import java.util.Date;
 import java.awt.*;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.poi.hssf.model.InternalSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
@@ -64,7 +65,6 @@ import ro.nextreports.engine.ReportLayout;
 import ro.nextreports.engine.band.Band;
 import ro.nextreports.engine.band.BandElement;
 import ro.nextreports.engine.band.Border;
-import ro.nextreports.engine.band.ColumnBandElement;
 import ro.nextreports.engine.band.ExpressionBandElement;
 import ro.nextreports.engine.band.FieldBandElement;
 import ro.nextreports.engine.band.Hyperlink;
@@ -90,6 +90,8 @@ import ro.nextreports.engine.util.StringUtil;
  * Time: 9:53:57 AM
  */
 public class XlsExporter extends ResultExporter {
+	
+	private static Log LOG = LogFactory.getLog(XlsExporter.class);
 
     //todo : character width?? (use 5)
     // method setColumnWidth(int column, int width) from poi
@@ -113,7 +115,17 @@ public class XlsExporter extends ResultExporter {
     }
       
     protected void initExport() throws QueryException {    	
-    	wb = new HSSFWorkbook();    		    	   
+    	if (hasTemplate()) {    		
+    		try {
+				wb = new HSSFWorkbook(getTemplateInputStream());
+			} catch (IOException e) {
+				e.printStackTrace();
+				LOG.error(e.getMessage(), e);
+				wb = new HSSFWorkbook();   
+			}
+    	} else {
+    		wb = new HSSFWorkbook();
+    	}
     	createFontsAndStyles();
     }
 
@@ -784,7 +796,11 @@ public class XlsExporter extends ResultExporter {
 
 	protected void newPage() {
 		addRegions(xlsSheet, regions, wb);
-		xlsSheet = wb.createSheet("Page " + page);
+		if (hasTemplate()) {
+			xlsSheet = wb.getSheetAt(bean.getReportLayout().getTemplateSheet()-1);  
+		} else {
+			xlsSheet = wb.createSheet("Page " + page);
+		}
 		xlsSheet.setMargin(InternalSheet.LeftMargin, getInches(bean.getReportLayout().getPagePadding().getLeft()));
 		xlsSheet.setMargin(InternalSheet.RightMargin, getInches(bean.getReportLayout().getPagePadding().getRight()));
 		xlsSheet.setMargin(InternalSheet.TopMargin, getInches(bean.getReportLayout().getPagePadding().getTop()));
@@ -877,5 +893,18 @@ public class XlsExporter extends ResultExporter {
     public List<XlsRegion> getSubreportRegions() {
     	return regions;
     }
+    
+	private InputStream getTemplateInputStream() throws IOException {
+		InputStream is = getClass().getResourceAsStream("/" + bean.getReportLayout().getTemplateName());
+		if (is == null) {
+			LOG.error("Template '" + bean.getReportLayout().getTemplateName() + "' not found in classpath.");
+			throw new IOException("Template '" + bean.getReportLayout().getTemplateName() + "' not found.");
+		}
+		return is;
+	}
+	
+	private boolean hasTemplate() {
+		return (bean.getReportLayout().getTemplateName() != null) && !"".equals(bean.getReportLayout().getTemplateName().trim());
+	}
 
 }

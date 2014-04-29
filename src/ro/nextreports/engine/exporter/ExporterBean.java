@@ -142,7 +142,7 @@ public class ExporterBean {
 		
 	public List<Alert> getAlerts() {
 		return alerts;
-	}
+	}		
 
 	@Override
 	public String toString() {

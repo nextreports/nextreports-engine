@@ -106,6 +106,10 @@ public class ReportRunner implements Runner {
     private String chartImagePath;
     private List<Alert> alerts;
     private boolean csv = false;
+    
+    // to write excel in a existing template, in a specific sheet (other sheets may contain calculations on data sheet)
+    private String templateName;
+    private int sheetNumber;
 
     /** Get database connection
      *
@@ -393,7 +397,7 @@ public class ReportRunner implements Runner {
             exporter = new TsvExporter(bean);
         } else if (TXT_FORMAT.equals(format)) {        	
             exporter = new TxtExporter(bean);
-        } else if (EXCEL_FORMAT.equals(format)) {
+        } else if (EXCEL_FORMAT.equals(format)) {        	
             exporter = new XlsExporter(bean);
         } else if (RTF_FORMAT.equals(format)) {
             exporter = new RtfExporter(bean);
@@ -491,7 +495,21 @@ public class ReportRunner implements Runner {
 	public void setChartImagePath(String chartImagePath) {
 		this.chartImagePath = chartImagePath;
 	}
-    
-    
+
+	public String getTemplateName() {
+		return templateName;
+	}
+
+	public void setTemplateName(String templateName) {
+		this.templateName = templateName;
+	}
+
+	public int getSheetNumber() {
+		return sheetNumber;
+	}
+
+	public void setSheetNumber(int sheetNumber) {
+		this.sheetNumber = sheetNumber;
+	}		        
     
 }

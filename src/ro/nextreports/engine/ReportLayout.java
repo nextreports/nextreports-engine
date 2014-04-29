@@ -81,6 +81,8 @@ public class ReportLayout implements Serializable {
     private PaperSize paperSize;
     private Padding pagePadding;
     private String backgroundImage;
+    private String templateName;
+    private int templateSheet;
 
     private boolean headerOnEveryPage;
 
@@ -151,8 +153,24 @@ public class ReportLayout implements Serializable {
     public void setPaperSize(PaperSize paperSize) {
         this.paperSize = paperSize;
     }
-                
-    public String getBackgroundImage() {
+                        
+    public String getTemplateName() {
+		return templateName;
+	}
+
+	public void setTemplateName(String templateName) {
+		this.templateName = templateName;
+	}
+
+	public int getTemplateSheet() {
+		return templateSheet;
+	}
+
+	public void setTemplateSheet(int templateSheet) {
+		this.templateSheet = templateSheet;
+	}
+
+	public String getBackgroundImage() {
 		return backgroundImage;
 	}
 
@@ -450,6 +468,8 @@ public class ReportLayout implements Serializable {
         if (pageHeaderBand != null ? !pageHeaderBand.equals(that.pageHeaderBand) : that.pageHeaderBand != null) return false;
         if (pageFooterBand != null ? !pageFooterBand.equals(that.pageFooterBand) : that.pageFooterBand != null) return false;
         if (pageFormat != null ? !pageFormat.equals(that.pageFormat) : that.pageFormat != null) return false;
+        if (templateName != null ? !templateName.equals(that.templateName) : that.templateName != null) return false;
+        if (templateSheet != that.templateSheet) return false;
         if (pagePadding != null ? !pagePadding.equals(that.pagePadding) : that.pagePadding != null) return false;
         if (backgroundImage != null ? !backgroundImage.equals(that.backgroundImage) : that.backgroundImage != null) return false;
         if (paperSize != null ? !paperSize.equals(that.paperSize) : that.paperSize != null) return false;
@@ -472,6 +492,8 @@ public class ReportLayout implements Serializable {
         result = 31 * result + orientation;
         result = 31 * result + reportType;
         result = 31 * result + (pageFormat != null ? pageFormat.hashCode() : 0);
+        result = 31 * result + (templateName != null ? templateName.hashCode() : 0);
+        result = 31 * result + templateSheet;
         result = 31 * result + (headerOnEveryPage ? 1 : 0);
         result = 31 * result + (pagePadding != null ? pagePadding.hashCode() : 0);
         result = 31 * result + (backgroundImage != null ? backgroundImage.hashCode() : 0);
