@@ -37,6 +37,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -990,6 +992,11 @@ public class ReportUtil {
 				if (be instanceof FunctionBandElement) {					
 					return true;
 				}
+				if (be instanceof ExpressionBandElement) {
+					if (((ExpressionBandElement)be).getExpression().contains("$F")) {
+						return true;
+					}
+				}
 			}
 		}
 		return false;
@@ -1040,5 +1047,19 @@ public class ReportUtil {
 			band.getRow(0).set(0,fbe);
 		}	
 	}
+	
+	public static List<FunctionBandElement> getFunctionsFromExpression(String expression) {
+		List<FunctionBandElement> result = new ArrayList<FunctionBandElement>();
+		String regex = "[^\\$]*\\$F_([^_\\$]+)_([^_\\$\\s\\.\\+\\*/-]+)[^\\$]*";
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(expression);
+		while(m.find()) {                 
+			String function = m.group(1);
+			String column = m.group(2);
+			FunctionBandElement fbe = new FunctionBandElement(function, column);
+			result.add(fbe);
+		}				
+		return result;
+	}		
 
 }

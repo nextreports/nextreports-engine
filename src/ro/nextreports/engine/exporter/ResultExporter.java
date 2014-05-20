@@ -398,7 +398,7 @@ public abstract class ResultExporter {
 			RowFormattingConditions rfc = rowEl.getFormattingConditions();
 			if ((rfc != null) && (rfc.getConditions().size() > 0)) {
 				try {
-					Serializable rowEval = (Serializable) evaluateExpression("", rfc.getExpressionText(), currentBandName, null);										
+					Serializable rowEval = (Serializable) evaluateExpression("", rfc.getExpressionText(), currentBandName, null, null);										
 					RowFormattingConditions renderConditions = rowEl.getFormattingConditions();
 					putFormattingConditions(format, renderConditions, gridRow, gridColumn, rowEval, colSpan, true);
 				} catch (QueryException e) {
@@ -418,7 +418,7 @@ public abstract class ResultExporter {
 				} else {
 					try {
 						Serializable expEval = (Serializable) evaluateExpression("", cellExpressionText,
-								getBand(getReportLayout(), gridRow).getName(), null);
+								getBand(getReportLayout(), gridRow).getName(), null, null);
 						putFormattingConditions(format, renderConditions, gridRow, gridColumn, expEval, colSpan, true);
 					} catch (QueryException e) {
 						e.printStackTrace();
@@ -876,7 +876,7 @@ public abstract class ResultExporter {
                 previousRow[i] = getResult().nextValue(i);
             }
             for (int i = cols; i < cols+expNo; i++) {
-                previousRow[i] = evaluateExpression(expressions.get(i-cols));
+                previousRow[i] = evaluateExpression(expressions.get(i-cols), null);
             }                               
         }
         
@@ -909,7 +909,7 @@ public abstract class ResultExporter {
             String column = fc.getFunctionColumn();
             Object value;
             if (fc.isExpression()) {
-                value = evaluateExpression(getExpressionBandElement(fc.getFunctionColumn()), currentBandName);
+                value = evaluateExpression(getExpressionBandElement(fc.getFunctionColumn()), currentBandName, gc);
             } else {
                 value = getResult().nextValue(column);
             }            
@@ -972,7 +972,7 @@ public abstract class ResultExporter {
                 for (FunctionCache fc : gc.getFuncCache()) {
                     Object nv;
                     if (fc.isExpression()) {                    	
-                        nv = evaluateExpression(getExpressionBandElement(fc.getFunctionColumn()), currentBandName);
+                        nv = evaluateExpression(getExpressionBandElement(fc.getFunctionColumn()), currentBandName, gc);
                     } else {
                         nv = getResult().nextValue(fc.getFunctionColumn());
                     }
@@ -1102,7 +1102,7 @@ public abstract class ResultExporter {
                     BandElement bandElement = band.getElementAt(i, j);
                     if ((bandElement != null) && (bandElement.getHideWhenExpression() != null)) {
                         String expression = bandElement.getHideWhenExpression();
-                        Boolean result = (Boolean) evaluateExpression("", expression, currentBandName, null);
+                        Boolean result = (Boolean) evaluateExpression("", expression, currentBandName, null, gc);
                         hide[j] = result;
                     } else {
                     	// bandElement can be null in older version of reports (previous to 4.1)
@@ -1233,7 +1233,7 @@ public abstract class ResultExporter {
                  if (usePrevious) {
                     value = previousRow[getExpressionBandElementIndex((ExpressionBandElement) bandElement)];
                  } else {                                    	 
-                    value = evaluateExpression((ExpressionBandElement) bandElement, currentBandName);
+                    value = evaluateExpression((ExpressionBandElement) bandElement, currentBandName, gc);
                  }
                 // here compute the footer functions
                 for (FunctionCache fc : footerFunctionCache) {
@@ -1251,7 +1251,7 @@ public abstract class ResultExporter {
                 }
             } else {
                 // expression does not contain columns , just variables, parameters and literals
-                value = evaluateExpression((ExpressionBandElement) bandElement, currentBandName);
+                value = evaluateExpression((ExpressionBandElement) bandElement, currentBandName, gc);
             }
 
         } else if (bandElement instanceof FunctionBandElement) {
@@ -1329,7 +1329,7 @@ public abstract class ResultExporter {
     	if (bandElement instanceof ExpressionBandElement) {    		
     		Object value = null;
 			try {
-				value = evaluateExpression((ExpressionBandElement)bandElement, currentBandName);
+				value = evaluateExpression((ExpressionBandElement)bandElement, currentBandName, null);
 			} catch (QueryException e) {
 				LOG.error(e.getMessage(), e);
 			}    		
@@ -1341,15 +1341,19 @@ public abstract class ResultExporter {
     	}
     }
     
-    protected Object evaluateExpression(ExpressionBean bean) throws QueryException {
-        return evaluateExpression(bean.getBandElement().getExpressionName(), bean.getBandElement().getExpression(), bean.getBandName(), bean.getBandElement().getPattern());
+    protected Object evaluateExpression(ExpressionBean bean, GroupCache gc) throws QueryException {
+        return evaluateExpression(bean.getBandElement().getExpressionName(), bean.getBandElement().getExpression(), bean.getBandName(), bean.getBandElement().getPattern(), gc);
     }       
 
-    protected Object evaluateExpression(ExpressionBandElement bandElement, String bandName) throws QueryException {
-        return evaluateExpression(bandElement.getExpressionName(), bandElement.getExpression(), bandName, bandElement.getPattern());
+    protected Object evaluateExpression(ExpressionBandElement bandElement, String bandName, GroupCache gc) throws QueryException {
+        return evaluateExpression(bandElement.getExpressionName(), bandElement.getExpression(), bandName, bandElement.getPattern(), gc);
     }
+    
+//    private Object evaluateExpression(String expressionName, String expression, String bandName, String pattern) throws QueryException {   
+//    	return evaluateExpression(expressionName, expression, bandName, pattern, null);
+//    }
 
-    private Object evaluateExpression(String expressionName, String expression, String bandName, String pattern) throws QueryException {    	    	
+    private Object evaluateExpression(String expressionName, String expression, String bandName, String pattern, GroupCache gc) throws QueryException {    	    	
         Object value = null;        
         Expression e = jexl.createExpression(expression);
         // create context with all variables, parameters and columns
@@ -1382,9 +1386,9 @@ public abstract class ResultExporter {
             }
         }
         
-        // ony expressions in footers can contain functions
-        if (expression.contains("$F")) {
-        	for (String f : bean.getReportLayout().getFunctions()) {
+        // ony expressions in footers or headers can contain functions
+        if (expression.contains("$F")) {        	
+        	for (String f : bean.getReportLayout().getFunctions()) {        		
         		FunctionCache fc = findFunctionCache(f, bandName);
         		Double fv = new Double(0);
         		if (fc != null) {        			        		
@@ -1392,6 +1396,17 @@ public abstract class ResultExporter {
         		}        		
         		checkContext.set("$F_" + f,fv);
         	}			
+        	// expressions in headers
+	        if (needsFirstCrossing()  && !(this instanceof FirstCrossingExporter)) {   
+	        	for (FunctionBandElement fbe : ReportUtil.getFunctionsFromExpression(expression)) {	        		
+		    		value = getFunctionTemplate(gc, fbe, false);
+		    		String template = (String)value;		    		
+		    		if (templatesValues.containsKey(value)) {            			
+		    			value = templatesValues.get(value);            			
+		    		}
+		    		checkContext.set("$F_" + fbe.getFunction()+"_" + fbe.getColumn(),value);
+	        	}
+	    	} 
         }
         try {
             value = e.evaluate(checkContext);
@@ -1848,7 +1863,7 @@ public abstract class ResultExporter {
 			if (bandElement instanceof FieldBandElement) {
 				pattern = ((FieldBandElement)bandElement).getPattern();
 			}
-			exp = StringUtil.getValueAsString( evaluateExpression(((ExpressionBandElement) bandElement), ""), pattern);
+			exp = StringUtil.getValueAsString( evaluateExpression(((ExpressionBandElement) bandElement), "", null), pattern);
 			String name = "$V_" + Variable.PAGE_NO_VARIABLE;
 			return StringUtil.parse(exp, name);
 		} catch (QueryException ex) {
