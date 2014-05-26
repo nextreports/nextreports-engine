@@ -35,6 +35,7 @@ import ro.nextreports.engine.exporter.util.function.FunctionUtil;
 import ro.nextreports.engine.exporter.util.function.GFunction;
 import ro.nextreports.engine.queryexec.QueryException;
 import ro.nextreports.engine.queryexec.QueryResult;
+import ro.nextreports.engine.util.ColorUtil;
 import ro.nextreports.engine.util.StringUtil;
 
 /* 
@@ -103,7 +104,7 @@ public class JsonHTML5Exporter implements ChartExporter {
         Font font = chartTitle.getFont();
         
         if (chartTitle.getColor() !=  null) {
-        	nct.setColor(getHexColor(chartTitle.getColor()));
+        	nct.setColor(ColorUtil.getHexColor(chartTitle.getColor()));
         }
         nct.setFont(createFont(font));
         
@@ -144,20 +145,20 @@ public class JsonHTML5Exporter implements ChartExporter {
         nc.setAlpha(getAlpha(chart.getTransparency()));
 				
         if (chart.getxAxisColor() != null) {
-        	nc.setColorXaxis(getHexColor(chart.getxAxisColor()));
+        	nc.setColorXaxis(ColorUtil.getHexColor(chart.getxAxisColor()));
         }
         if (chart.getyAxisColor() != null) {
-        	nc.setColorYaxis(getHexColor(chart.getyAxisColor()));
+        	nc.setColorYaxis(ColorUtil.getHexColor(chart.getyAxisColor()));
         }
 		boolean showGridX = chart.getXShowGrid() == null ? false : chart.getXShowGrid();
 	    boolean showGridY = chart.getYShowGrid() == null ? false :chart.getYShowGrid();
 		nc.setShowGridX(showGridX);
 		nc.setShowGridY(showGridY);
 		if (chart.getXGridColor() != null) {
-			nc.setColorGridX(getHexColor(chart.getXGridColor()));
+			nc.setColorGridX(ColorUtil.getHexColor(chart.getXGridColor()));
 		}
 		if (chart.getYGridColor() != null) {
-			nc.setColorGridY(getHexColor(chart.getYGridColor()));
+			nc.setColorGridY(ColorUtil.getHexColor(chart.getYGridColor()));
 		}
 		
 		// todo : customize tickCount?
@@ -172,13 +173,13 @@ public class JsonHTML5Exporter implements ChartExporter {
         nc.setShowTicks(showYLabel);
         if (showXLabel) {
         	NextChartAxis xData = new NextChartAxis();
-        	xData.setColor(getHexColor(chart.getXColor()));		
+        	xData.setColor(ColorUtil.getHexColor(chart.getXColor()));		
         	xData.setFont(createFont(chart.getXLabelFont()));
         	nc.setxData(xData);
         }
         if (showYLabel) {
 			NextChartAxis yData = new NextChartAxis();
-			yData.setColor(getHexColor(chart.getYColor()));
+			yData.setColor(ColorUtil.getHexColor(chart.getYColor()));
 			yData.setFont(createFont(chart.getYLabelFont()));
 			nc.setyData(yData);
         }
@@ -400,7 +401,7 @@ public class JsonHTML5Exporter implements ChartExporter {
 
     private void setBackground() {
         if (chart.getBackground() != null) {
-        	nc.setBackground(getHexColor(chart.getBackground()));
+        	nc.setBackground(ColorUtil.getHexColor(chart.getBackground()));
         }
     }  
     
@@ -409,7 +410,7 @@ public class JsonHTML5Exporter implements ChartExporter {
     	if (ChartType.PIE == chart.getType().getType()) {
     		for (Color color : chart.getForegrounds()) {
     			if (color != null) {
-    				colors.add(getHexColor(color));
+    				colors.add(ColorUtil.getHexColor(color));
     			}
             }    
     	} else {
@@ -418,12 +419,12 @@ public class JsonHTML5Exporter implements ChartExporter {
 				if (size > 1) {
 					size--;
 					List<String> lineColorList = new ArrayList<String>();
-					lineColorList.add(getHexColor(chart.getForegrounds().get(size)));
+					lineColorList.add(ColorUtil.getHexColor(chart.getForegrounds().get(size)));
 					nc.setLineColor(lineColorList);
 				}
 			}
 	    	for (int i=0; i < size; i++) {
-	    		colors.add(getHexColor(chart.getForegrounds().get(i)));	    		
+	    		colors.add(ColorUtil.getHexColor(chart.getForegrounds().get(i)));	    		
 	    	}     
     	}
 		nc.setColor(colors);
@@ -512,13 +513,13 @@ public class JsonHTML5Exporter implements ChartExporter {
 		}		
 		if ((chart.getXLegend() != null) && !isEmpty(chart.getXLegend().getTitle())) {
 			NextChartLegend xLegend = new NextChartLegend(replaceParameters(chart.getXLegend().getTitle()));
-			xLegend.setColor(getHexColor(chart.getXLegend().getColor()));
+			xLegend.setColor(ColorUtil.getHexColor(chart.getXLegend().getColor()));
 			xLegend.setFont(createFont(chart.getXLegend().getFont()));
 			nc.setxLegend(xLegend);
 		}
 		if ((chart.getYLegend() != null) && !isEmpty(chart.getYLegend().getTitle()))  {
 			NextChartLegend yLegend = new NextChartLegend(replaceParameters(chart.getYLegend().getTitle()));
-			yLegend.setColor(getHexColor(chart.getYLegend().getColor()));
+			yLegend.setColor(ColorUtil.getHexColor(chart.getYLegend().getColor()));
 			yLegend.setFont(createFont(chart.getYLegend().getFont()));
 			nc.setyLegend(yLegend);
 		}
@@ -538,13 +539,7 @@ public class JsonHTML5Exporter implements ChartExporter {
         } else {
             return String.valueOf(number.doubleValue());
         }
-    }
-
-    private String getHexColor(Color color) {
-        String rgb = Integer.toHexString(color.getRGB());
-        rgb = rgb.substring(2, rgb.length());
-        return "#" + rgb;
-    }
+    }    
 
     private void setLabelOrientation(byte rotation) {
         if (Chart.VERTICAL == rotation) {

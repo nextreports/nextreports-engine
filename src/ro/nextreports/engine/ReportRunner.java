@@ -29,6 +29,7 @@ import java.io.OutputStream;
 import ro.nextreports.engine.exporter.AlarmExporter;
 import ro.nextreports.engine.exporter.Alert;
 import ro.nextreports.engine.exporter.CsvExporter;
+import ro.nextreports.engine.exporter.DisplayExporter;
 import ro.nextreports.engine.exporter.ExporterBean;
 import ro.nextreports.engine.exporter.HtmlExporter;
 import ro.nextreports.engine.exporter.IndicatorExporter;
@@ -43,6 +44,7 @@ import ro.nextreports.engine.exporter.XmlExporter;
 import ro.nextreports.engine.exporter.event.ExporterEventListener;
 import ro.nextreports.engine.exporter.exception.NoDataFoundException;
 import ro.nextreports.engine.exporter.util.AlarmData;
+import ro.nextreports.engine.exporter.util.DisplayData;
 import ro.nextreports.engine.exporter.util.IndicatorData;
 import ro.nextreports.engine.exporter.util.ParametersBean;
 import ro.nextreports.engine.exporter.util.TableData;
@@ -92,6 +94,8 @@ public class ReportRunner implements Runner {
     public static final String ALARM_FORMAT = "ALARM";
     /** Memory indicator output format */
     public static final String INDICATOR_FORMAT = "INDICATOR";
+    /** Memory display output format */
+    public static final String DISPLAY_FORMAT = "DISPLAY";
     
     private Connection connection;
     private Dialect dialect;
@@ -276,7 +280,7 @@ public class ReportRunner implements Runner {
      */
     public boolean run(OutputStream stream) throws ReportRunnerException, NoDataFoundException {
 
-        if ((stream == null) && !TABLE_FORMAT.equals(format) && !ALARM_FORMAT.equals(format) && !INDICATOR_FORMAT.equals(format)) {
+        if ((stream == null) && !TABLE_FORMAT.equals(format) && !ALARM_FORMAT.equals(format) && !INDICATOR_FORMAT.equals(format) && !DISPLAY_FORMAT.equals(format)) {
             throw new ReportRunnerException("OutputStream cannot be null!");
         }
 
@@ -290,6 +294,10 @@ public class ReportRunner implements Runner {
         
         if ((stream != null) && INDICATOR_FORMAT.equals(format)) {
             throw new ReportRunnerException("INDICATOR FORMAT does not need an output stream. Use run() method instead.");
+        }
+        
+        if ((stream != null) && DISPLAY_FORMAT.equals(format)) {
+            throw new ReportRunnerException("DISPLAY FORMAT does not need an output stream. Use run() method instead.");
         }
         
         if (connection == null) {
@@ -360,7 +368,7 @@ public class ReportRunner implements Runner {
     }
 
     private boolean formatAllowed(String format) {
-        if (TABLE_FORMAT.equals(format) || ALARM_FORMAT.equals(format) ||  INDICATOR_FORMAT.equals(format)) {
+        if (TABLE_FORMAT.equals(format) || ALARM_FORMAT.equals(format) ||  INDICATOR_FORMAT.equals(format) ||  DISPLAY_FORMAT.equals(format)) {
             return true;
         }
         
@@ -389,6 +397,11 @@ public class ReportRunner implements Runner {
         	bean.setQueryTimeout(0);
         	bean.setOut(new ByteArrayOutputStream());
             exporter = new IndicatorExporter(bean);
+        } else if (DISPLAY_FORMAT.equals(format)) {        	
+        	bean.setConnection(null);
+        	bean.setQueryTimeout(0);
+        	bean.setOut(new ByteArrayOutputStream());
+            exporter = new DisplayExporter(bean);    
         } else if (PDF_FORMAT.equals(format)) {
             exporter = new PdfExporter(bean);
         } else if (CSV_FORMAT.equals(format)) {        	
@@ -485,6 +498,19 @@ public class ReportRunner implements Runner {
     		return ie.getData();            
         } else {
             return new IndicatorData();
+        }
+    }
+    
+    /** Get display data DISPLAY exporter
+    *
+    * @return display data for DISPLAY exporter
+    */
+    public DisplayData getDisplayData() {
+    	if (DISPLAY_FORMAT.equals(format)) {
+    		DisplayExporter de = (DisplayExporter)exporter;
+    		return de.getData();            
+        } else {
+            return new DisplayData();
         }
     }
 

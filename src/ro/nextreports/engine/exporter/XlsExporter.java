@@ -895,11 +895,14 @@ public class XlsExporter extends ResultExporter {
     }
     
 	private InputStream getTemplateInputStream() throws IOException {
+		LOG.info(">>>>>>>>> Look for : " + bean.getReportLayout().getTemplateName());
 		InputStream is = getClass().getResourceAsStream("/" + bean.getReportLayout().getTemplateName());
 		if (is == null) {
 			LOG.error("Template '" + bean.getReportLayout().getTemplateName() + "' not found in classpath.");
 			throw new IOException("Template '" + bean.getReportLayout().getTemplateName() + "' not found.");
 		}
+		LOG.info(">>>>>>>>> Found template: " + bean.getReportLayout().getTemplateName());
+		
 		return is;
 	}
 	

@@ -135,6 +135,7 @@ public abstract class ResultExporter {
     public static final int ALARM_TYPE = 1;
     public static final int TABLE_TYPE = 2;
     public static final int INDICATOR_TYPE = 3;
+    public static final int DISPLAY_TYPE = 4;
 
     // A4 width in inches
     public static final float A4_WIDTH = 8.27f;
