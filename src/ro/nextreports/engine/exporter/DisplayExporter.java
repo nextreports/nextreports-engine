@@ -63,6 +63,11 @@ public class DisplayExporter extends ResultExporter {
 						data.setValueColor(ColorUtil.getHexColor((Color) style.get(StyleFormatConstants.FONT_COLOR)));
 					}
 					data.setValue(StringUtil.getValueAsString(value, ((ColumnBandElement)bandElement).getPattern()));
+					for (Alert alert : alerts) {                	
+						if (isAlert(alert, value)) {
+							executeAlert(alert, value, "");
+						} 
+					}
 				} else if (column == 1) {					
 					data.setPreviousColor(ColorUtil.getHexColor(bandElement.getForeground()));
 					if (style.containsKey(StyleFormatConstants.FONT_COLOR)) {

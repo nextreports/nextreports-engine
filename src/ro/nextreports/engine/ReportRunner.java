@@ -251,8 +251,8 @@ public class ReportRunner implements Runner {
     	if (format == null) {
     		throw new IllegalStateException("You have to use setFormat with a valid output format before using setAlert!");
     	}
-    	if (!ALARM_FORMAT.equals(format) && !INDICATOR_FORMAT.equals(format)) {
-    		throw new IllegalStateException("You can use setAlert only for ALARM or INDICATOR output formats!");
+    	if (!ALARM_FORMAT.equals(format) && !INDICATOR_FORMAT.equals(format) && !DISPLAY_FORMAT.equals(format)) {
+    		throw new IllegalStateException("You can use setAlert only for ALARM, INDICATOR or DISPLAY output formats!");
     	}
 		this.alerts = alerts;
 	}
