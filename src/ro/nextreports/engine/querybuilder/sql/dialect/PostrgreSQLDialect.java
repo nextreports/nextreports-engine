@@ -57,6 +57,7 @@ public class PostrgreSQLDialect extends AbstractDialect {
         registerColumnType("date", Types.DATE);
         registerColumnType("time", Types.TIME);
         registerColumnType("timestamp", Types.TIMESTAMP);
+        registerColumnType("timestamptz", Types.TIMESTAMP);
         registerColumnType("bytea", Types.VARBINARY);
         registerColumnType("text", Types.CLOB);
         registerColumnType("oid", Types.BLOB);
