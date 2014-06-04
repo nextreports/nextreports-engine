@@ -70,6 +70,7 @@ public class ChartRunner implements Runner {
     private int imageWidth;
     private int imageHeight;
     private boolean csv = false;
+    private String language;
                 
     /**
 	 * Get database connection
@@ -243,8 +244,25 @@ public class ChartRunner implements Runner {
     public void setDrillFunction(String drillFunction) {
         this.drillFunction = drillFunction;
     }
+    
+    
+    /** Get language for internationalized strings
+     * 
+     * @return language for internationalized strings
+     */
+    public String getLanguage() {
+		return language;
+	}
 
-    /**
+    /** Set language for internationalized strings
+     * 
+     * @param language language for internationalized strings
+     */
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+
+	/**
 	 * Export the current chart to table
 	 *
 	 * @throws ReportRunnerException if ChartRunner object is not correctly configured
@@ -358,19 +376,19 @@ public class ChartRunner implements Runner {
     private void createExporter(Query query, Map<String, QueryParameter> parameters,
                Map<String, Object> parameterValues, QueryResult qr, OutputStream stream) {
         if (TABLE_FORMAT.equals(format)) {
-            exporter = new ChartTableExporter(qr, chart);
+            exporter = new ChartTableExporter(qr, chart, language);
         } else if (IMAGE_FORMAT.equals(format)) {
         	if (imagePath == null) {
         		imagePath = ".";
         	}
-        	exporter = new JFreeChartExporter(parameterValues, qr, chart, imagePath, imageName, imageWidth, imageHeight);     
+        	exporter = new JFreeChartExporter(parameterValues, qr, chart, imagePath, imageName, imageWidth, imageHeight, language);     
         	
         } else {
         	if (graphicType == HTML5_TYPE) {
-        		exporter = new JsonHTML5Exporter(parameterValues, qr, stream, chart, drillFunction);
+        		exporter = new JsonHTML5Exporter(parameterValues, qr, stream, chart, drillFunction, language);
         	} else {
         		// FLASH_TYPE
-        		exporter = new JsonExporter(parameterValues, qr, stream, chart, drillFunction);
+        		exporter = new JsonExporter(parameterValues, qr, stream, chart, drillFunction, language);
         	}
         }
     }

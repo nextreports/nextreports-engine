@@ -105,6 +105,19 @@ public class FluentReportRunner {
     	reportRunner.setChartImagePath(path);
     	return this;
     }
+    
+    /** Set language for internationalized reports
+     * 
+     * Language string is computed as :
+	 *     locale.getLanguage() + "_" + locale.getCountry()
+	 *     
+     * @param language language
+     * @return FluentReportRunner object with language set
+     */
+    public FluentReportRunner withLanguage(String language) {
+    	reportRunner.setLanguage(language);
+    	return this;
+    }
 
     /** Set the output format
      *

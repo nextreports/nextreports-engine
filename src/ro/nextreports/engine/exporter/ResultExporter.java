@@ -31,6 +31,7 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
@@ -104,6 +105,8 @@ import ro.nextreports.engine.exporter.util.variable.RowVariable;
 import ro.nextreports.engine.exporter.util.variable.TotalPageNoVariable;
 import ro.nextreports.engine.exporter.util.variable.Variable;
 import ro.nextreports.engine.exporter.util.variable.VariableFactory;
+import ro.nextreports.engine.i18n.I18nLanguage;
+import ro.nextreports.engine.i18n.I18nUtil;
 import ro.nextreports.engine.queryexec.IdName;
 import ro.nextreports.engine.queryexec.Query;
 import ro.nextreports.engine.queryexec.QueryException;
@@ -1326,7 +1329,7 @@ public abstract class ResultExporter {
     }
     
     protected String getBandElementValueAsString(BandElement bandElement) {
-    	String pattern = getPattern(bandElement);
+    	String pattern = getPattern(bandElement);    	
     	if (bandElement instanceof ExpressionBandElement) {    		
     		Object value = null;
 			try {
@@ -1334,7 +1337,8 @@ public abstract class ResultExporter {
 			} catch (QueryException e) {
 				LOG.error(e.getMessage(), e);
 			}    		
-            return StringUtil.getValueAsString(value, pattern);
+			I18nLanguage lang = I18nUtil.getLanguageByName(bean.getReportLayout(), bean.getLanguage());
+            return StringUtil.getValueAsString(value, pattern, lang);
     	} else if (bandElement instanceof VariableBandElement) {
     		return getStringValue((VariableBandElement)bandElement, currentBandName);    	
     	} else {
@@ -1411,6 +1415,10 @@ public abstract class ResultExporter {
         }
         try {
             value = e.evaluate(checkContext);
+            if (value instanceof String) {
+            	I18nLanguage lang = I18nUtil.getLanguageByName(bean.getReportLayout(), bean.getLanguage());
+            	value = StringUtil.getI18nString((String)value, lang);
+            }
         } catch (JexlException ex) {
             ex.printStackTrace();
             LOG.error(ex.getMessage(), ex);
@@ -1453,7 +1461,9 @@ public abstract class ResultExporter {
         if ((bandElement == null) || (bandElement.getText().trim().length() == 0)) {
             return getNullElement();
         }
-        return StringUtil.getValueAsString(bandElement.getText(), pattern);
+        
+        I18nLanguage lang = I18nUtil.getLanguageByName(bean.getReportLayout(), bean.getLanguage());        
+        return StringUtil.getValueAsString(StringUtil.getI18nString(bandElement.getText(), lang), pattern);
     }
 
     protected abstract String getNullElement();
@@ -1748,6 +1758,10 @@ public abstract class ResultExporter {
         runner.setQueryTimeout(bean.getQueryTimeout());
         runner.setParameterValues(bean.getParametersBean().getParamValues());        
         runner.setImagePath(imageChartPath);  
+        I18nLanguage lang = I18nUtil.getLanguageByName(bean.getReportLayout(), bean.getLanguage());
+        if (lang != null) {
+        	runner.setLanguage(lang.getName());
+        }
         int width = (bandElement.getWidth() == null) ? 0 : bandElement.getWidth();
         int height = (bandElement.getHeight() == null) ? 0 : bandElement.getHeight();
         runner.setImageWidth(width);
@@ -2018,5 +2032,18 @@ public abstract class ResultExporter {
         }
         return null;
     }
+	
+	protected String getSystemDefaultLanguage() {
+		Locale locale = Locale.getDefault();
+		return locale.getLanguage() + "_" + locale.getCountry();
+	}		
+	
+	protected I18nLanguage getReportLanguage() {		
+		if (bean.getLanguage() == null) {
+			return I18nUtil.getDefaultLanguage(bean.getReportLayout());
+		} else {			
+			return I18nUtil.getLanguageByName(bean.getReportLayout(), bean.getLanguage());
+		}
+	}
        
 }

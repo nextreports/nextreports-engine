@@ -29,6 +29,7 @@ import ro.nextreports.engine.band.BandElement;
 import ro.nextreports.engine.band.Hyperlink;
 import ro.nextreports.engine.band.HyperlinkBandElement;
 import ro.nextreports.engine.exporter.util.TableData;
+import ro.nextreports.engine.i18n.I18nUtil;
 import ro.nextreports.engine.queryexec.QueryException;
 import ro.nextreports.engine.util.StringUtil;
 
@@ -55,7 +56,7 @@ public class ReportTableExporter extends ResultExporter implements TableExporter
             Hyperlink hyperlink = ((HyperlinkBandElement) bandElement).getHyperlink();
             value = hyperlink.getText();
         }
-        String s = StringUtil.getValueAsString(value, getPattern(bandElement));
+        String s = StringUtil.getValueAsString(value, getPattern(bandElement), I18nUtil.getLanguageByName(bean.getReportLayout(), bean.getLanguage()));
 
         // only last row from header is put in memory
         if (ReportLayout.HEADER_BAND_NAME.equals(bandName)) {

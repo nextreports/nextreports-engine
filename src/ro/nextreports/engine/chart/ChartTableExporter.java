@@ -25,6 +25,7 @@ import ro.nextreports.engine.exporter.util.function.AbstractGFunction;
 import ro.nextreports.engine.exporter.util.function.FunctionFactory;
 import ro.nextreports.engine.exporter.util.function.FunctionUtil;
 import ro.nextreports.engine.exporter.util.function.GFunction;
+import ro.nextreports.engine.i18n.I18nUtil;
 import ro.nextreports.engine.queryexec.QueryException;
 import ro.nextreports.engine.queryexec.QueryResult;
 import ro.nextreports.engine.util.StringUtil;
@@ -39,11 +40,13 @@ public class ChartTableExporter implements ChartExporter, TableExporter {
     private QueryResult result;
     private Chart chart;
     
-    private TableData data;    
+    private TableData data;   
+    private String language;
 
-    public ChartTableExporter(QueryResult result, Chart chart) {
+    public ChartTableExporter(QueryResult result, Chart chart, String language) {
         this.result = result;
         this.chart = chart;
+        this.language = language;
         data = new TableData();
         data.setStyle(null);
     }
@@ -163,7 +166,7 @@ public class ChartTableExporter implements ChartExporter, TableExporter {
 
     private String getStringValue(String column, String pattern) throws QueryException {
         Object xObject = result.nextValue(column);
-        return StringUtil.getValueAsString(xObject, pattern);
+        return StringUtil.getValueAsString(xObject, pattern, I18nUtil.getLanguageByName(chart, language));
     }  
 	
 	public TableData getTableData() {

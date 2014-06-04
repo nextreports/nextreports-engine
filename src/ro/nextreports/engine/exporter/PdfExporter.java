@@ -291,9 +291,9 @@ public class PdfExporter extends ResultExporter {
         } else {
             String stringValue;
             if (style.containsKey(StyleFormatConstants.PATTERN)) {
-                stringValue = StringUtil.getValueAsString(value, (String) style.get(StyleFormatConstants.PATTERN));
+                stringValue = StringUtil.getValueAsString(value, (String) style.get(StyleFormatConstants.PATTERN), getReportLanguage());
             } else {
-                stringValue = StringUtil.getValueAsString(value, null);
+                stringValue = StringUtil.getValueAsString(value, null, getReportLanguage());
             }
             if (stringValue == null) {
                 stringValue = "";

@@ -189,7 +189,7 @@ public class XmlExporter extends ResultExporter {
     }
 
     private String getStringValue(Object val, String pattern) {
-        String v = StringUtil.getValueAsString(val, pattern);
+        String v = StringUtil.getValueAsString(val, pattern, getReportLanguage());
         if (v == null) {
             return getNullElement();
         }
@@ -250,7 +250,7 @@ public class XmlExporter extends ResultExporter {
 				}
 			}    
         } else {
-            result = StringUtil.getValueAsString(value, null);
+            result = StringUtil.getValueAsString(value, null, getReportLanguage());
             if (result == null) {
                 result = getNullElement();
             }

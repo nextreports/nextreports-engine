@@ -49,7 +49,7 @@ public class IndicatorExporter extends ResultExporter {
         	if (headerRows == 2) {
         		if (row == 0) {
         			switch (column) {
-        				case 0: data.setTitle(getBandElementValueAsString(bandElement));
+        				case 0: data.setTitle(getBandElementValueAsString(bandElement));        				
         						break;
         				case 1: data.setDescription(getBandElementValueAsString(bandElement));
         						break;

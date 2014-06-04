@@ -33,6 +33,7 @@ import ro.nextreports.engine.exporter.util.function.AbstractGFunction;
 import ro.nextreports.engine.exporter.util.function.FunctionFactory;
 import ro.nextreports.engine.exporter.util.function.FunctionUtil;
 import ro.nextreports.engine.exporter.util.function.GFunction;
+import ro.nextreports.engine.i18n.I18nUtil;
 import ro.nextreports.engine.queryexec.QueryException;
 import ro.nextreports.engine.queryexec.QueryResult;
 import ro.nextreports.engine.util.StringUtil;
@@ -85,13 +86,16 @@ public class JsonExporter implements ChartExporter {
     private String MID_SLIDE= "mid-slide";
     private String SHRINK_IN = "shrink-in";
     
+    private String language;
+    
     public JsonExporter(Map<String, Object> parameterValues, QueryResult result, OutputStream out,
-                        Chart chart, String drillFunction) {
+                        Chart chart, String drillFunction, String language) {
         this.parameterValues = parameterValues;
         this.result = result;
         this.out = out;
         this.chart = chart;
         this.drillFunction = drillFunction;
+        this.language = language;
     }
 
     public boolean export() throws QueryException, NoDataFoundException {
@@ -156,7 +160,8 @@ public class JsonExporter implements ChartExporter {
     private ro.nextreports.jofc2.model.Chart createFlashChart() throws QueryException {
 
         ChartTitle chartTitle = chart.getTitle();
-        String title = replaceParameters(chartTitle.getTitle());        
+        String title = replaceParameters(chartTitle.getTitle());      
+        title = StringUtil.getI18nString(title, I18nUtil.getLanguageByName(chart, language));
 
         String titleStyle = getStyle(chartTitle);
         ro.nextreports.jofc2.model.Chart flashChart = new ro.nextreports.jofc2.model.Chart(title, titleStyle);
@@ -362,10 +367,10 @@ public class JsonExporter implements ChartExporter {
                 if (chart.getYColumnsLegends().get(i) != null) {
                     if (isStacked) {
                         StackedBarChart.Key key = new StackedBarChart.Key(getHexColor(chart.getForegrounds().get(i)),
-                                replaceParameters(chart.getYColumnsLegends().get(i)), 12);
+                        		StringUtil.getI18nString(replaceParameters(chart.getYColumnsLegends().get(i)),I18nUtil.getLanguageByName(chart, language)), 12);
                         keys.add(key);
                     } else {
-                        elementChart[i].setText(replaceParameters(chart.getYColumnsLegends().get(i)));
+                        elementChart[i].setText(StringUtil.getI18nString(replaceParameters(chart.getYColumnsLegends().get(i)),I18nUtil.getLanguageByName(chart, language)));
                     }
                 }
             }
@@ -708,8 +713,10 @@ public class JsonExporter implements ChartExporter {
 
     private void setLegends(ro.nextreports.jofc2.model.Chart flashChart) {
         boolean isHorizontal = chart.getType().isHorizontal();
-        Text xText = new Text(replaceParameters(chart.getXLegend().getTitle()), getStyle(chart.getXLegend()));
-        Text yText = new Text(replaceParameters(chart.getYLegend().getTitle()), getStyle(chart.getYLegend()));        
+        String xLegend = StringUtil.getI18nString(replaceParameters(chart.getXLegend().getTitle()), I18nUtil.getLanguageByName(chart, language));
+		String yLegend = StringUtil.getI18nString(replaceParameters(chart.getYLegend().getTitle()), I18nUtil.getLanguageByName(chart, language));
+        Text xText = new Text(xLegend, getStyle(chart.getXLegend()));
+        Text yText = new Text(yLegend, getStyle(chart.getYLegend()));        
         if (!isHorizontal) {
             flashChart.setXLegend(xText);
             flashChart.setYLegend(yText);
@@ -792,7 +799,7 @@ public class JsonExporter implements ChartExporter {
     // replace $P{...} parameters (used in title and x,y legends
     private String replaceParameters(String text) {
         for  (String param : parameterValues.keySet()) {
-             text = StringUtil.replace(text, "\\$P\\{" + param + "\\}", StringUtil.getValueAsString(parameterValues.get(param), null));
+             text = StringUtil.replace(text, "\\$P\\{" + param + "\\}", StringUtil.getValueAsString(parameterValues.get(param), null, I18nUtil.getLanguageByName(chart, language)));
         }
         return text;
     }       

@@ -656,6 +656,8 @@ public class XlsExporter extends ResultExporter {
                     			// use default pattern if none selected
                     			Locale locale = Locale.getDefault();
                     			pattern = ((SimpleDateFormat)DateFormat.getDateInstance(SimpleDateFormat.MEDIUM,locale)).toPattern();                    			
+                    		} else {
+                    			pattern = StringUtil.getI18nString(pattern, getReportLanguage());
                     		}
                     		cellStyle.setDataFormat(wb.createDataFormat().getFormat(pattern));
                     	}

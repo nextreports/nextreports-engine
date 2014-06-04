@@ -46,7 +46,7 @@ public class Report implements Serializable {
     private List<TablePersistentObject> tables;
     private List<MyRow> rows;
     private ReportLayout layout;
-    private String version;
+    private String version;        
     
     // for ForReportBandElement
  	private transient Map<String, Object> generatedParamValues;
@@ -218,8 +218,8 @@ public class Report implements Serializable {
 		}
 		return generatedParamValues;
 	}	
-
-    /** Tostring method
+        
+	/** Tostring method
      *
      * @return report object as a string
      */
@@ -230,7 +230,7 @@ public class Report implements Serializable {
                 ", query=" + query +
                 ", parameters=" + parameters +
                 ", sql='" + sql + '\'' +
-                ", tables=" + tables +
+                ", tables=" + tables +            
                 '}';
     }
 
@@ -252,7 +252,7 @@ public class Report implements Serializable {
                 !report.rows.containsAll(rows))) return false;
         if (sql != null ? !sql.equals(report.sql) : report.sql != null) return false;
         if (tables != null && report.tables != null && (!tables.containsAll(report.tables) ||
-                !report.tables.containsAll(tables))) return false;        
+                !report.tables.containsAll(tables))) return false;                
         return true;
     }
 
@@ -267,7 +267,8 @@ public class Report implements Serializable {
         result = 31 * result + (sql != null ? sql.hashCode() : 0);
         result = 31 * result + (tables != null ? tables.hashCode() : 0);
         result = 31 * result + (rows != null ? EqualsUtil.hashCode(rows) : 0);
-        result = 31 * result + (layout != null ? layout.hashCode() : 0);
+        result = 31 * result + (layout != null ? layout.hashCode() : 0);       
         return result;
     }
+       
 }

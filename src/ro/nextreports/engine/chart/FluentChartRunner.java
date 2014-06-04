@@ -132,6 +132,16 @@ public class FluentChartRunner {
 		chartRunner.setImageHeight(imageHeight);
 		return this;		
 	}
+	
+	/** Set language
+     * 
+     * @param language language
+     * @return FluentChartRunner object with language set
+     */
+	public FluentChartRunner withLanguage(String language) {
+		chartRunner.setLanguage(language);
+		return this;		
+	}
 	    
    /** Export the current chart to the specified output format : this method can be used by GRAPHIC_FORMAT
     * For IMAGE_FORMAT use withImagePath method.

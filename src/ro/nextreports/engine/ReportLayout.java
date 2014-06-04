@@ -16,8 +16,12 @@
  */
 package ro.nextreports.engine;
 
+import java.io.ObjectStreamException;
 import java.io.Serializable;
+import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -31,6 +35,7 @@ import ro.nextreports.engine.band.Padding;
 import ro.nextreports.engine.band.PaperSize;
 import ro.nextreports.engine.band.ReportBandElement;
 import ro.nextreports.engine.exporter.ResultExporter;
+import ro.nextreports.engine.i18n.I18nLanguage;
 
 
 /**
@@ -85,6 +90,9 @@ public class ReportLayout implements Serializable {
     private int templateSheet;
 
     private boolean headerOnEveryPage;
+    
+    private List<String> i18nkeys;
+    private List<I18nLanguage> languages;
 
     public ReportLayout() {
         groups = new ArrayList<ReportGroup>();
@@ -473,6 +481,10 @@ public class ReportLayout implements Serializable {
         if (pagePadding != null ? !pagePadding.equals(that.pagePadding) : that.pagePadding != null) return false;
         if (backgroundImage != null ? !backgroundImage.equals(that.backgroundImage) : that.backgroundImage != null) return false;
         if (paperSize != null ? !paperSize.equals(that.paperSize) : that.paperSize != null) return false;
+        if (i18nkeys != null && that.i18nkeys != null && (!i18nkeys.containsAll(that.i18nkeys) ||
+                !that.i18nkeys.containsAll(i18nkeys))) return false;
+        if (languages != null && that.languages != null && (!languages.containsAll(that.languages) ||
+                !that.languages.containsAll(languages))) return false;
 
         return true;
     }
@@ -498,6 +510,8 @@ public class ReportLayout implements Serializable {
         result = 31 * result + (pagePadding != null ? pagePadding.hashCode() : 0);
         result = 31 * result + (backgroundImage != null ? backgroundImage.hashCode() : 0);
         result = 31 * result + (paperSize != null ? paperSize.hashCode() : 0);
+        result = 31 * result + (i18nkeys != null ? i18nkeys.hashCode() : 0);
+        result = 31 * result + (languages != null ? languages.hashCode() : 0);
         return result;
     }
     
@@ -573,4 +587,53 @@ public class ReportLayout implements Serializable {
         }
         return null;
    }
+    
+    /** Get keys for internationalized strings
+     * 
+     * @return list of keys for internationalized strings
+     */
+    public List<String> getI18nkeys() {
+    	Collections.sort(i18nkeys, new Comparator<String>() {
+
+			@Override
+			public int compare(String o1, String o2) {				
+				return Collator.getInstance().compare(o1, o2);
+			}
+		});
+		return i18nkeys;
+	}
+
+    /** Set keys for internationalized strings     
+     * 
+     * @param i18nkeys list of keys for internationalized strings
+     */
+	public void setI18nkeys(List<String> i18nkeys) {
+		this.i18nkeys = i18nkeys;
+	}
+
+	 /** Get languages for internationalized strings
+     * 
+     * @return list of languages for internationalized strings
+     */
+	public List<I18nLanguage> getLanguages() {
+		return languages;
+	}
+
+	 /** Set languages for internationalized strings     
+     * 
+     * @param languages list of languages for internationalized strings
+     */
+	public void setLanguages(List<I18nLanguage> languages) {
+		this.languages = languages;
+	}
+	
+	private Object readResolve() throws ObjectStreamException {
+		if (i18nkeys == null) {
+			i18nkeys = new ArrayList<String>();
+		}
+		if (languages == null) {
+			languages = new ArrayList<I18nLanguage>();
+		}
+		return this;
+	}
 }

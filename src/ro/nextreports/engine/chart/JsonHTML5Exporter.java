@@ -33,6 +33,7 @@ import ro.nextreports.engine.exporter.util.function.AbstractGFunction;
 import ro.nextreports.engine.exporter.util.function.FunctionFactory;
 import ro.nextreports.engine.exporter.util.function.FunctionUtil;
 import ro.nextreports.engine.exporter.util.function.GFunction;
+import ro.nextreports.engine.i18n.I18nUtil;
 import ro.nextreports.engine.queryexec.QueryException;
 import ro.nextreports.engine.queryexec.QueryResult;
 import ro.nextreports.engine.util.ColorUtil;
@@ -52,17 +53,19 @@ public class JsonHTML5Exporter implements ChartExporter {
     private Map<String, Object> parameterValues;
     private String drillFunction;
     private NextChart nc;
+    private String language;
 
     // markup for clicked value inside onClick javascript function
     private static final String CLICKED_VALUE = "#val";            
     
     public JsonHTML5Exporter(Map<String, Object> parameterValues, QueryResult result, OutputStream out,
-                        Chart chart, String drillFunction) {
+                        Chart chart, String drillFunction, String language) {
         this.parameterValues = parameterValues;
         this.result = result;
         this.out = out;
         this.chart = chart;
-        this.drillFunction = drillFunction;        
+        this.drillFunction = drillFunction;
+        this.language = language;
         this.nc = new NextChart();
     }
 
@@ -100,7 +103,7 @@ public class JsonHTML5Exporter implements ChartExporter {
     }
 
     private NextChartTitle createTitle(ChartTitle chartTitle) {
-        NextChartTitle nct = new NextChartTitle(chartTitle.getTitle());
+        NextChartTitle nct = new NextChartTitle(StringUtil.getI18nString(chartTitle.getTitle(), I18nUtil.getLanguageByName(chart, language)));
         Font font = chartTitle.getFont();
         
         if (chartTitle.getColor() !=  null) {
@@ -499,26 +502,29 @@ public class JsonHTML5Exporter implements ChartExporter {
 				if (size > 1) {
 					size--;
 					List<String> lineList = new ArrayList<String>();
-					lineList.add(replaceParameters(chart.getYColumnsLegends().get(size)));					
+					lineList.add(StringUtil.getI18nString(replaceParameters(chart.getYColumnsLegends().get(size)),I18nUtil.getLanguageByName(chart, language)));					
 					nc.setLineLegend(lineList);
 				}
 			}
 			for (int i=0; i<size; i++) {
 				String s = chart.getYColumnsLegends().get(i);
-				list.add(replaceParameters(s));
+				list.add(StringUtil.getI18nString(replaceParameters(s),I18nUtil.getLanguageByName(chart, language)));
 			}			
 			nc.setLegend(list);
 			
 			
 		}		
+				
 		if ((chart.getXLegend() != null) && !isEmpty(chart.getXLegend().getTitle())) {
-			NextChartLegend xLegend = new NextChartLegend(replaceParameters(chart.getXLegend().getTitle()));
+			String xLeg = StringUtil.getI18nString(replaceParameters(chart.getXLegend().getTitle()), I18nUtil.getLanguageByName(chart, language));
+			NextChartLegend xLegend = new NextChartLegend(xLeg);
 			xLegend.setColor(ColorUtil.getHexColor(chart.getXLegend().getColor()));
 			xLegend.setFont(createFont(chart.getXLegend().getFont()));
 			nc.setxLegend(xLegend);
 		}
 		if ((chart.getYLegend() != null) && !isEmpty(chart.getYLegend().getTitle()))  {
-			NextChartLegend yLegend = new NextChartLegend(replaceParameters(chart.getYLegend().getTitle()));
+			String yLeg = StringUtil.getI18nString(replaceParameters(chart.getYLegend().getTitle()), I18nUtil.getLanguageByName(chart, language));
+			NextChartLegend yLegend = new NextChartLegend(yLeg);
 			yLegend.setColor(ColorUtil.getHexColor(chart.getYLegend().getColor()));
 			yLegend.setFont(createFont(chart.getYLegend().getFont()));
 			nc.setyLegend(yLegend);
@@ -569,10 +575,10 @@ public class JsonHTML5Exporter implements ChartExporter {
     // replace $P{...} parameters (used in title and x,y legends
     private String replaceParameters(String text) {
         for  (String param : parameterValues.keySet()) {
-             text = StringUtil.replace(text, "\\$P\\{" + param + "\\}", StringUtil.getValueAsString(parameterValues.get(param), null));
+             text = StringUtil.replace(text, "\\$P\\{" + param + "\\}", StringUtil.getValueAsString(parameterValues.get(param), null,I18nUtil.getLanguageByName(chart, language)));
         }
         return text;
-    }    
+    }           
     
     private boolean isEmpty(String s) {
     	return (s == null) || "".equals(s.trim());

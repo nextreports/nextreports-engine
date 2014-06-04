@@ -37,6 +37,7 @@ public class ExporterBean {
 	private boolean subreport;
 	private List<Alert> alerts;
 	private boolean isProcedure;
+	private String language;
 	
 	public ExporterBean(Connection con, int queryTimeout, QueryResult result,
 			OutputStream out, ReportLayout reportLayout, ParametersBean pBean,
@@ -143,6 +144,14 @@ public class ExporterBean {
 	public List<Alert> getAlerts() {
 		return alerts;
 	}		
+	
+	public String getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
+	}
 
 	@Override
 	public String toString() {

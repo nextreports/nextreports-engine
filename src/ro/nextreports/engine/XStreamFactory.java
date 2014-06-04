@@ -39,6 +39,8 @@ import ro.nextreports.engine.chart.Chart;
 import ro.nextreports.engine.chart.ChartTitle;
 import ro.nextreports.engine.chart.ChartType;
 import ro.nextreports.engine.condition.BandElementCondition;
+import ro.nextreports.engine.i18n.I18nLanguage;
+import ro.nextreports.engine.i18n.I18nString;
 import ro.nextreports.engine.persistence.TablePersistentObject;
 import ro.nextreports.engine.querybuilder.MyRow;
 import ro.nextreports.engine.querybuilder.sql.Column;
@@ -159,6 +161,9 @@ public class XStreamFactory {
 
         xstream.alias("group", ReportGroup.class);
         xstream.alias("band", Band.class);
+        
+        xstream.alias("language", I18nLanguage.class);
+        xstream.alias("i18nstring", I18nString.class);
       
 //        xstream.addImplicitCollection(FormattingConditions.class, "conditions");
         

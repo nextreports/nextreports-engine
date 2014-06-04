@@ -101,7 +101,7 @@ public class CsvExporter extends ResultExporter {
 				}
 			}
         }    
-        put(stream, StringUtil.getValueAsString(value, getPattern(bandElement)));
+        put(stream, StringUtil.getValueAsString(value, getPattern(bandElement), getReportLanguage()));
         if (column == cols - 1) {
             nl(stream);
         }

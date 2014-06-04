@@ -70,6 +70,7 @@ import ro.nextreports.engine.exporter.util.function.AbstractGFunction;
 import ro.nextreports.engine.exporter.util.function.FunctionFactory;
 import ro.nextreports.engine.exporter.util.function.FunctionUtil;
 import ro.nextreports.engine.exporter.util.function.GFunction;
+import ro.nextreports.engine.i18n.I18nUtil;
 import ro.nextreports.engine.queryexec.QueryException;
 import ro.nextreports.engine.queryexec.QueryResult;
 import ro.nextreports.engine.util.StringUtil;
@@ -98,23 +99,24 @@ public class JFreeChartExporter implements ChartExporter {
     private Map<String, Integer> xValueSerie = new HashMap<String, Integer>();
     private float transparency = 0.7f;
     private boolean isLineCombo = false;
+    private String language;
     
-    public JFreeChartExporter(Map<String, Object> parameterValues, QueryResult result, Chart chart) {
-    	this(parameterValues, result, chart, ".", DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    public JFreeChartExporter(Map<String, Object> parameterValues, QueryResult result, Chart chart, String language) {
+    	this(parameterValues, result, chart, ".", DEFAULT_WIDTH, DEFAULT_HEIGHT, language);
     }
     
-    public JFreeChartExporter(Map<String, Object> parameterValues, QueryResult result, Chart chart, String path) {
-    	this(parameterValues, result, chart, path, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    public JFreeChartExporter(Map<String, Object> parameterValues, QueryResult result, Chart chart, String path, String language) {
+    	this(parameterValues, result, chart, path, DEFAULT_WIDTH, DEFAULT_HEIGHT, language);
     }
     
     public JFreeChartExporter(Map<String, Object> parameterValues, QueryResult result, Chart chart, String path, 
-    		int width, int height) {
+    		int width, int height, String language) {
     	
-    	this(parameterValues, result, chart, path, null, width, height);
+    	this(parameterValues, result, chart, path, null, width, height, language);
     }
     
     public JFreeChartExporter(Map<String, Object> parameterValues, QueryResult result, Chart chart, String path, 
-    		String imageName, int width, int height) {
+    		String imageName, int width, int height, String language) {
     	
     	if (width <= 0) {
     		width = DEFAULT_WIDTH;
@@ -129,6 +131,7 @@ public class JFreeChartExporter implements ChartExporter {
         this.chartImageName = imageName;
         this.width = width;
         this.height = height;
+        this.language = language;
     }
 
 	public boolean export() throws QueryException, NoDataFoundException {
@@ -180,7 +183,8 @@ public class JFreeChartExporter implements ChartExporter {
 	
 	private JFreeChart createLineChart() throws QueryException {
 		XYSeriesCollection dataset = new XYSeriesCollection(); 
-		String chartTitle = replaceParameters(chart.getTitle().getTitle());
+		String chartTitle = replaceParameters(chart.getTitle().getTitle());		
+		chartTitle = StringUtil.getI18nString(chartTitle, I18nUtil.getLanguageByName(chart, language));
 		Object[] charts = new Object[chart.getYColumns().size()];
 		List<String> legends = chart.getYColumnsLegends();
 		boolean hasLegend = false;
@@ -188,6 +192,7 @@ public class JFreeChartExporter implements ChartExporter {
 			String legend = "";
 			try {
 				legend = replaceParameters(legends.get(i));
+				legend = StringUtil.getI18nString(legend, I18nUtil.getLanguageByName(chart, language));
 			} catch (IndexOutOfBoundsException ex){
 				// no legend set
 			}
@@ -199,10 +204,13 @@ public class JFreeChartExporter implements ChartExporter {
 			dataset.addSeries(lineChart);
 		}
 		
+		String xLegend = StringUtil.getI18nString(replaceParameters(chart.getXLegend().getTitle()), I18nUtil.getLanguageByName(chart, language));
+		String yLegend = StringUtil.getI18nString(replaceParameters(chart.getYLegend().getTitle()), I18nUtil.getLanguageByName(chart, language));
+		
 		JFreeChart jfreechart = ChartFactory.createXYLineChart(
 				chartTitle, // Title
-				replaceParameters(chart.getXLegend().getTitle()), // x-axis Label
-				replaceParameters(chart.getYLegend().getTitle()), // y-axis Label
+				replaceParameters(xLegend), // x-axis Label
+				replaceParameters(yLegend), // y-axis Label
                 dataset, // Dataset
                 PlotOrientation.VERTICAL, // Plot Orientation
                 true, // Show Legend
@@ -375,6 +383,7 @@ public class JFreeChartExporter implements ChartExporter {
 	private JFreeChart createBarChart(boolean horizontal, boolean stacked, boolean isCombo) throws QueryException {
 		barDataset = new DefaultCategoryDataset();
 		String chartTitle = replaceParameters(chart.getTitle().getTitle());
+		chartTitle = StringUtil.getI18nString(chartTitle, I18nUtil.getLanguageByName(chart, language));
 		Object[] charts;
 		List<String> legends;
 		Object[] lineCharts = null;
@@ -397,6 +406,7 @@ public class JFreeChartExporter implements ChartExporter {
 			String legend = "";
 			try {
 				legend = replaceParameters(legends.get(i));
+				legend = StringUtil.getI18nString(legend, I18nUtil.getLanguageByName(chart, language));
 			} catch (IndexOutOfBoundsException ex){
 				// no legend set
 			}			
@@ -419,12 +429,14 @@ public class JFreeChartExporter implements ChartExporter {
 		byte style = chart.getType().getStyle();
 		JFreeChart jfreechart;
 						
+		String xLegend = StringUtil.getI18nString(replaceParameters(chart.getXLegend().getTitle()), I18nUtil.getLanguageByName(chart, language));
+		String yLegend = StringUtil.getI18nString(replaceParameters(chart.getYLegend().getTitle()), I18nUtil.getLanguageByName(chart, language));
 		PlotOrientation plotOrientation = horizontal ? PlotOrientation.HORIZONTAL : PlotOrientation.VERTICAL;
 		if (stacked) {
 			jfreechart = ChartFactory.createStackedBarChart(
     				chartTitle,                    // chart title
-    				replaceParameters(chart.getXLegend().getTitle()), // x-axis Label
-    				replaceParameters(chart.getYLegend().getTitle()), // y-axis Label
+    				xLegend,                       // x-axis Label
+    				yLegend,                       // y-axis Label
     	            barDataset,                    // data
     	            plotOrientation,               // orientation
     	            true,                          // include legend
@@ -437,8 +449,8 @@ public class JFreeChartExporter implements ChartExporter {
 			case ChartType.STYLE_BAR_CYLINDER:
 				jfreechart = ChartFactory.createBarChart3D(
 						chartTitle,                    // chart title
-						replaceParameters(chart.getXLegend().getTitle()), // x-axis Label
-						replaceParameters(chart.getYLegend().getTitle()), // y-axis Label
+						xLegend,                       // x-axis Label
+						yLegend,                       // y-axis Label
 						barDataset,                    // data
 						plotOrientation,               // orientation
 						true,                          // include legend
@@ -449,8 +461,8 @@ public class JFreeChartExporter implements ChartExporter {
 			default:
 				jfreechart = ChartFactory.createBarChart(
 						chartTitle,                    // chart title
-						replaceParameters(chart.getXLegend().getTitle()), // x-axis Label
-						replaceParameters(chart.getYLegend().getTitle()), // y-axis Label
+						xLegend,                       // x-axis Label
+						yLegend,                       // y-axis Label
 						barDataset,                    // data
 						plotOrientation,               // orientation
 						true,                          // include legend
@@ -646,6 +658,7 @@ public class JFreeChartExporter implements ChartExporter {
 	private JFreeChart createAreaChart() throws QueryException {
 		barDataset = new DefaultCategoryDataset();
 		String chartTitle = replaceParameters(chart.getTitle().getTitle());
+		chartTitle = StringUtil.getI18nString(chartTitle, I18nUtil.getLanguageByName(chart, language));
 		Object[] charts = new Object[chart.getYColumns().size()];
 		List<String> legends = chart.getYColumnsLegends();
 		boolean hasLegend = false;
@@ -653,6 +666,7 @@ public class JFreeChartExporter implements ChartExporter {
 			String legend = "";
 			try {
 				legend = replaceParameters(legends.get(i));
+				legend = StringUtil.getI18nString(legend, I18nUtil.getLanguageByName(chart, language));
 			} catch (IndexOutOfBoundsException ex){
 				// no legend set
 			}			
@@ -665,11 +679,13 @@ public class JFreeChartExporter implements ChartExporter {
 			charts[i] = legend;			
 		}		
 						
+		String xLegend = StringUtil.getI18nString(replaceParameters(chart.getXLegend().getTitle()), I18nUtil.getLanguageByName(chart, language));
+		String yLegend = StringUtil.getI18nString(replaceParameters(chart.getYLegend().getTitle()), I18nUtil.getLanguageByName(chart, language));
 		byte style = chart.getType().getStyle();
 		JFreeChart jfreechart = ChartFactory.createAreaChart(
 	            "Area Chart",             // chart title
-	            replaceParameters(chart.getXLegend().getTitle()), // x-axis Label
-				replaceParameters(chart.getYLegend().getTitle()), // y-axis Label
+	            xLegend,                  // x-axis Label
+				yLegend,                  // y-axis Label
 	            barDataset,               // data
 	            PlotOrientation.VERTICAL, // orientation
 	            true,                     // include legend
@@ -787,6 +803,7 @@ public class JFreeChartExporter implements ChartExporter {
 	private JFreeChart createPieChart() throws QueryException {		
 		pieDataset = new DefaultPieDataset();
 		String chartTitle = replaceParameters(chart.getTitle().getTitle());
+		chartTitle = StringUtil.getI18nString(chartTitle, I18nUtil.getLanguageByName(chart, language));
 		JFreeChart jfreechart = ChartFactory.createPieChart(
 				    chartTitle,
 	                pieDataset, 
@@ -848,10 +865,13 @@ public class JFreeChartExporter implements ChartExporter {
 		// x, y are inverted for jfree bubble chart!
 		// that's why we use minX & maxX values to compute Tu (tickUnit)
 		String chartTitle = replaceParameters(chart.getTitle().getTitle());
+		chartTitle = StringUtil.getI18nString(chartTitle, I18nUtil.getLanguageByName(chart, language));
+		String xLegend = StringUtil.getI18nString(replaceParameters(chart.getYLegend().getTitle()), I18nUtil.getLanguageByName(chart, language));
+		String yLegend = StringUtil.getI18nString(replaceParameters(chart.getXLegend().getTitle()), I18nUtil.getLanguageByName(chart, language));
 		JFreeChart jfreechart = ChartFactory.createBubbleChart(
 				    chartTitle,
-				    replaceParameters(chart.getYLegend().getTitle()), // x-axis Label
-					replaceParameters(chart.getXLegend().getTitle()), // y-axis Label
+				    xLegend, // x-axis Label
+					yLegend, // y-axis Label
 				    bubbleDataset, 
 				    PlotOrientation.HORIZONTAL,
 	                true, 
@@ -1013,12 +1033,14 @@ public class JFreeChartExporter implements ChartExporter {
 		public String generateLabel(XYDataset dataset, int series, int item) {					
 			String[] keys = new String[bubbleData.size()]; 
 			bubbleData.keySet().toArray(keys);
-			return bubbleData.get(keys[series]).getLabels().get(item);		    
+			String legend = bubbleData.get(keys[series]).getLabels().get(item);
+			legend = StringUtil.getI18nString(legend, I18nUtil.getLanguageByName(chart, language));			
+			return legend;
 		}
 	}
 	
 	private void setTitle(JFreeChart jfreechart) {
-		TextTitle title = new TextTitle(replaceParameters(chart.getTitle().getTitle()));
+		TextTitle title = new TextTitle(StringUtil.getI18nString(replaceParameters(chart.getTitle().getTitle()), I18nUtil.getLanguageByName(chart, language)));
 		title.setFont(chart.getTitle().getFont());
 		title.setPaint(chart.getTitle().getColor());
 		if  (chart.getTitle().getAlignment() == ChartTitle.LEFT_ALIGNMENT) {
@@ -1265,7 +1287,7 @@ public class JFreeChartExporter implements ChartExporter {
     		return null;
     	}
         for  (String param : parameterValues.keySet()) {
-             text = StringUtil.replace(text, "\\$P\\{" + param + "\\}", StringUtil.getValueAsString(parameterValues.get(param), null));
+             text = StringUtil.replace(text, "\\$P\\{" + param + "\\}", StringUtil.getValueAsString(parameterValues.get(param), null,I18nUtil.getLanguageByName(chart, language)));
         }
         return text;
     }

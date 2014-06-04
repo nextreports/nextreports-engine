@@ -42,6 +42,9 @@ import com.thoughtworks.xstream.core.util.Base64Encoder;
 
 import ro.nextreports.engine.exporter.util.RomanNumberConverter;
 import ro.nextreports.engine.exporter.util.StyleFormatConstants;
+import ro.nextreports.engine.i18n.I18nLanguage;
+import ro.nextreports.engine.i18n.I18nString;
+import ro.nextreports.engine.i18n.I18nUtil;
 import ro.nextreports.engine.queryexec.IdName;
 
 
@@ -194,8 +197,12 @@ public class StringUtil {
         Matcher matcher = pattern.matcher(s);
         return matcher.matches();            
     }
-
+    
     public static String getValueAsString(Object val, String pattern) {
+    	return getValueAsString(val, pattern, null);
+    }
+
+    public static String getValueAsString(Object val, String pattern, I18nLanguage lang) {
         if (val == null) {
             return null;
         }
@@ -212,6 +219,15 @@ public class StringUtil {
         if (val instanceof String) {
             return (String) val;
         }
+        
+        // i18n pattern
+        if ((pattern != null) && pattern.contains(I18nString.MARKUP)) {
+        	if (lang != null) {
+        		pattern = getI18nString(pattern, lang);
+        	}
+            		
+        }
+        
         if (val instanceof Number) {
             if (pattern == null) {                
                 return NumberFormat.getNumberInstance().format(((Number) val).doubleValue());
@@ -225,7 +241,7 @@ public class StringUtil {
         if (val instanceof Date) {
             if (pattern == null) {
             	return DateFormat.getDateInstance().format((Date)val);                
-            } else {
+            } else {            	
                 SimpleDateFormat sfd = new SimpleDateFormat(pattern);
                 return sfd.format((Date) val);
             }
@@ -382,6 +398,44 @@ public class StringUtil {
 		}	
 		return sb.toString().toLowerCase();
 	}
-
+	
+	public static String getI18nString(String s, I18nLanguage lang) {			
+		int index = s.indexOf(I18nString.MARKUP);
+		if (index == -1) {
+			return s;
+		} else {
+			String s2 = s.substring(index + I18nString.MARKUP.length());
+			int index2 = s2.indexOf(I18nString.MARKUP);
+			if (index2 == -1) {
+				return s;
+			} else {				
+				String key = s2.substring(0, index2);				
+				if (lang == null) {
+					return s;
+				} else {
+					String newValue = I18nUtil.getString(key, lang);
+					if ("".equals(newValue.trim())) {
+						return s;
+					}
+					return s.substring(0, index) + I18nUtil.getString(key, lang) + s2.substring(index2 + I18nString.MARKUP.length());
+				}
+			}
+		}
+	}
+	
+	public static String getKey(String s) {			
+		int index = s.indexOf(I18nString.MARKUP);
+		if (index == -1) {
+			return null;
+		} else {
+			String s2 = s.substring(index + I18nString.MARKUP.length());
+			int index2 = s2.indexOf(I18nString.MARKUP);
+			if (index2 == -1) {
+				return null;
+			} else {				
+				return s2.substring(0, index2);
+			}
+		}
+	}
 
 }

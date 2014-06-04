@@ -114,6 +114,8 @@ public class ReportRunner implements Runner {
     // to write excel in a existing template, in a specific sheet (other sheets may contain calculations on data sheet)
     private String templateName;
     private int sheetNumber;
+    
+    private String language;
 
     /** Get database connection
      *
@@ -350,10 +352,15 @@ public class ReportRunner implements Runner {
             ParametersBean bean = new ParametersBean(query, parameters, parameterValues);
                         
             ReportLayout convertedLayout = ReportUtil.getDynamicReportLayout(connection, report.getLayout(), bean);
-            
+                        
             boolean isProcedure = QueryUtil.isProcedureCall(sql);
-            createExporter( new ExporterBean(connection, queryTimeout, queryResult, stream, convertedLayout, 
-            								 bean, report.getBaseName(), false, alerts, isProcedure));
+            
+            ExporterBean eb = new ExporterBean(connection, queryTimeout, queryResult, stream, convertedLayout, 
+					 bean, report.getBaseName(), false, alerts, isProcedure);
+            if (language != null) {            	
+            	eb.setLanguage(language);
+            }
+            createExporter(eb);
 
             return exporter.export();
         } catch (NoDataFoundException e) {
@@ -381,7 +388,8 @@ public class ReportRunner implements Runner {
         return false;
     }
     
-    private void createExporter(ExporterBean bean) {        
+    private void createExporter(ExporterBean bean) {     
+    	bean.setLanguage(language);
         if (TABLE_FORMAT.equals(format)) {     
         	bean.setConnection(null);
         	bean.setQueryTimeout(0);
@@ -536,6 +544,25 @@ public class ReportRunner implements Runner {
 
 	public void setSheetNumber(int sheetNumber) {
 		this.sheetNumber = sheetNumber;
+	}
+
+	/** Get language for internationalization
+	 * 
+	 * @return language for internationalization
+	 */
+	public String getLanguage() {
+		return language;
+	}
+
+	/** Set language for internationalization
+	 * 
+	 * Language string is computed as :
+	 *     locale.getLanguage() + "_" + locale.getCountry()
+	 * 
+	 * @param language language for internationalization
+	 */
+	public void setLanguage(String language) {
+		this.language = language;
 	}		        
     
 }

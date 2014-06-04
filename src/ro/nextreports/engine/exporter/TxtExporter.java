@@ -97,7 +97,7 @@ public class TxtExporter extends ResultExporter {
 				}
 			}
         }    
-        put(stream, StringUtil.getValueAsString(value, getPattern(bandElement)), column, colSpan, bandElement);
+        put(stream, StringUtil.getValueAsString(value, getPattern(bandElement), getReportLanguage()), column, colSpan, bandElement);
         if (column == cols - 1) {
             nl(stream);
         }

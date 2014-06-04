@@ -16,13 +16,18 @@
  */
 package ro.nextreports.engine.chart;
 
+import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.awt.*;
+import java.text.Collator;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import ro.nextreports.engine.Report;
+import ro.nextreports.engine.i18n.I18nLanguage;
 
 /**
  * User: mihai.panaitescu
@@ -79,6 +84,8 @@ public class Chart implements Serializable {
     private Font font;
     private Font xLabelFont;
     private Font yLabelFont;
+    private List<String> i18nkeys;
+    private List<I18nLanguage> languages;
 
     public static transient Color[] COLORS = new Color[] {
             new Color(0, 0, 204),
@@ -483,6 +490,8 @@ public class Chart implements Serializable {
         if (xAxisColor != null ? !xAxisColor.equals(chart.xAxisColor) : chart.xAxisColor != null) return false;
         if (yAxisColor != null ? !yAxisColor.equals(chart.yAxisColor) : chart.yAxisColor != null) return false;
         if (tooltipMessage != null ? !tooltipMessage.equals(chart.tooltipMessage) : chart.tooltipMessage != null) return false;
+        if (i18nkeys != null ? !i18nkeys.equals(chart.i18nkeys) : chart.i18nkeys != null) return false;
+        if (languages != null ? !languages.equals(chart.languages) : chart.languages != null) return false;        
 
         return true;
     }
@@ -522,6 +531,8 @@ public class Chart implements Serializable {
         result = 31 * result + (xLabelFont != null ? xLabelFont.hashCode() : 0);
         result = 31 * result + (yLabelFont != null ? yLabelFont.hashCode() : 0);
         result = 31 * result + (tooltipMessage != null ? tooltipMessage.hashCode() : 0);
+        result = 31 * result + (i18nkeys != null ? i18nkeys.hashCode() : 0);
+        result = 31 * result + (languages != null ? languages.hashCode() : 0);
         return result;
     }
 
@@ -560,6 +571,57 @@ public class Chart implements Serializable {
                 ", font=" + font +
                 ", xLabelFont=" + xLabelFont +
                 ", yLabelFont=" + yLabelFont +
+                ", i18nkeys='" + i18nkeys + '\'' +
+                ", languages='" + languages + '\'' +
                 '}';
     }
+    
+    /** Get keys for internationalized strings
+     * 
+     * @return list of keys for internationalized strings
+     */
+    public List<String> getI18nkeys() {
+    	Collections.sort(i18nkeys, new Comparator<String>() {
+
+			@Override
+			public int compare(String o1, String o2) {				
+				return Collator.getInstance().compare(o1, o2);
+			}
+		});
+		return i18nkeys;
+	}
+
+    /** Set keys for internationalized strings     
+     * 
+     * @param i18nkeys list of keys for internationalized strings
+     */
+	public void setI18nkeys(List<String> i18nkeys) {
+		this.i18nkeys = i18nkeys;
+	}
+
+	 /** Get languages for internationalized strings
+     * 
+     * @return list of languages for internationalized strings
+     */
+	public List<I18nLanguage> getLanguages() {
+		return languages;
+	}
+
+	 /** Set languages for internationalized strings     
+     * 
+     * @param languages list of languages for internationalized strings
+     */
+	public void setLanguages(List<I18nLanguage> languages) {
+		this.languages = languages;
+	}
+	
+	private Object readResolve() throws ObjectStreamException {
+		if (i18nkeys == null) {
+			i18nkeys = new ArrayList<String>();
+		}
+		if (languages == null) {
+			languages = new ArrayList<I18nLanguage>();
+		}
+		return this;
+	}
 }

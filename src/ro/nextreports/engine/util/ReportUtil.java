@@ -54,11 +54,14 @@ import ro.nextreports.engine.band.BarcodeBandElement;
 import ro.nextreports.engine.band.ChartBandElement;
 import ro.nextreports.engine.band.ExpressionBandElement;
 import ro.nextreports.engine.band.ExpressionBean;
+import ro.nextreports.engine.band.FieldBandElement;
 import ro.nextreports.engine.band.ForReportBandElement;
 import ro.nextreports.engine.band.FunctionBandElement;
 import ro.nextreports.engine.band.ImageBandElement;
 import ro.nextreports.engine.band.ReportBandElement;
 import ro.nextreports.engine.exporter.util.ParametersBean;
+import ro.nextreports.engine.i18n.I18nLanguage;
+import ro.nextreports.engine.i18n.I18nString;
 import ro.nextreports.engine.queryexec.IdName;
 import ro.nextreports.engine.queryexec.QueryParameter;
 import ro.nextreports.engine.util.converter.ConverterChain;
@@ -1059,6 +1062,31 @@ public class ReportUtil {
 			FunctionBandElement fbe = new FunctionBandElement(function, column);
 			result.add(fbe);
 		}				
+		return result;
+	}		
+	
+	
+	public static List<String> getKeys(ReportLayout layout) {
+		List<String> result = new ArrayList<String>();
+		List<Band> bands = layout.getBands();
+		for (Band band : bands) {
+			for (int i=0, size = band.getRowCount(); i<size; i++) {
+				List<BandElement> elements = band.getRow(i);
+				for (BandElement be : elements) {
+					if (be != null) {
+						if (be.getText().contains(I18nString.MARKUP)) {							
+							result.add(StringUtil.getKey(be.getText()));	
+						}
+						if (be instanceof FieldBandElement) {
+							String pattern = ((FieldBandElement)be).getPattern();
+							if ((pattern != null) && (pattern.indexOf(I18nString.MARKUP) != -1)) {								
+								result.add(StringUtil.getKey(pattern));
+							}
+						}
+					}
+				}
+			}
+		}
 		return result;
 	}		
 

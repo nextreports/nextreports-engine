@@ -332,8 +332,8 @@ public class HtmlExporter extends ResultExporter {
     }
 
 
-    private String getStringValue(Object val, String pattern) {
-        String v = StringUtil.getValueAsString(val, pattern);
+    private String getStringValue(Object val, String pattern) {    	
+        String v = StringUtil.getValueAsString(val, pattern, getReportLanguage());
         if (v == null) {
             return getNullElement();
         }
