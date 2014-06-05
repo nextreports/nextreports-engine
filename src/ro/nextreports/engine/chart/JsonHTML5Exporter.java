@@ -168,7 +168,8 @@ public class JsonHTML5Exporter implements ChartExporter {
 		nc.setTickCount(5);
 		
 		if ((chart.getTooltipMessage() != null) && ! chart.getTooltipMessage().trim().isEmpty()) {
-			nc.setMessage(chart.getTooltipMessage());
+			String msg = StringUtil.getI18nStringMultiple(chart.getTooltipMessage(), I18nUtil.getLanguageByName(chart, language));
+			nc.setMessage(msg);
 		}
 
         boolean showXLabel = chart.getXShowLabel() == null ? false : chart.getXShowLabel();

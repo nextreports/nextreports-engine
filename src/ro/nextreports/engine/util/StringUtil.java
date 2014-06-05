@@ -423,6 +423,19 @@ public class StringUtil {
 		}
 	}
 	
+	public static String getI18nStringMultiple(String s, I18nLanguage lang) {		
+		s = getI18nString(s, lang);
+		while (s.contains(I18nString.MARKUP)) {
+			String oldS = s;
+			s = getI18nString(s, lang);
+			// only start markup, we should exit
+			if (oldS.equals(s)) {
+				break;
+			}
+		}
+		return s;		
+	}
+	
 	public static String getKey(String s) {			
 		int index = s.indexOf(I18nString.MARKUP);
 		if (index == -1) {
