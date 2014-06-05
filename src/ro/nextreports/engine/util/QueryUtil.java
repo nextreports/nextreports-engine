@@ -68,9 +68,13 @@ public class QueryUtil {
 		System.out.println(sql);
 		return sql;
 	}
-
+	
 	public List<String> getColumnNames(String sql, Map<String, QueryParameter> params) throws Exception {
-		List<NameType> list = getColumns(sql, params);
+		return getColumnNames(sql, params, null);
+	}
+
+	public List<String> getColumnNames(String sql, Map<String, QueryParameter> params, List<NameType> cachedColumns) throws Exception {
+		List<NameType> list = getColumns(sql, params, cachedColumns);
 		List<String> columns = new ArrayList<String>();
 		for (NameType nt : list) {
 			columns.add(nt.getName());
@@ -78,17 +82,13 @@ public class QueryUtil {
 		return columns;
 	}
 
-	public List<String> getColumnTypes(String sql, Map<String, QueryParameter> params) throws Exception {
-		List<NameType> list = getColumns(sql, params);
-		List<String> types = new ArrayList<String>();
-		for (NameType nt : list) {
-			types.add(nt.getType());
-		}
-		return types;
+	public List<String> getColumnTypes(String sql, Map<String, QueryParameter> params, List<NameType> cachedColumns) throws Exception {
+		List<NameType> list = getColumns(sql, params, cachedColumns);
+		return ReportUtil.getColumnNames(list);
 	}
-
-	public String getColumnType(String sql, Map<String, QueryParameter> params, String columnName) throws Exception {
-		List<NameType> list = getColumns(sql, params);
+	
+	public String getColumnType(String sql, Map<String, QueryParameter> params, String columnName, List<NameType> cachedColumns) throws Exception {
+		List<NameType> list = getColumns(sql, params, cachedColumns);
 		for (NameType nt : list) {
 			if (nt.getName().equalsIgnoreCase(columnName)) {
 				return nt.getType();
@@ -96,8 +96,17 @@ public class QueryUtil {
 		}
 		return null;
 	}
-
+	
 	public List<NameType> getColumns(String sql, Map<String, QueryParameter> params) throws Exception {
+		return getColumns(sql, params, null);
+	}
+		
+
+	public List<NameType> getColumns(String sql, Map<String, QueryParameter> params, List<NameType> cachedColumns) throws Exception {
+		if (cachedColumns != null) {
+			return cachedColumns;
+		}
+		
 		// create the query object
 		Query query = new Query(sql);
 

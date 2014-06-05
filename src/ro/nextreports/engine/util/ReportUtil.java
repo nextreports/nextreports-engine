@@ -1088,6 +1088,14 @@ public class ReportUtil {
 			}
 		}
 		return result;
-	}		
+	}	
+	
+	public static List<String> getColumnNames(List<NameType> columns) {
+		List<String> names = new ArrayList<String>();
+		for (NameType nt : columns) {
+			names.add(nt.getName());
+		}
+		return names;
+	}
 
 }
