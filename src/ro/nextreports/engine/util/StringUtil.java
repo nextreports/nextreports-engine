@@ -28,6 +28,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
 import java.text.DateFormat;
@@ -449,6 +450,26 @@ public class StringUtil {
 				return s2.substring(0, index2);
 			}
 		}
+	}
+	
+	public static List<String> getKeys(String s) {
+		List<String> result = new ArrayList<String>();
+		if (s == null) {
+			return result;
+		}
+		int index = s.indexOf(I18nString.MARKUP);
+		while (index != -1) {
+			String s2 = s.substring(index + I18nString.MARKUP.length());
+			int index2 = s2.indexOf(I18nString.MARKUP);
+			if (index2 != -1) {							
+				result.add(s2.substring(0, index2));
+			} else {
+				break;
+			}
+			s = s2.substring(index2 + I18nString.MARKUP.length());
+			index = s.indexOf(I18nString.MARKUP);
+		}		
+		return result;
 	}
 
 }
