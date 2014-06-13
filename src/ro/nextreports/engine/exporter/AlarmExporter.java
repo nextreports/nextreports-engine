@@ -29,6 +29,7 @@ import ro.nextreports.engine.band.BandElement;
 import ro.nextreports.engine.exporter.util.AlarmData;
 import ro.nextreports.engine.exporter.util.StyleFormatConstants;
 import ro.nextreports.engine.queryexec.QueryException;
+import ro.nextreports.engine.util.ColorUtil;
 
 public class AlarmExporter extends ResultExporter {
 	        
@@ -50,9 +51,9 @@ public class AlarmExporter extends ResultExporter {
         if (ReportLayout.DETAIL_BAND_NAME.equals(bandName)) {
             if (rows == 1) {            	
                 if (column == 0) {
-                	data.setColor(bandElement.getBackground());
+                	data.setColor(ColorUtil.getHexColor(bandElement.getBackground()));
                 	if (style.containsKey(StyleFormatConstants.BACKGROUND_COLOR)) {
-                        data.setColor((Color) style.get(StyleFormatConstants.BACKGROUND_COLOR));                        
+                        data.setColor(ColorUtil.getHexColor((Color) style.get(StyleFormatConstants.BACKGROUND_COLOR)));                        
                     }
 					for (Alert alert : alerts) {
 						if (isAlert(alert, value)) {
@@ -63,9 +64,9 @@ public class AlarmExporter extends ResultExporter {
 					}
                 } else if (column == 1) {
                 	if (value == null) {
-                		data.setMessage("");
+                		data.setText("");
                 	} else {
-                		data.setMessage(value.toString());
+                		data.setText(value.toString());
                 	}
                 	for (int i=0, size=alertValues.size(); i<size; i++) {
                 		Object alertValue = alertValues.get(i);

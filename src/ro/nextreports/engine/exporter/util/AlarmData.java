@@ -18,45 +18,65 @@ package ro.nextreports.engine.exporter.util;
 
 import java.awt.Color;
 import java.io.Serializable;
+import java.io.StringWriter;
+
+import ro.nextreports.engine.util.ColorUtil;
+
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class AlarmData implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private Color color;
-	private String message;
+	private String color;
+	private String text;
 	
 	public AlarmData() {
-		color = Color.WHITE;
-        message = "";
+		color =  ColorUtil.getHexColor(Color.WHITE);
+        text = "";
 	}
 	
-	public AlarmData(Color color, String message) {
+	public AlarmData(String color, String text) {
 		super();
 		this.color = color;
-		this.message = message;
+		this.text = text;
 	}
 
-	public Color getColor() {
+	public String getColor() {
 		return color;
 	}
 
-	public String getMessage() {
-		return message;
+	public String getText() {
+		return text;
 	}		
 
-	public void setColor(Color color) {
+	public void setColor(String color) {
 		this.color = color;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
+	public void setText(String text) {
+		this.text = text;
 	}
 
 	// Do not modify : used by wicket model on the server
 	@Override
 	public String toString() {
-		return message;
+		return text;
 	}
+	
+	public String toJson() {
+		ObjectMapper mapper = new ObjectMapper();		
+		mapper.setSerializationInclusion(Include.NON_NULL);
+		mapper.setSerializationInclusion(Include.NON_EMPTY);
+		StringWriter writer = new StringWriter();
+		try {
+			mapper.writeValue(writer, this);
+			return writer.toString();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return "Error : " + ex.getMessage();
+		}
+	}	
 	
 }
