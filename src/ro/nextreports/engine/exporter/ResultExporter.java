@@ -80,6 +80,7 @@ import ro.nextreports.engine.band.FieldBandElement;
 import ro.nextreports.engine.band.FunctionBandElement;
 import ro.nextreports.engine.band.HyperlinkBandElement;
 import ro.nextreports.engine.band.ImageBandElement;
+import ro.nextreports.engine.band.ImageColumnBandElement;
 import ro.nextreports.engine.band.Padding;
 import ro.nextreports.engine.band.ParameterBandElement;
 import ro.nextreports.engine.band.RowElement;
@@ -1203,14 +1204,18 @@ public abstract class ResultExporter {
     	
     	Object value = null;
         String column = null;
-        if (bandElement instanceof ColumnBandElement) {
+        if (bandElement instanceof ColumnBandElement) {        	
             if (staticBand == null) {
                 column = ((ColumnBandElement) bandElement).getColumn();
                 if (usePrevious) {
                     value = previousRow[getResult().getColumnIndex(column)];
                 } else {
-                    value = getResult().nextValue(column);
-                }
+                	if (bandElement instanceof ImageColumnBandElement) {
+                		value = getResult().nextBlobValue(column);
+                	} else {
+                		value = getResult().nextValue(column);
+                	}                    
+                }                                
 
                 // here compute the footer functions
                 for (FunctionCache fc : footerFunctionCache) {

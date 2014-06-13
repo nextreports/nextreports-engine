@@ -89,6 +89,18 @@ public class QueryResult {
             throw new QueryException(e);
         }
     }
+    
+    public Object nextBlobValue(String columnName) throws QueryException {
+        if (resultSet == null) {
+            return null;
+        }
+        
+        try {
+            return resultSet.getBlob(columnName);
+        } catch (SQLException e) {
+            throw new QueryException(e);
+        }
+    }
 
     public Object nextValue(int columnIndex) throws QueryException {
         if (resultSet == null) {

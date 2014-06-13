@@ -240,7 +240,7 @@ public class HtmlExporter extends ResultExporter {
 				}
 			}
         } else if (bandElement instanceof ImageColumnBandElement){
-        	   		
+        	
     		String v = StringUtil.getValueAsString(value, null);
     		if(StringUtil.BLOB.equals(v)) {
     			sb.append(StringUtil.BLOB);            			
