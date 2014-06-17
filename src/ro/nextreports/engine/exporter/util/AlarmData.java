@@ -31,16 +31,19 @@ public class AlarmData implements Serializable {
 	
 	private String color;
 	private String text;
+	private boolean shadow;
 	
 	public AlarmData() {
 		color =  ColorUtil.getHexColor(Color.WHITE);
         text = "";
+        shadow = false;
 	}
 	
 	public AlarmData(String color, String text) {
 		super();
 		this.color = color;
 		this.text = text;
+		this.shadow = false;
 	}
 
 	public String getColor() {
@@ -57,6 +60,14 @@ public class AlarmData implements Serializable {
 
 	public void setText(String text) {
 		this.text = text;
+	}
+		
+	public boolean isShadow() {
+		return shadow;
+	}
+
+	public void setShadow(boolean shadow) {
+		this.shadow = shadow;
 	}
 
 	// Do not modify : used by wicket model on the server

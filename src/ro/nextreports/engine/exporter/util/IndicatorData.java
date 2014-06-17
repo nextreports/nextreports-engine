@@ -32,6 +32,7 @@ public class IndicatorData implements Serializable {
 	private Color color;
 	private Color background;
 	private double value;
+	private boolean shadow;
 	
 	public IndicatorData() {
 		super();		
@@ -44,6 +45,7 @@ public class IndicatorData implements Serializable {
 		color = Color.RED;
 		background = Color.WHITE;
 		value = 0;
+		shadow = false;
 	}
 
 	public void setTitle(String title) {
@@ -117,5 +119,14 @@ public class IndicatorData implements Serializable {
 	public double getValue() {
 		return value;
 	}
+
+	public boolean isShadow() {
+		return shadow;
+	}
+
+	public void setShadow(boolean shadow) {
+		this.shadow = shadow;
+	}
+	
 				
 }

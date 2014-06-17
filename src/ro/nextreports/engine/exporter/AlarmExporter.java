@@ -74,6 +74,8 @@ public class AlarmExporter extends ResultExporter {
                 			executeAlert(alerts.get(i), alertValue, value.toString());
                 		}
                 	}
+                } else if (column == 2) {
+                	data.setShadow(Boolean.parseBoolean(bandElement.getText()));
                 }
             }
             return;

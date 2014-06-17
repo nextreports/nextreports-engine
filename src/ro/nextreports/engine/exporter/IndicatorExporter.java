@@ -55,6 +55,7 @@ public class IndicatorExporter extends ResultExporter {
         						break;
         				case 2: data.setUnit(bandElement.getText());
         						break;
+        				case 3: data.setShadow(Boolean.parseBoolean(bandElement.getText()));		
         			}
         		} else if (row == 1) {
 					switch (column) {
