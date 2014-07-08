@@ -149,12 +149,10 @@ public class XlsExporter extends ResultExporter {
 
     private void createFontsAndStyles() {
         int cols = bean.getReportLayout().getColumnCount();
-        int rows = bean.getReportLayout().getRowCount();
-        fonts = new HSSFFont[rows][cols];
+        int rows = bean.getReportLayout().getRowCount();        
         styles = new HSSFCellStyle[rows][cols];
         for (int i=0; i<rows; i++) {
-            for (int j=0; j<cols; j++) {
-                fonts[i][j] = wb.createFont();
+            for (int j=0; j<cols; j++) {                
                 styles[i][j] = wb.createCellStyle();
             }
         }
@@ -272,9 +270,10 @@ public class XlsExporter extends ResultExporter {
     // reuse fonts and styles
     // there is a maximum number of unique fonts in a workbook (512)
     // there is a maximum number of cell formats (4000)
-    private HSSFFont[][] fonts;
+    //private HSSFFont[][] fonts;
     private HSSFCellStyle[][] styles;
     // cache fonts used by formatting conditions
+    private Map<Integer, HSSFFont> fonts = new HashMap<Integer, HSSFFont>();
     private Map<Integer, HSSFFont> condFonts = new HashMap<Integer, HSSFFont>();
     
     private Border border;
@@ -287,6 +286,7 @@ public class XlsExporter extends ResultExporter {
         // we have to create new fonts and styles if some formatting conditions are met  
         // also for subreports we may have a subreportCellStyle passed by ReportBandElement 
         boolean cacheFont = false;
+        boolean cacheAllFont = false;
         if ((modifiedStyle[gridRow][gridColumn]) || bean.isSubreport()) {
         	fontKey = getFontKey(style);
         	if (fontKey != -1) {
@@ -300,43 +300,55 @@ public class XlsExporter extends ResultExporter {
             modifiedStyle[gridRow][gridColumn] = false;
         } else {
             cellStyle = styles[gridRow][gridColumn];
-            cellFont = fonts[gridRow][gridColumn];
+            fontKey = getFontKey(style);
+        	if (fontKey != -1) {        		
+        		cellFont = fonts.get(fontKey);        		
+        	}
+        	if (cellFont == null) {        		
+            	cellFont = wb.createFont();
+            	cacheAllFont = true;
+            }	           
         }
 
         // HSSFPalette cellPal = wb.getCustomPalette();
-        if (style.containsKey(StyleFormatConstants.FONT_FAMILY_KEY)) {
-            String val = (String) style.get(StyleFormatConstants.FONT_FAMILY_KEY);
-            cellFont.setFontName(val);
-        }
-        if (style.containsKey(StyleFormatConstants.FONT_SIZE)) {
-            Float val = (Float) style.get(StyleFormatConstants.FONT_SIZE);
-            cellFont.setFontHeightInPoints(val.shortValue());
-        }
-        if (style.containsKey(StyleFormatConstants.FONT_COLOR)) {
-            Color val = (Color) style.get(StyleFormatConstants.FONT_COLOR);
-            cellFont.setColor(ExcelColorSupport.getNearestColor(val));
-        }
-        if (style.containsKey(StyleFormatConstants.FONT_STYLE_KEY)) {
-            if (StyleFormatConstants.FONT_STYLE_NORMAL.equals(
-                    style.get(StyleFormatConstants.FONT_STYLE_KEY))) {
-                cellFont.setBoldweight(HSSFFont.BOLDWEIGHT_NORMAL);
-            }
-            if (StyleFormatConstants.FONT_STYLE_BOLD.equals(
-                    style.get(StyleFormatConstants.FONT_STYLE_KEY))) {
-                cellFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
-            }
-            if (StyleFormatConstants.FONT_STYLE_ITALIC.equals(
-                    style.get(StyleFormatConstants.FONT_STYLE_KEY))) {
-                cellFont.setItalic(true);
-            }
-            if (StyleFormatConstants.FONT_STYLE_BOLDITALIC.equals(
-                    style.get(StyleFormatConstants.FONT_STYLE_KEY))) {
-                cellFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
-                cellFont.setItalic(true);
-            }
+        if (cacheFont || cacheAllFont) {
+	        if (style.containsKey(StyleFormatConstants.FONT_FAMILY_KEY)) {
+	            String val = (String) style.get(StyleFormatConstants.FONT_FAMILY_KEY);
+	            cellFont.setFontName(val);
+	        }
+	        if (style.containsKey(StyleFormatConstants.FONT_SIZE)) {
+	            Float val = (Float) style.get(StyleFormatConstants.FONT_SIZE);
+	            cellFont.setFontHeightInPoints(val.shortValue());
+	        }
+	        if (style.containsKey(StyleFormatConstants.FONT_COLOR)) {
+	            Color val = (Color) style.get(StyleFormatConstants.FONT_COLOR);
+	            cellFont.setColor(ExcelColorSupport.getNearestColor(val));
+	        }
+	        if (style.containsKey(StyleFormatConstants.FONT_STYLE_KEY)) {
+	            if (StyleFormatConstants.FONT_STYLE_NORMAL.equals(
+	                    style.get(StyleFormatConstants.FONT_STYLE_KEY))) {
+	                cellFont.setBoldweight(HSSFFont.BOLDWEIGHT_NORMAL);
+	            }
+	            if (StyleFormatConstants.FONT_STYLE_BOLD.equals(
+	                    style.get(StyleFormatConstants.FONT_STYLE_KEY))) {
+	                cellFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+	            }
+	            if (StyleFormatConstants.FONT_STYLE_ITALIC.equals(
+	                    style.get(StyleFormatConstants.FONT_STYLE_KEY))) {
+	                cellFont.setItalic(true);
+	            }
+	            if (StyleFormatConstants.FONT_STYLE_BOLDITALIC.equals(
+	                    style.get(StyleFormatConstants.FONT_STYLE_KEY))) {
+	                cellFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+	                cellFont.setItalic(true);
+	            }
+	        }
         }
         if (cacheFont && (fontKey != -1)) {
         	condFonts.put(fontKey, cellFont);
+        }
+        if (cacheAllFont && (fontKey != -1)) {
+        	fonts.put(fontKey, cellFont);
         }
         if (style.containsKey(StyleFormatConstants.BACKGROUND_COLOR)) {
             Color val = (Color) style.get(StyleFormatConstants.BACKGROUND_COLOR);
