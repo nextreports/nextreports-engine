@@ -807,6 +807,12 @@ public class XlsExporter extends ResultExporter {
 		xlsSheet.setMargin(InternalSheet.RightMargin, getInches(bean.getReportLayout().getPagePadding().getRight()));
 		xlsSheet.setMargin(InternalSheet.TopMargin, getInches(bean.getReportLayout().getPagePadding().getTop()));
 		xlsSheet.setMargin(InternalSheet.BottomMargin, getInches(bean.getReportLayout().getPagePadding().getBottom()));
+		
+		
+		if (bean.getReportLayout().getOrientation() == LANDSCAPE) {
+			xlsSheet.getPrintSetup().setLandscape(true);			
+		}
+		
 		patriarch = xlsSheet.createDrawingPatriarch();
 		buildHeader();
 		buildFooter();
