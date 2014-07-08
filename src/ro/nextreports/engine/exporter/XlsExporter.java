@@ -310,45 +310,40 @@ public class XlsExporter extends ResultExporter {
             }	           
         }
 
-        // HSSFPalette cellPal = wb.getCustomPalette();
-        if (cacheFont || cacheAllFont) {
-	        if (style.containsKey(StyleFormatConstants.FONT_FAMILY_KEY)) {
-	            String val = (String) style.get(StyleFormatConstants.FONT_FAMILY_KEY);
-	            cellFont.setFontName(val);
-	        }
-	        if (style.containsKey(StyleFormatConstants.FONT_SIZE)) {
-	            Float val = (Float) style.get(StyleFormatConstants.FONT_SIZE);
-	            cellFont.setFontHeightInPoints(val.shortValue());
-	        }
-	        if (style.containsKey(StyleFormatConstants.FONT_COLOR)) {
-	            Color val = (Color) style.get(StyleFormatConstants.FONT_COLOR);
-	            cellFont.setColor(ExcelColorSupport.getNearestColor(val));
-	        }
-	        if (style.containsKey(StyleFormatConstants.FONT_STYLE_KEY)) {
-	            if (StyleFormatConstants.FONT_STYLE_NORMAL.equals(
-	                    style.get(StyleFormatConstants.FONT_STYLE_KEY))) {
-	                cellFont.setBoldweight(HSSFFont.BOLDWEIGHT_NORMAL);
-	            }
-	            if (StyleFormatConstants.FONT_STYLE_BOLD.equals(
-	                    style.get(StyleFormatConstants.FONT_STYLE_KEY))) {
-	                cellFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
-	            }
-	            if (StyleFormatConstants.FONT_STYLE_ITALIC.equals(
-	                    style.get(StyleFormatConstants.FONT_STYLE_KEY))) {
-	                cellFont.setItalic(true);
-	            }
-	            if (StyleFormatConstants.FONT_STYLE_BOLDITALIC.equals(
-	                    style.get(StyleFormatConstants.FONT_STYLE_KEY))) {
-	                cellFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
-	                cellFont.setItalic(true);
-	            }
-	        }
-        }
+        // HSSFPalette cellPal = wb.getCustomPalette();        
+		if (style.containsKey(StyleFormatConstants.FONT_FAMILY_KEY)) {
+			String val = (String) style.get(StyleFormatConstants.FONT_FAMILY_KEY);
+			cellFont.setFontName(val);
+		}
+		if (style.containsKey(StyleFormatConstants.FONT_SIZE)) {
+			Float val = (Float) style.get(StyleFormatConstants.FONT_SIZE);
+			cellFont.setFontHeightInPoints(val.shortValue());
+		}
+		if (style.containsKey(StyleFormatConstants.FONT_COLOR)) {
+			Color val = (Color) style.get(StyleFormatConstants.FONT_COLOR);
+			cellFont.setColor(ExcelColorSupport.getNearestColor(val));
+		}
+		if (style.containsKey(StyleFormatConstants.FONT_STYLE_KEY)) {
+			if (StyleFormatConstants.FONT_STYLE_NORMAL.equals(style.get(StyleFormatConstants.FONT_STYLE_KEY))) {
+				cellFont.setBoldweight(HSSFFont.BOLDWEIGHT_NORMAL);
+			}
+			if (StyleFormatConstants.FONT_STYLE_BOLD.equals(style.get(StyleFormatConstants.FONT_STYLE_KEY))) {
+				cellFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+			}
+			if (StyleFormatConstants.FONT_STYLE_ITALIC.equals(style.get(StyleFormatConstants.FONT_STYLE_KEY))) {
+				cellFont.setItalic(true);
+			}
+			if (StyleFormatConstants.FONT_STYLE_BOLDITALIC.equals(style.get(StyleFormatConstants.FONT_STYLE_KEY))) {
+				cellFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+				cellFont.setItalic(true);
+			}
+		}
+        
         if (cacheFont && (fontKey != -1)) {
         	condFonts.put(fontKey, cellFont);
         }
         if (cacheAllFont && (fontKey != -1)) {
-        	fonts.put(fontKey, cellFont);
+        	fonts.put(fontKey, cellFont);        	
         }
         if (style.containsKey(StyleFormatConstants.BACKGROUND_COLOR)) {
             Color val = (Color) style.get(StyleFormatConstants.BACKGROUND_COLOR);
