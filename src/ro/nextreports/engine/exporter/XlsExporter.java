@@ -57,6 +57,7 @@ import org.apache.poi.hpsf.SummaryInformation;
 import org.apache.poi.hpsf.PropertySetFactory;
 import org.apache.poi.ss.usermodel.Footer;
 import org.apache.poi.ss.usermodel.Header;
+import org.apache.poi.ss.usermodel.PrintSetup;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 import ro.nextreports.engine.ReleaseInfoAdapter;
@@ -304,8 +305,8 @@ public class XlsExporter extends ResultExporter {
         	if (fontKey != -1) {        		
         		cellFont = fonts.get(fontKey);        		
         	}
-        	if (cellFont == null) {        		
-            	cellFont = wb.createFont();
+        	if ((cellFont == null) && (bandElement != null)) {        		
+            	cellFont = wb.createFont();            	
             	cacheAllFont = true;
             }	           
         }
@@ -459,7 +460,9 @@ public class XlsExporter extends ResultExporter {
         border.setTopColor(topColor);
         border.setBottomColor(bottomColor);
 
-        cellStyle.setFont(cellFont);
+        if (cellFont != null) {
+        	cellStyle.setFont(cellFont);
+        }
 
         if (style.containsKey(StyleFormatConstants.PATTERN)) {
             String pattern = (String) style.get(StyleFormatConstants.PATTERN);
@@ -820,6 +823,8 @@ public class XlsExporter extends ResultExporter {
 			xlsSheet.getPrintSetup().setLandscape(true);			
 		}
 		
+		setPaperSize();
+		
 		patriarch = xlsSheet.createDrawingPatriarch();
 		buildHeader();
 		buildFooter();
@@ -831,6 +836,27 @@ public class XlsExporter extends ResultExporter {
 			} catch (QueryException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	private void setPaperSize() {
+		String pageFormat = bean.getReportLayout().getPageFormat();		
+		short size = 0;		
+		if (ReportLayout.LETTER.equals(pageFormat)) {			
+			size = PrintSetup.LETTER_PAPERSIZE;
+		} else if (ReportLayout.A3.equals(pageFormat)) {			
+			size = PrintSetup.A3_PAPERSIZE;
+		} else if (ReportLayout.A4.equals(pageFormat)) {			
+			size = PrintSetup.A4_PAPERSIZE;
+		} else if (ReportLayout.LEGAL.equals(pageFormat)) {			
+			size = PrintSetup.LEGAL_PAPERSIZE;
+		} else if (ReportLayout.LEDGER.equals(pageFormat)) {			
+			size = PrintSetup.LEDGER_PAPERSIZE;
+		} else if (ReportLayout.TABLOID.equals(pageFormat)) {			
+			size = PrintSetup.TABLOID_PAPERSIZE;
+		}
+		if (size != 0) {
+			xlsSheet.getPrintSetup().setPaperSize(size);
 		}
 	}
     
