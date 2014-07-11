@@ -39,6 +39,7 @@ public class DialectFactory {
     private static final Map<String,DialectMapper> MAPPERS = new HashMap<String,DialectMapper>();
 
     public static final String ORACLE = "Oracle";
+    public static final String SYBASE9 = "Adaptive Server Anywhere";
     public static final String MSSQL = "Microsoft SQL Server";
     public static final String MySQL = "MySQL";
     public static final String DERBY = "Apache Derby";
@@ -51,6 +52,7 @@ public class DialectFactory {
     static {
         // add buit-in dialect mappers
         addDialect(ORACLE, OracleDialect.class.getName());
+        addDialect(SYBASE9, MSSQLDialect.class.getName());
         addDialect(MSSQL, MSSQLDialect.class.getName());
         addDialect(MySQL, MySQLDialect.class.getName());
         addDialect(DERBY, DerbyDialect.class.getName());
@@ -81,7 +83,7 @@ public class DialectFactory {
         // TODO workaround for firebird (databaseName='Firebird 2.0.LI-V2.0.3.12981 Firebird 2.0/tcp (decebal)/P10')
         if (databaseName.startsWith(FIREBIRD)) {
         	dialectName = FirebirdDialect.class.getName();
-        } else {
+        } else {        	
         	DialectMapper mapper = MAPPERS.get(databaseName);        	
         	if (mapper == null) {
         		throw new DialectException( "Dialect must be explicitly set for database: " + databaseName );
