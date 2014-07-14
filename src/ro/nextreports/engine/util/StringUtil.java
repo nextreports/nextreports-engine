@@ -37,6 +37,7 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.sql.Blob;
 import java.sql.Clob;
+import java.sql.Time;
 import java.sql.Timestamp;
 
 import com.thoughtworks.xstream.core.util.Base64Encoder;
@@ -206,7 +207,7 @@ public class StringUtil {
     public static String getValueAsString(Object val, String pattern, I18nLanguage lang) {
         if (val == null) {
             return null;
-        }
+        }                
         
         if (val instanceof IdName) {
         	IdName in = (IdName)val;
@@ -239,6 +240,17 @@ public class StringUtil {
                 return df.format(((Number) val).doubleValue());
             }
         }
+        // should be before Date (because Time extends Date)
+        if (val instanceof Time) {        	
+            if (pattern == null) {                
+            	return DateFormat.getTimeInstance().format((Time)val);
+            } else {
+                Time d = (Time) val;
+                SimpleDateFormat sfd = new SimpleDateFormat(pattern);
+                return sfd.format(d);
+            }
+        }
+        
         if (val instanceof Date) {
             if (pattern == null) {
             	return DateFormat.getDateInstance().format((Date)val);                
@@ -256,7 +268,7 @@ public class StringUtil {
                 return sfd.format(d);
             }
         }
-        
+                
 		if (val instanceof Clob) {
 			Clob clob = (Clob) val;
 			InputStream is = null;
