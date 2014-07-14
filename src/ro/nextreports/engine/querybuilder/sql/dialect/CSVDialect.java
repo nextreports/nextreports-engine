@@ -30,6 +30,7 @@ public class CSVDialect extends AbstractDialect {
 		registerColumnType("Float", Types.FLOAT);
 		registerColumnType("Double", Types.DOUBLE);
 		registerColumnType("Date", Types.DATE);
+		registerColumnType("Time", Types.TIME);
 		registerColumnType("Boolean", Types.BOOLEAN);
 	}		
 
