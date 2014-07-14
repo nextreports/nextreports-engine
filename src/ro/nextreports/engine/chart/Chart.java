@@ -581,6 +581,9 @@ public class Chart implements Serializable {
      * @return list of keys for internationalized strings
      */
     public List<String> getI18nkeys() {
+    	if (i18nkeys == null) {
+    		return new ArrayList<String>();
+    	}
     	Collections.sort(i18nkeys, new Comparator<String>() {
 
 			@Override
