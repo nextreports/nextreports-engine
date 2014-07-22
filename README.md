@@ -3,6 +3,8 @@ Current build status: [![Build Status](https://buildhive.cloudbees.com/job/nextr
 -->
 Current build status: [![Build Status](https://travis-ci.org/nextreports/nextreports-engine.png?branch=master)](https://travis-ci.org/nextreports/nextreports-engine)
 
+For more information about NextReports Engine see the product page [link](http://www.next-reports.com/index.php/products/nextreports-engine.html). 
+
 How to build
 -------------------
 Requirements: 
