@@ -560,8 +560,7 @@ public class DateUtil {
      */
     public static Date getLastDayFromLastWeek(Date d) {
         Calendar cal = Calendar.getInstance();
-        cal.setTime(d);
-        cal.add(Calendar.WEEK_OF_YEAR, -1);
+        cal.setTime(d);        
         cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
         cal.set(Calendar.HOUR_OF_DAY, 23);
         cal.set(Calendar.MINUTE, 59);
@@ -594,6 +593,7 @@ public class DateUtil {
     public static Date getLastDayFromCurrentWeek(Date d) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(d);        
+        cal.add(Calendar.WEEK_OF_YEAR, 1);  // for us the week starts on Monday
         cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
         cal.set(Calendar.HOUR_OF_DAY, 23);
         cal.set(Calendar.MINUTE, 59);
