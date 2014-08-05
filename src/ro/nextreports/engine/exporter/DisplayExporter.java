@@ -37,6 +37,11 @@ public class DisplayExporter extends ResultExporter {
 					switch (column) {
 					case 0:
 						data.setTitle(replaceParameters(getBandElementValueAsString(bandElement)));
+						if (bandElement.getHorizontalAlign() == BandElement.CENTER) {
+							data.setTitleAlignment(DisplayData.TITLE_ALIGNMENT_CENTER);
+						} else {
+							data.setTitleAlignment(DisplayData.TITLE_ALIGNMENT_VALUE);
+						}
 						data.setBackground(ColorUtil.getHexColor(bandElement.getBackground()));
 						if (style.containsKey(StyleFormatConstants.BACKGROUND_COLOR)) {
 							data.setBackground(ColorUtil.getHexColor((Color) style.get(StyleFormatConstants.BACKGROUND_COLOR)));

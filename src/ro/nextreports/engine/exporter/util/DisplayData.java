@@ -14,6 +14,7 @@ public class DisplayData implements Serializable {
 	private static final long serialVersionUID = 2512427516851551606L;
 	
 	private String title;
+	private String titleAlignment;
 	private String titleColor;
 	private String value;
 	private String valueColor;
@@ -24,9 +25,13 @@ public class DisplayData implements Serializable {
 	private boolean shadow;
 	private boolean shouldRise;
 	
+	public static final String TITLE_ALIGNMENT_CENTER = "center";
+	public static final String TITLE_ALIGNMENT_VALUE = "alignToValue";
+	
 	public DisplayData() {
 		super();
 		title = "";
+		titleAlignment = TITLE_ALIGNMENT_VALUE;
 		titleColor = ColorUtil.getHexColor(Color.BLACK);
 		value = "0";
 		valueColor = ColorUtil.getHexColor(Color.BLACK);
@@ -44,6 +49,14 @@ public class DisplayData implements Serializable {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+		
+	public String getTitleAlignment() {
+		return titleAlignment;
+	}
+
+	public void setTitleAlignment(String titleAlignment) {
+		this.titleAlignment = titleAlignment;
 	}
 
 	public String getTitleColor() {
