@@ -13,3 +13,7 @@ src/ro/nextreports/engine/.cvsignore
 /bin
 /artifacts
 /lib
+
+# IntelliJ IDEA #
+.idea/
+*.iml
