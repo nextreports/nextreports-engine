@@ -17,6 +17,8 @@
 package ro.nextreports.engine.exporter;
 
 import java.awt.Color;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +60,8 @@ import com.lowagie.text.Table;
 import com.lowagie.text.PageSize;
 import com.lowagie.text.Image;
 import com.lowagie.text.Anchor;
+import com.lowagie.text.html.simpleparser.HTMLWorker;
+import com.lowagie.text.html.simpleparser.StyleSheet;
 import com.lowagie.text.rtf.RtfWriter2;
 import com.lowagie.text.rtf.field.RtfPageNumber;
 import com.lowagie.text.rtf.headerfooter.RtfHeaderFooter;
@@ -292,8 +296,25 @@ public class RtfExporter extends ResultExporter {
 			if (stringValue == null) {
 				stringValue = "";
 			}
-
-			Phrase ph = new Phrase(stringValue, fnt);
+			Phrase ph;
+			if (stringValue.startsWith("<html>")) {
+				StringReader reader = new StringReader(stringValue);
+				List<Element> elems = new ArrayList<Element>();
+				try {
+					elems = HTMLWorker.parseToList(reader, new StyleSheet());
+					ph = new Phrase();
+					for (int i = 0; i < elems.size(); i++) {
+						Element elem = (Element) elems.get(i);
+						ph.add(elem);
+					}
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					ph = new Phrase(stringValue, fnt);
+				}
+			} else {
+				ph = new Phrase(stringValue, fnt);
+			}
 
 			try {
 				cell = new RtfCell(ph);

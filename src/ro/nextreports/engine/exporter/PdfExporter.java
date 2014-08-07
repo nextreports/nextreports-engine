@@ -20,6 +20,8 @@ import com.itextpdf.text.*;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.Image;
+import com.itextpdf.text.html.simpleparser.HTMLWorker;
+import com.itextpdf.text.html.simpleparser.StyleSheet;
 import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPRow;
@@ -33,6 +35,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.Map;
 import java.awt.*;
+import java.io.IOException;
+import java.io.StringReader;
 
 import ro.nextreports.engine.ReleaseInfoAdapter;
 import ro.nextreports.engine.Report;
@@ -298,8 +302,29 @@ public class PdfExporter extends ResultExporter {
             if (stringValue == null) {
                 stringValue = "";
             }
-            Phrase ph = new Phrase(stringValue, fnt);
-            cell = new PdfPCell(ph);
+            if (stringValue.startsWith("<html>")) {
+            	StringReader reader = new StringReader(stringValue);             	
+            	List<Element> elems = new ArrayList<Element>();
+				try {
+					elems = HTMLWorker.parseToList(reader, new StyleSheet());
+					Phrase ph = new Phrase();
+	            	for (int i = 0; i < elems.size(); i++){
+	            		Element elem = (Element)elems.get(i);
+	            		ph.add(elem);
+	            	}
+	            	cell = new PdfPCell(ph); 
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					Phrase ph = new Phrase(stringValue, fnt);
+			        cell = new PdfPCell(ph);
+				}
+            	                     
+            	
+            } else {
+	            Phrase ph = new Phrase(stringValue, fnt);
+	            cell = new PdfPCell(ph);
+            }
         }
 
         cell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);

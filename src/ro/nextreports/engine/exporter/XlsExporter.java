@@ -688,20 +688,17 @@ public class XlsExporter extends ResultExporter {
             		c.setCellStyle(cellStyle);
             	}
             }
-
 			
-				if ((rowSpan > 1) || (colSpan > 1)) {
-					CellRangeAddress cra = new CellRangeAddress(sheetRow, sheetRow + rowSpan - 1, sheetColumn, sheetColumn
-							+ colSpan - 1);
-					Border beBorder = bandElement.getBorder();
-					if (hasRowRenderConditions(bandElement, gridRow, value)) {
-						// for row render conditions we must keep the row border
-						beBorder = border;
-					}
-					regions.add(new XlsRegion(cra, beBorder));
+			if ((rowSpan > 1) || (colSpan > 1)) {
+				CellRangeAddress cra = new CellRangeAddress(sheetRow, sheetRow + rowSpan - 1, sheetColumn, sheetColumn + colSpan - 1);
+				Border beBorder = bandElement.getBorder();
+				if (hasRowRenderConditions(bandElement, gridRow, value)) {
+					// for row render conditions we must keep the row border
+					beBorder = border;
 				}
-			
-            
+				regions.add(new XlsRegion(cra, beBorder));
+			}
+			            
         }
     }
     
