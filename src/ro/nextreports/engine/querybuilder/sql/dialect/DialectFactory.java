@@ -48,6 +48,7 @@ public class DialectFactory {
     public static final String SQLITE = "SQLite";
     public static final String CSV = "CsvJdbc";
     public static final String VERTICA = "Vertica Database";
+    public static final String PERVASIVE = "Pervasive.SQL";
 
     static {
         // add buit-in dialect mappers
@@ -59,7 +60,8 @@ public class DialectFactory {
         addDialect(POSTGRES, PostrgreSQLDialect.class.getName());
         addDialect(SQLITE, SQLiteDialect.class.getName());
         addDialect(CSV, CSVDialect.class.getName());
-        addDialect(VERTICA, VerticaDialect.class.getName());        
+        addDialect(VERTICA, VerticaDialect.class.getName());
+        addDialect(PERVASIVE, PervasiveDialect.class.getName());        
         addDialectsFromVMParameters();
     }
     
