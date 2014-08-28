@@ -30,6 +30,7 @@ import ro.nextreports.engine.exporter.AlarmExporter;
 import ro.nextreports.engine.exporter.Alert;
 import ro.nextreports.engine.exporter.CsvExporter;
 import ro.nextreports.engine.exporter.DisplayExporter;
+import ro.nextreports.engine.exporter.DocxExporter;
 import ro.nextreports.engine.exporter.ExporterBean;
 import ro.nextreports.engine.exporter.HtmlExporter;
 import ro.nextreports.engine.exporter.IndicatorExporter;
@@ -76,6 +77,8 @@ public class ReportRunner implements Runner {
     public static final String HTML_FORMAT = "HTML";
     /** RTF output format */
     public static final String RTF_FORMAT = "RTF";
+    /** DOCX output format */
+    public static final String DOCX_FORMAT = "DOCX";
     /** CSV output format */
     public static final String CSV_FORMAT = "CSV";
     /** TSV  output format */
@@ -85,7 +88,7 @@ public class ReportRunner implements Runner {
     /** XML output format */
     public static final String XML_FORMAT = "XML";
     /** Array of all output persistent formats */
-    public static final String[] FORMATS = { PDF_FORMAT, EXCEL_FORMAT, HTML_FORMAT, RTF_FORMAT,
+    public static final String[] FORMATS = { PDF_FORMAT, EXCEL_FORMAT, HTML_FORMAT, DOCX_FORMAT, RTF_FORMAT,
             CSV_FORMAT, TSV_FORMAT, TXT_FORMAT, XML_FORMAT };
 
     /** Memory table output format */
@@ -412,6 +415,8 @@ public class ReportRunner implements Runner {
             exporter = new DisplayExporter(bean);    
         } else if (PDF_FORMAT.equals(format)) {
             exporter = new PdfExporter(bean);
+        } else if (DOCX_FORMAT.equals(format)) {
+            exporter = new DocxExporter(bean);    
         } else if (CSV_FORMAT.equals(format)) {        	
             exporter = new CsvExporter(bean);
         } else if (TSV_FORMAT.equals(format)) {        	

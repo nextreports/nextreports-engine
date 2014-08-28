@@ -13,8 +13,9 @@
         <conf name="pdf"/>
         <conf name="excel"/>
         <conf name="rtf"/>
+        <conf name="docx"/>
         <conf name="chart"/>
-        <conf name="allruntime" extends="runtime, pdf, excel, rtf, chart"/>
+        <conf name="allruntime" extends="runtime, pdf, excel, rtf, docx, chart"/>
         <conf name="javadoc" description="Javadoc dependencies"/>
         <conf name="demo" description="Demo dependencies"/>
     </configurations>
@@ -46,7 +47,7 @@
         <dependency org="com.fasterxml.jackson.core" name="jackson-databind" rev="2.3.0" conf="chart, allruntime"/>        
         
         <!-- POI -->
-        <dependency org="org.apache.poi" name="poi" rev="3.7" conf="excel, allruntime"/>        
+        <dependency org="org.apache.poi" name="poi" rev="3.7" conf="excel, docx, allruntime"/>        
         
         <!-- iText -->
         <dependency org="com.itextpdf" name="itextpdf" rev="5.0.6" conf="pdf, allruntime">
@@ -58,6 +59,11 @@
         <dependency org="com.lowagie" name="itext-rtf" rev="2.1.7" conf="rtf, allruntime">
             <exclude org="bouncycastle"/>
         </dependency>
+        
+        <!-- docx4j -->
+        <dependency org="org.docx4j" name="docx4j" rev="3.2.0" conf="docx, allruntime">
+            <exclude org="org.apache.poi"/>
+        </dependency>                          
         
         <!-- JOFC2 -->
         <dependency org="ro.nextreports" name="jofc2" rev="1.0.1" conf="chart, allruntime"/>

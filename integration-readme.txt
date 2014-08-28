@@ -11,8 +11,14 @@ Integration zip contains in lib folder all the jars that a java/web application 
 * itext.jar is needed just for PDF and RTF exports
 * itext-rtf.jar is needed just for RTF export
 
-* poi.jar is needed just for EXCEL export
-* poi-contrib.jar is needed just for EXCEL export
+* poi.jar is needed just for EXCEL and DOCX exports
+
+* docx4j.jar is needed just for DOCX export
+* commons-io.jar is needed just for DOCX export
+* jaxb-xmldsig-core.jar is needed just for DOCX export
+* slf4j-*.jar are needed just for DOCX export
+* xalan.jar is needed just for DOCX export
+* xmlgraphics-commons.jar is needed just for DOCX export
 
 * jcommon.jar is needed for exporting reports which contain charts
 * jfreechart.jar is needed for exporting reports which contain charts
@@ -42,12 +48,13 @@ To make your own database connection for testing you can create a DemoDefinition
 and add it inside DemoDefinitionFactory.java. Then in DemoUtil you use this definition.
 
 Timesheet.report has two images. The example takes care to copy those images to the folder where exported
-report is generated (current directory). For HTML that is enough to view images. For other types like PDF, RTF, EXCEL,
-you will have to add the folder where you copy images to the CLASSPATH (because report images are loaded from classpath).
+report is generated (current directory). For HTML that is enough to view images. For other types like PDF, RTF, 
+DOCX, EXCEL, you will have to add the folder where you copy images to the CLASSPATH (because report images are 
+loaded from classpath).
 
 Timesheet_Charts.reports contains internal charts. Exporting this report will also generate jpg images for charts.
 
 ChartDemo shows you how to run a Next chart as flash, image or data.
 FluentChartDemo exports a chart as an image with a specific name and size.
 
-Integration using nextreports engine is free of charge.
+NextReports engine is a free, open source project. Please ask questions and give feedbacks on next_support@asf.ro .

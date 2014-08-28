@@ -131,6 +131,12 @@ Copyright:
                 <include name="jfreechart*.jar"/>
                 <include name="jcommon*.jar"/>
                 <include name="derby-*.jar"/>
+                <include name="docx4j-*.jar"/>
+                <include name="jaxb-xmldsig-core-*.jar"/>
+                <include name="slf4j-*.jar"/>
+                <include name="xalan-*.jar"/>
+                <include name="xmlgraphics-commons-*.jar"/>
+                <include name="commons-io-*.jar"/>                                
             </fileset>
         </copy>
 
