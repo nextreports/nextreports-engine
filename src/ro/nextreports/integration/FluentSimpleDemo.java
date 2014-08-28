@@ -16,6 +16,8 @@
  */
 package ro.nextreports.integration;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.Connection;
 
@@ -40,7 +42,7 @@ public class FluentSimpleDemo extends AbstractDemo {
 		new FluentSimpleDemo().runDemo();
 	}
 
-	public void runReport(Connection connection, Report report, OutputStream output)
+	public void runReport(Connection connection, Report report)
 			throws Exception {
 		System.out.println("Run report...");
 
@@ -68,5 +70,11 @@ public class FluentSimpleDemo extends AbstractDemo {
 		time = System.currentTimeMillis() - time;
 		System.out.println("Done in " + time + " ms");
 	}
+
+	@Override
+	protected OutputStream getOutputStream() throws IOException {		
+		return new FileOutputStream("test.hml");
+	}
+	
 
 }

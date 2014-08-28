@@ -16,7 +16,7 @@
  */
 package ro.nextreports.integration;
 
-import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -29,20 +29,23 @@ import ro.nextreports.engine.util.LoadReportException;
  * @author Decebal Suiu
  */
 public abstract class AbstractDemo {
+	
+	protected OutputStream output = null;
 
 	public void runDemo() {
 		Connection connection = null;
-		OutputStream output = null;
+		
 		try {
 			// load demo report
 			Report report = getReport();
 			
 			// connect to demo database
 			connection = getConnection();
+			
+			output = getOutputStream();
 
 			// run the report
-			output = new FileOutputStream("test.html");
-			runReport(connection, report, output);
+			runReport(connection, report);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -58,8 +61,10 @@ public abstract class AbstractDemo {
 	public Connection getConnection() throws ClassNotFoundException, SQLException  {
 		return DemoUtil.createDemoConnection();
 	}
+	
+	protected abstract OutputStream getOutputStream() throws IOException;
 
-	protected abstract void runReport(Connection connection, Report report, OutputStream output)
+	protected abstract void runReport(Connection connection, Report report)
 		throws Exception;
-
+		
 }
