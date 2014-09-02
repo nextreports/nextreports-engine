@@ -8,7 +8,7 @@ Most useful targets:
   - compile -> compile all java sources
   - jar     -> creates the application's jar file
   - clean   -> removes all the generated files and directories
-  - release -> creates the artifacts  
+  - release -> creates the artifacts
 
 Authors:
   Decebal Suiu <decebal.suiu@asf.ro>
@@ -21,20 +21,20 @@ Copyright:
 
     <property file="local.properties"/>
     <property file="build.properties"/>
-    
+
     <property name="integration.name" value="nextreports-integration-demo"/>
     <property name="integration.zip.dir" location="${app.target}/${app.version}/${integration.name}"/>
     <property name="integration.zip" value="${app.target}/${integration.name}-${app.version}.zip"/>
-        
+
     <property name="ivy.lib.dir" value="${app.lib}"/>
-        
-    <import file="ivy-build.xml"/>    
+
+    <import file="ivy-build.xml"/>
 
     <!-- Classpath -->
     <path id="classpath">
         <fileset dir="${app.lib}" includes="*.jar"/>
         <fileset dir="${ant.tasks.dir}" includes="*.jar"/>
-    </path>                
+    </path>
 
     <!-- ================================================================== -->
     <!-- I V Y . I N I T                                                    -->
@@ -54,14 +54,14 @@ Copyright:
     <!-- ================================================================== -->
 
     <!-- resolve dependent libraries -->
-    <target name="ivy.resolve" depends="ivy.init">      
+    <target name="ivy.resolve" depends="ivy.init">
         <ivy:configure file="ivysettings.xml"/>
         <ivy:resolve file="ivy.xml"/>
         <!--
         <ivy:retrieve pattern="${ivy.lib.dir}/[artifact].[ext]" conf="runtime"/>
         -->
         <ivy:retrieve sync="true"/>
-        
+
         <mkdir dir="ivy-report"/>
         <ivy:report todir="ivy-report"/>
     </target>
@@ -72,17 +72,19 @@ Copyright:
 
     <target name="compile" depends="ivy.resolve,version">
         <!-- Create the ${app.classes} directory -->
-        <mkdir dir="${app.classes}"/>        
+        <mkdir dir="${app.classes}"/>
 
         <!-- Compile the java code from ${app.src} into ${app.classes} -->
         <javac
+            source="${javac.version}"
+            target="${javac.version}"
             srcdir="${app.src}"
             destdir="${app.classes}"
             debug="${javac.debug}"
             verbose="${javac.verbose}"
             deprecation="${javac.deprecation}"
             classpathref="classpath"
-        />       
+        />
     </target>
 
     <!-- ================================================================== -->
@@ -112,7 +114,7 @@ Copyright:
 
         <!-- Copy integration readme file -->
         <copy file="integration-readme.txt" tofile="${integration.zip.dir}/readme.txt"/>
-        
+
         <!-- Copy some file in temporary dir -->
         <copy todir="${integration.zip.dir}/src">
             <fileset dir="${app.src}" includes="ro/nextreports/integration/**"/>
@@ -121,7 +123,7 @@ Copyright:
             <fileset dir="${app.target}" includes="${app.jar}"/>
             <fileset dir="${app.lib}">
                 <include name="commons-logging-*.jar"/>
-                <include name="commons-jexl-*.jar"/>                
+                <include name="commons-jexl-*.jar"/>
                 <include name="xstream-*.jar"/>
                 <include name="poi-*.jar"/>
                 <include name="itext*.jar"/>
@@ -136,7 +138,7 @@ Copyright:
                 <include name="slf4j-*.jar"/>
                 <include name="xalan-*.jar"/>
                 <include name="xmlgraphics-commons-*.jar"/>
-                <include name="commons-io-*.jar"/>                                
+                <include name="commons-io-*.jar"/>
             </fileset>
         </copy>
 
@@ -151,7 +153,7 @@ Copyright:
         <copy todir="${integration.zip.dir}/javadoc">
             <fileset dir="${app.target}/javadoc"/>
         </copy>
-        
+
         <!-- Create the zip with dist -->
         <zip destfile="${integration.zip}" basedir="${app.target}/${app.version}"/>
 
@@ -180,7 +182,7 @@ Copyright:
 
         <!-- Create release info -->
         <jreleaseinfo
-            classname="ReleaseInfo"         
+            classname="ReleaseInfo"
             packagename="ro.nextreports.engine"
             targetdir="${app.src.dir}"
             project="NextReports"
@@ -195,14 +197,14 @@ Copyright:
     <!-- ================================================================== -->
     <!-- J A V A D O C                                                      -->
     <!-- ================================================================== -->
-    
+
     <target name="javadoc">
         <mkdir dir="${app.target}/javadoc"/>
 
         <javadoc packagenames="ro.nextreports.engine"
                sourcepath="src"
-               destdir="${app.target}/javadoc" 
-               classpathref="classpath" 
+               destdir="${app.target}/javadoc"
+               classpathref="classpath"
                author="false">
             <doctitle><![CDATA[<h1>NextReports Integration ${app.version}</h1>]]></doctitle>
             <fileset dir="${app.src}">
@@ -229,13 +231,13 @@ Copyright:
             <fileset dir="${app.target}/javadoc" includes="*.dot"/>
             <mapper type="glob" from="*.dot" to="*.png"/>
         </apply>
-        
+
         <!-- Delete some temporary files-->
         <delete>
             <fileset dir="${app.target}/javadoc" includes="**/*.dot,**/*.map"/>
         </delete>
     </target>
-    
+
     <!-- ================================================================== -->
     <!-- R E L E A S E                                                      -->
     <!-- ================================================================== -->
@@ -255,5 +257,5 @@ Copyright:
         <delete dir="${app.artifacts}"/>
         <delete dir="${ivy.lib.dir}"/>
     </target>
-    
+
 </project>
