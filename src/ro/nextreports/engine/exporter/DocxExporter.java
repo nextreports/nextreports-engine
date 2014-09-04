@@ -320,8 +320,7 @@ public class DocxExporter extends ResultExporter {
 			table = null;		
 			
 			try {
-				addPageHeaderFooter();
-				//@todo
+				addPageHeaderFooter();				
 				//addBackgroundImage();
 			} catch (Exception ex) {
 				ex.printStackTrace();
@@ -1132,19 +1131,10 @@ public class DocxExporter extends ResultExporter {
 	private void addBackgroundImage() throws Exception {
 		String image = bean.getReportLayout().getBackgroundImage();
 		if (image != null) {						
-			byte[] imageBytes = getImage(image);
-			
+			byte[] imageBytes = getImage(image);			
 			MainDocumentPart mdp = wordMLPackage.getMainDocumentPart();
-			BinaryPartAbstractImage imagePartBG = BinaryPartAbstractImage.createImagePart(wordMLPackage, imageBytes);
-      
-			Relationship rel = mdp.addTargetPart(imagePartBG);      
-//			HashMap<String, String> mappingsBG = new HashMap<String, String>();
-//			mappingsBG.put("rID", rel.getId());
-			
-//			String BACKGROUND="<p:bg xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\"><p:bgPr><a:blipFill dpi=\"0\" rotWithShape=\"1\"><a:blip r:embed=\"${rID}\" cstate=\"print\"><a:lum/></a:blip><a:srcRect/><a:stretch><a:fillRect/></a:stretch></a:blipFill><a:effectLst/></p:bgPr></p:bg>";
-//            Object oBG = org.docx4j.XmlUtils.unmarshallFromTemplate(BACKGROUND, mappingsBG, Context.jc, CTBackground.class);
-      			
-            mdp.getContents().setBackground(createBackground(rel.getId()));						
+			BinaryPartAbstractImage imagePartBG = BinaryPartAbstractImage.createImagePart(wordMLPackage, imageBytes);      		            
+            mdp.getContents().setBackground(createBackground(imagePartBG.getRelLast().getId())); 
 		}
 	}
 	
