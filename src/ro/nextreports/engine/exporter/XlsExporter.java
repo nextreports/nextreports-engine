@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.awt.*;
 
 import org.apache.commons.logging.Log;
@@ -50,7 +52,6 @@ import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.hssf.usermodel.HSSFPicture;
 import org.apache.poi.hssf.usermodel.HSSFHyperlink;
 import org.apache.poi.hssf.util.HSSFRegionUtil;
-
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.hpsf.SummaryInformation;
@@ -673,10 +674,25 @@ public class XlsExporter extends ResultExporter {
                     	}
                     	c.setCellValue(date);
                     } else {                    	
-                    	c.setCellType(HSSFCell.CELL_TYPE_STRING);
-                    	c.setCellValue(new HSSFRichTextString(StringUtil.getValueAsString(value, pattern)));
-                    }
-                    
+                    	c.setCellType(HSSFCell.CELL_TYPE_STRING);                    	
+                    	String text = StringUtil.getValueAsString(value, pattern);
+                    	String crLf = Character.toString((char)13) + Character.toString((char)10);  
+                    	// \\n is used here to be possible to add in designer grid cell with \n                    	
+                    	if (text.contains("\\n") || text.contains("\n") || text.contains("\r") || text.contains("\r\n")) {
+                    		int lines = countLines(text);          
+                    		if (text.contains("\r\n")) {
+                    			text = text.replaceAll("\r\n", crLf);
+                    		} else {
+                    			text = text.replaceAll("(\n)|(\r)|(\\\\n)", crLf);
+                    		}
+                    		c.setCellValue(text);
+                        	cellStyle.setWrapText(true);                             	
+                        	xlsRow.setHeightInPoints(lines*(cellStyle.getFont(wb).getFontHeightInPoints()+ 3));
+                    	} else {                    		
+                    		c.setCellValue(new HSSFRichTextString(text));
+                    	}                    	
+                    	
+                    }                    
                 }
             }
 
@@ -700,6 +716,15 @@ public class XlsExporter extends ResultExporter {
 			}
 			            
         }
+    }
+    
+    private int countLines(String text) {
+    	Matcher m = Pattern.compile("(\n)|(\r)|(\r\n)|(\\\\n)").matcher(text);
+    	int lines = 1;
+    	while (m.find()) {
+    		lines ++;
+    	}
+    	return lines;
     }
     
     // http://poi.apache.org/apidocs/org/apache/poi/xssf/usermodel/extensions/XSSFHeaderFooter.html
