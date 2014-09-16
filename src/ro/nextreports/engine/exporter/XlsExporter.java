@@ -675,22 +675,27 @@ public class XlsExporter extends ResultExporter {
                     	c.setCellValue(date);
                     } else {                    	
                     	c.setCellType(HSSFCell.CELL_TYPE_STRING);                    	
-                    	String text = StringUtil.getValueAsString(value, pattern);
-                    	String crLf = Character.toString((char)13) + Character.toString((char)10);  
-                    	// \\n is used here to be possible to add in designer grid cell with \n                    	
-                    	if (text.contains("\\n") || text.contains("\n") || text.contains("\r") || text.contains("\r\n")) {
-                    		int lines = countLines(text);          
-                    		if (text.contains("\r\n")) {
-                    			text = text.replaceAll("\r\n", crLf);
-                    		} else {
-                    			text = text.replaceAll("(\n)|(\r)|(\\\\n)", crLf);
-                    		}
-                    		c.setCellValue(text);
-                        	cellStyle.setWrapText(true);                             	
-                        	xlsRow.setHeightInPoints(lines*(cellStyle.getFont(wb).getFontHeightInPoints()+ 3));
-                    	} else {                    		
-                    		c.setCellValue(new HSSFRichTextString(text));
-                    	}                    	
+                    	String text = StringUtil.getValueAsString(value, pattern);                    	
+						if ((bandElement != null) && bandElement.isWrapText()) {							
+							// try to interpret new line characters
+							// \\n is used here to be possible to add in designer grid cell with \n
+							if (text.contains("\\n") || text.contains("\n") || text.contains("\r") || text.contains("\r\n")) {
+								String crLf = Character.toString((char) 13) + Character.toString((char) 10);
+								int lines = countLines(text);
+								if (text.contains("\r\n")) {
+									text = text.replaceAll("\r\n", crLf);
+								} else {
+									text = text.replaceAll("(\n)|(\r)|(\\\\n)", crLf);
+								}
+								c.setCellValue(text);
+								cellStyle.setWrapText(true);
+								xlsRow.setHeightInPoints(lines * (cellStyle.getFont(wb).getFontHeightInPoints() + 3));
+							} else {
+								c.setCellValue(new HSSFRichTextString(text));
+							}
+						} else {
+							c.setCellValue(new HSSFRichTextString(text));
+						}        	
                     	
                     }                    
                 }
