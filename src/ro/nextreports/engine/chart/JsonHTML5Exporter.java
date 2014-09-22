@@ -37,6 +37,7 @@ import ro.nextreports.engine.i18n.I18nUtil;
 import ro.nextreports.engine.queryexec.QueryException;
 import ro.nextreports.engine.queryexec.QueryResult;
 import ro.nextreports.engine.util.ColorUtil;
+import ro.nextreports.engine.util.ObjectCloner;
 import ro.nextreports.engine.util.StringUtil;
 
 /* 
@@ -394,7 +395,7 @@ public class JsonHTML5Exporter implements ChartExporter {
     }
     
     private void setTitle() {
-    	ChartTitle chartTitle = chart.getTitle();    	
+    	ChartTitle chartTitle = ObjectCloner.silenceDeepCopy(chart.getTitle());    	
         String title = replaceParameters(chartTitle.getTitle());
         chartTitle.setTitle(title);
         if (!isEmpty(title)) {
