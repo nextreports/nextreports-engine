@@ -88,6 +88,8 @@ public class ReportLayout implements Serializable {
     private String backgroundImage;
     private String templateName;
     private int templateSheet;
+    private String sheetNames;
+    
 
     private boolean headerOnEveryPage;
     
@@ -176,6 +178,14 @@ public class ReportLayout implements Serializable {
 
 	public void setTemplateSheet(int templateSheet) {
 		this.templateSheet = templateSheet;
+	}
+		
+	public String getSheetNames() {
+		return sheetNames;
+	}
+
+	public void setSheetNames(String sheetNames) {
+		this.sheetNames = sheetNames;
 	}
 
 	public String getBackgroundImage() {
@@ -478,6 +488,7 @@ public class ReportLayout implements Serializable {
         if (pageFormat != null ? !pageFormat.equals(that.pageFormat) : that.pageFormat != null) return false;
         if (templateName != null ? !templateName.equals(that.templateName) : that.templateName != null) return false;
         if (templateSheet != that.templateSheet) return false;
+        if (sheetNames != null ? !sheetNames.equals(that.sheetNames) : that.sheetNames != null) return false;
         if (pagePadding != null ? !pagePadding.equals(that.pagePadding) : that.pagePadding != null) return false;
         if (backgroundImage != null ? !backgroundImage.equals(that.backgroundImage) : that.backgroundImage != null) return false;
         if (paperSize != null ? !paperSize.equals(that.paperSize) : that.paperSize != null) return false;
@@ -506,6 +517,7 @@ public class ReportLayout implements Serializable {
         result = 31 * result + (pageFormat != null ? pageFormat.hashCode() : 0);
         result = 31 * result + (templateName != null ? templateName.hashCode() : 0);
         result = 31 * result + templateSheet;
+        result = 31 * result + (sheetNames != null ? sheetNames.hashCode() : 0);
         result = 31 * result + (headerOnEveryPage ? 1 : 0);
         result = 31 * result + (pagePadding != null ? pagePadding.hashCode() : 0);
         result = 31 * result + (backgroundImage != null ? backgroundImage.hashCode() : 0);

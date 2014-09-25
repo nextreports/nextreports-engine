@@ -131,7 +131,17 @@ public class XlsExporter extends ResultExporter {
     	createFontsAndStyles();
     }
 
-    protected void finishExport() {
+    protected void finishExport() {    	
+    	String sheetName = bean.getReportLayout().getSheetNames();		
+		if (sheetNameContainsGroup(sheetName)) {
+			String actualName = replaceSheetNameParam(sheetName);
+	    	if (wb.getSheetName(page-3).equals(actualName)) {
+	    		// after group we may have other pages!
+	    		wb.setSheetName(page-2, String.valueOf(page-1));
+	    	} else {
+	    		wb.setSheetName(page-2, actualName);
+	    	}
+		}
 		if (!bean.isSubreport()) {
 			addRegions(xlsSheet, regions, wb);
 			try {
@@ -838,13 +848,24 @@ public class XlsExporter extends ResultExporter {
 		if (hasTemplate()) {
 			xlsSheet = wb.getSheetAt(bean.getReportLayout().getTemplateSheet()-1);  
 		} else {
-			xlsSheet = wb.createSheet("Page " + page);
+			// for a group name inside sheet name when we create a page we do not have the group name yet
+			// so we will have to set the name of the previous sheet (see also finishExport where we set the name of the last sheet(s)
+			String sheetName = replaceSheetNameParam(bean.getReportLayout().getSheetNames());
+			if ((sheetName == null) || sheetName.isEmpty()) {
+				sheetName = String.valueOf(page);
+			}
+			if (sheetNameContainsGroup(bean.getReportLayout().getSheetNames()) && (page>1)) {
+				// current group is for previous sheet page			
+				xlsSheet = wb.createSheet(String.valueOf(page));				
+				wb.setSheetName(page-2, sheetName);				
+			} else {
+				xlsSheet = wb.createSheet(sheetName);
+			}
 		}
 		xlsSheet.setMargin(InternalSheet.LeftMargin, getInches(bean.getReportLayout().getPagePadding().getLeft()));
 		xlsSheet.setMargin(InternalSheet.RightMargin, getInches(bean.getReportLayout().getPagePadding().getRight()));
 		xlsSheet.setMargin(InternalSheet.TopMargin, getInches(bean.getReportLayout().getPagePadding().getTop()));
-		xlsSheet.setMargin(InternalSheet.BottomMargin, getInches(bean.getReportLayout().getPagePadding().getBottom()));
-		
+		xlsSheet.setMargin(InternalSheet.BottomMargin, getInches(bean.getReportLayout().getPagePadding().getBottom()));		
 		
 		if (bean.getReportLayout().getOrientation() == LANDSCAPE) {
 			xlsSheet.getPrintSetup().setLandscape(true);			
@@ -976,6 +997,42 @@ public class XlsExporter extends ResultExporter {
 	
 	private boolean hasTemplate() {
 		return (bean.getReportLayout().getTemplateName() != null) && !"".equals(bean.getReportLayout().getTemplateName().trim());
+	}
+	
+	private String replaceSheetNameParam(String sheetName) {	
+		String actualName = sheetName;
+		if (actualName == null) {
+			actualName = String.valueOf(page);
+		} else if (sheetName.contains("${NO}")) {			
+			actualName = StringUtil.replace(sheetName, "\\$\\{NO\\}", String.valueOf(page));	     
+		} else if (sheetName.contains("${G")) {
+		    int startIndex = sheetName.indexOf("${");
+		    int endIndex = sheetName.indexOf("}");
+		    String group = sheetName.substring(startIndex+2, endIndex);		    
+		    actualName = StringUtil.replace(sheetName, "\\$\\{" + group + "\\}", getCurrentValueForGroup(group));
+		    if (actualName.isEmpty()) {
+		    	actualName = String.valueOf(page);
+		    }		    
+		} else if (sheetName.contains(";")) {
+			// static list of names
+			String[] names = sheetName.split(";");
+			if (names.length < page) {
+				// too few sheet names
+				actualName = String.valueOf(page);
+			} else {
+				actualName = names[page-1];
+			}			
+		} else {
+			actualName = String.valueOf(page);
+		}
+		return actualName;				 	         
+	}     
+	
+	private boolean sheetNameContainsGroup(String sheetName) {
+		if (sheetName == null) {
+			return false;
+		}
+		return sheetName.contains("${G");
 	}
 
 }
