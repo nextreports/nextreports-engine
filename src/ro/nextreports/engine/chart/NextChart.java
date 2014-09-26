@@ -62,6 +62,8 @@ public class NextChart {
 	private NextChartLegend xLegend;
 	private NextChartLegend yLegend;
 	private NextNumberFormat tooltipPattern;
+	private boolean dualYaxis;
+	private NextChartLegend y2Legend;
 		
 	// function doClick(value){ console.log('Call from function : ' + value);}
 	private String onClick;
@@ -259,7 +261,23 @@ public class NextChart {
 
 	public void setyLegend(NextChartLegend yLegend) {
 		this.yLegend = yLegend;
-	}		
+	}				
+
+	public boolean isDualYaxis() {
+		return dualYaxis;
+	}
+
+	public void setDualYaxis(boolean dualYaxis) {
+		this.dualYaxis = dualYaxis;
+	}
+
+	public NextChartLegend getY2Legend() {
+		return y2Legend;
+	}
+
+	public void setY2Legend(NextChartLegend y2Legend) {
+		this.y2Legend = y2Legend;
+	}
 
 	public boolean isShowTicks() {
 		return showTicks;

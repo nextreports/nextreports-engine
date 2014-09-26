@@ -164,6 +164,9 @@ public class JsonHTML5Exporter implements ChartExporter {
 		if (chart.getYGridColor() != null) {
 			nc.setColorGridY(ColorUtil.getHexColor(chart.getYGridColor()));
 		}
+		if (chart.getShowDualAxis() != null) {
+			nc.setDualYaxis(chart.getShowDualAxis());
+		}
 		
 		// todo : customize tickCount?
 		nc.setTickCount(5);
@@ -530,6 +533,13 @@ public class JsonHTML5Exporter implements ChartExporter {
 			yLegend.setColor(ColorUtil.getHexColor(chart.getYLegend().getColor()));
 			yLegend.setFont(createFont(chart.getYLegend().getFont()));
 			nc.setyLegend(yLegend);
+		}
+		if ((chart.getyDualLegend() != null) && !isEmpty(chart.getyDualLegend().getTitle()))  {
+			String yLeg = StringUtil.getI18nString(replaceParameters(chart.getyDualLegend().getTitle()), I18nUtil.getLanguageByName(chart, language));
+			NextChartLegend yLegend = new NextChartLegend(yLeg);
+			yLegend.setColor(ColorUtil.getHexColor(chart.getyDualLegend().getColor()));
+			yLegend.setFont(createFont(chart.getyDualLegend().getFont()));
+			nc.setY2Legend(yLegend);
 		}
 	}
 

@@ -70,6 +70,7 @@ public class Chart implements Serializable {
     private byte transparency;
     private ChartTitle xLegend;
     private ChartTitle yLegend;
+    private ChartTitle yDualLegend;
     private String yFunction;
     private Color xGridColor;
     private Color yGridColor;
@@ -79,6 +80,7 @@ public class Chart implements Serializable {
     private Boolean yShowLabel;
     // showYValuesOnChart has meaning for image, not for flash
     private Boolean showYValuesOnChart;
+    private Boolean showDualAxis;
     private String yTooltipPattern;
     private String tooltipMessage;
     private Font font;
@@ -105,6 +107,7 @@ public class Chart implements Serializable {
         this.title = new ChartTitle("");
         this.xLegend = new ChartTitle("");
         this.yLegend = new ChartTitle("");
+        this.yDualLegend = new ChartTitle("");
         this.background = Color.WHITE;
         this.foregrounds = new ArrayList<Color>();
         this.xorientation = HORIZONTAL;
@@ -117,7 +120,8 @@ public class Chart implements Serializable {
         this.yShowGrid = Boolean.TRUE;
         this.xShowLabel = Boolean.TRUE;
         this.yShowLabel = Boolean.TRUE;
-        this.showYValuesOnChart = Boolean.FALSE;        
+        this.showYValuesOnChart = Boolean.FALSE;     
+        this.showDualAxis = Boolean.FALSE;
         foregrounds.addAll(Arrays.asList(COLORS));        
         setType(new ChartType(ChartType.BAR));
     }
@@ -332,8 +336,16 @@ public class Chart implements Serializable {
     public void setYLegend(ChartTitle yLegend) {
         this.yLegend = yLegend;
     }
+        
+    public ChartTitle getyDualLegend() {
+		return yDualLegend;
+	}
 
-    public String getYFunction() {
+	public void setyDualLegend(ChartTitle yDualLegend) {
+		this.yDualLegend = yDualLegend;
+	}
+
+	public String getYFunction() {
         return yFunction;
     }
 
@@ -404,7 +416,15 @@ public class Chart implements Serializable {
 	public void setShowYValuesOnChart(Boolean showYValuesOnChart) {
 		this.showYValuesOnChart = showYValuesOnChart;
 	}
-		
+				
+	public Boolean getShowDualAxis() {
+		return showDualAxis;
+	}
+
+	public void setShowDualAxis(Boolean showDualAxis) {
+		this.showDualAxis = showDualAxis;
+	}
+
 	public String getYTooltipPattern() {
 		return yTooltipPattern;
 	}
@@ -480,9 +500,11 @@ public class Chart implements Serializable {
         if (yFunction != null ? !yFunction.equals(chart.yFunction) : chart.yFunction != null) return false;
         if (yGridColor != null ? !yGridColor.equals(chart.yGridColor) : chart.yGridColor != null) return false;
         if (yLegend != null ? !yLegend.equals(chart.yLegend) : chart.yLegend != null) return false;
+        if (yDualLegend != null ? !yDualLegend.equals(chart.yDualLegend) : chart.yDualLegend != null) return false;
         if (yShowGrid != null ? !yShowGrid.equals(chart.yShowGrid) : chart.yShowGrid != null) return false;
         if (yShowLabel != null ? !yShowLabel.equals(chart.yShowLabel) : chart.yShowLabel != null) return false;
         if (showYValuesOnChart != null ? !showYValuesOnChart.equals(chart.showYValuesOnChart) : chart.showYValuesOnChart != null) return false;
+        if (showDualAxis != null ? !showDualAxis.equals(chart.showDualAxis) : chart.showDualAxis != null) return false;
         if (yTooltipPattern != null ? !yTooltipPattern.equals(chart.yTooltipPattern) : chart.yTooltipPattern != null) return false;
         if (font != null ? !font.equals(chart.font) : chart.font != null) return false;
         if (xLabelFont != null ? !xLabelFont.equals(chart.xLabelFont) : chart.xLabelFont != null) return false;
@@ -518,6 +540,7 @@ public class Chart implements Serializable {
         result = 31 * result + (int) transparency;
         result = 31 * result + (xLegend != null ? xLegend.hashCode() : 0);
         result = 31 * result + (yLegend != null ? yLegend.hashCode() : 0);
+        result = 31 * result + (yDualLegend != null ? yDualLegend.hashCode() : 0);
         result = 31 * result + (yFunction != null ? yFunction.hashCode() : 0);
         result = 31 * result + (xGridColor != null ? xGridColor.hashCode() : 0);
         result = 31 * result + (yGridColor != null ? yGridColor.hashCode() : 0);
@@ -526,6 +549,7 @@ public class Chart implements Serializable {
         result = 31 * result + (xShowLabel != null ? xShowLabel.hashCode() : 0);
         result = 31 * result + (yShowLabel != null ? yShowLabel.hashCode() : 0);
         result = 31 * result + (showYValuesOnChart != null ? showYValuesOnChart.hashCode() : 0);
+        result = 31 * result + (showDualAxis != null ? showDualAxis.hashCode() : 0);
         result = 31 * result + (yTooltipPattern != null ? yTooltipPattern.hashCode() : 0);
         result = 31 * result + (font != null ? font.hashCode() : 0);
         result = 31 * result + (xLabelFont != null ? xLabelFont.hashCode() : 0);
@@ -558,6 +582,7 @@ public class Chart implements Serializable {
                 ", transparency=" + transparency +
                 ", xLegend=" + xLegend +
                 ", yLegend=" + yLegend +
+                ", yDualLegend=" + yDualLegend +
                 ", yFunction='" + yFunction + '\'' +
                 ", xGridColor=" + xGridColor +
                 ", yGridColor=" + yGridColor +
@@ -566,6 +591,7 @@ public class Chart implements Serializable {
                 ", xShowLabel=" + xShowLabel +
                 ", yShowLabel=" + yShowLabel +
                 ", showYValuesOnChart=" + showYValuesOnChart +
+                ", showDualAxis=" + showDualAxis +
                 ", tooltipMessage=" + tooltipMessage +
                 ", yTooltipPattern=" + yTooltipPattern +
                 ", font=" + font +
