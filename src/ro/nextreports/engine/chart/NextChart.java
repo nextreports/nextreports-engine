@@ -64,6 +64,7 @@ public class NextChart {
 	private NextNumberFormat tooltipPattern;
 	private boolean dualYaxis;
 	private NextChartLegend y2Legend;
+	private int y2Count;
 		
 	// function doClick(value){ console.log('Call from function : ' + value);}
 	private String onClick;
@@ -277,6 +278,14 @@ public class NextChart {
 
 	public void setY2Legend(NextChartLegend y2Legend) {
 		this.y2Legend = y2Legend;
+	}
+		
+	public int getY2Count() {
+		return y2Count;
+	}
+
+	public void setY2Count(int y2Count) {
+		this.y2Count = y2Count;
 	}
 
 	public boolean isShowTicks() {

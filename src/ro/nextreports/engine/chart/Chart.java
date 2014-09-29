@@ -81,6 +81,7 @@ public class Chart implements Serializable {
     // showYValuesOnChart has meaning for image, not for flash
     private Boolean showYValuesOnChart;
     private Boolean showDualAxis;
+    private Integer y2SeriesCount;
     private String yTooltipPattern;
     private String tooltipMessage;
     private Font font;
@@ -122,6 +123,7 @@ public class Chart implements Serializable {
         this.yShowLabel = Boolean.TRUE;
         this.showYValuesOnChart = Boolean.FALSE;     
         this.showDualAxis = Boolean.FALSE;
+        this.y2SeriesCount = 1;
         foregrounds.addAll(Arrays.asList(COLORS));        
         setType(new ChartType(ChartType.BAR));
     }
@@ -424,6 +426,14 @@ public class Chart implements Serializable {
 	public void setShowDualAxis(Boolean showDualAxis) {
 		this.showDualAxis = showDualAxis;
 	}
+		
+	public Integer getY2SeriesCount() {
+		return y2SeriesCount;
+	}
+
+	public void setY2SeriesCount(Integer y2SeriesCount) {
+		this.y2SeriesCount = y2SeriesCount;
+	}
 
 	public String getYTooltipPattern() {
 		return yTooltipPattern;
@@ -505,6 +515,7 @@ public class Chart implements Serializable {
         if (yShowLabel != null ? !yShowLabel.equals(chart.yShowLabel) : chart.yShowLabel != null) return false;
         if (showYValuesOnChart != null ? !showYValuesOnChart.equals(chart.showYValuesOnChart) : chart.showYValuesOnChart != null) return false;
         if (showDualAxis != null ? !showDualAxis.equals(chart.showDualAxis) : chart.showDualAxis != null) return false;
+        if (y2SeriesCount != null ? !y2SeriesCount.equals(chart.y2SeriesCount) : chart.y2SeriesCount != null) return false;
         if (yTooltipPattern != null ? !yTooltipPattern.equals(chart.yTooltipPattern) : chart.yTooltipPattern != null) return false;
         if (font != null ? !font.equals(chart.font) : chart.font != null) return false;
         if (xLabelFont != null ? !xLabelFont.equals(chart.xLabelFont) : chart.xLabelFont != null) return false;
@@ -550,6 +561,7 @@ public class Chart implements Serializable {
         result = 31 * result + (yShowLabel != null ? yShowLabel.hashCode() : 0);
         result = 31 * result + (showYValuesOnChart != null ? showYValuesOnChart.hashCode() : 0);
         result = 31 * result + (showDualAxis != null ? showDualAxis.hashCode() : 0);
+        result = 31 * result + (y2SeriesCount != null ? y2SeriesCount.hashCode() : 0);
         result = 31 * result + (yTooltipPattern != null ? yTooltipPattern.hashCode() : 0);
         result = 31 * result + (font != null ? font.hashCode() : 0);
         result = 31 * result + (xLabelFont != null ? xLabelFont.hashCode() : 0);
@@ -592,6 +604,7 @@ public class Chart implements Serializable {
                 ", yShowLabel=" + yShowLabel +
                 ", showYValuesOnChart=" + showYValuesOnChart +
                 ", showDualAxis=" + showDualAxis +
+                ", y2SeriesCount=" + y2SeriesCount +
                 ", tooltipMessage=" + tooltipMessage +
                 ", yTooltipPattern=" + yTooltipPattern +
                 ", font=" + font +

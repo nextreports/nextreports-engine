@@ -166,6 +166,9 @@ public class JsonHTML5Exporter implements ChartExporter {
 		}
 		if (chart.getShowDualAxis() != null) {
 			nc.setDualYaxis(chart.getShowDualAxis());
+			if (chart.getY2SeriesCount() != null) {
+				nc.setY2Count(chart.getY2SeriesCount());
+			}
 		}
 		
 		// todo : customize tickCount?
