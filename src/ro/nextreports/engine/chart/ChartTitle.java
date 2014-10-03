@@ -90,7 +90,7 @@ public class ChartTitle implements Serializable {
     }
 
     private Font getDefaultFont() {
-       return new Font("SansSerif", Font.PLAIN, 12);
+       return new Font("SansSerif", Font.BOLD, 18);
     }
 
     private Color getDefaultColor() {
