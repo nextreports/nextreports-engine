@@ -125,7 +125,7 @@ public class Chart implements Serializable {
         this.showDualAxis = Boolean.FALSE;
         this.y2SeriesCount = 1;
         foregrounds.addAll(Arrays.asList(COLORS));        
-        setType(new ChartType(ChartType.BAR));
+        setType(new ChartType(ChartType.BAR, ChartType.STYLE_BAR_GLASS));
     }
 
     public Chart(ChartType type, Report report) {
