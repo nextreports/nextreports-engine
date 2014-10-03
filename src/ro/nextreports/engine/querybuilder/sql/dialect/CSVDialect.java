@@ -36,12 +36,12 @@ public class CSVDialect extends AbstractDialect {
 
 	@Override
 	public String getCurrentDate() throws DialectException {
-		return null;
+		return "CURRENT_DATE";
 	}
 
 	@Override
 	public String getCurrentDateSelect() {
-		return null;
+		return "select CURRENT_DATE";
 	}
 
 	@Override
