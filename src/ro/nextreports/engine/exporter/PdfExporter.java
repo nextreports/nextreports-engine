@@ -22,6 +22,7 @@ import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.html.simpleparser.HTMLWorker;
 import com.itextpdf.text.html.simpleparser.StyleSheet;
+import com.itextpdf.text.pdf.ArabicLigaturizer;
 import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPRow;
@@ -196,6 +197,8 @@ public class PdfExporter extends ResultExporter {
 
     public static final String PDF_ENCODING_PROPERTY = "nextreports.pdf.encoding";
     public static final String PDF_FONT_PROPERTY = "nextreports.pdf.font";
+    public static final String PDF_DIRECTION = "nextreports.pdf.direction";
+    public static final String PDF_ARABIC_OPTIONS = "nextreports.pdf.arabicOptions";        
 
     // ANSI Encoding of the pdf document
     // http://www.microsoft.com/globaldev/reference/WinCP.mspx
@@ -207,6 +210,12 @@ public class PdfExporter extends ResultExporter {
     // creating a not-readable string.
     // This is used only if an encoding is present.
     private final String embeddedFont = System.getProperty(PDF_FONT_PROPERTY);
+    
+    // other writing properties 
+    // PdfWriter.RUN_DIRECTION_DEFAULT, PdfWriter.RUN_DIRECTION_NO_BIDI, PdfWriter.RUN_DIRECTION_LTR, PdfWriter.RUN_DIRECTION_RTL
+    private final int textDirection = Integer.getInteger(System.getProperty(PDF_DIRECTION), PdfWriter.RUN_DIRECTION_DEFAULT);
+    // ar_nothing, ar_novowel, ar_composedtashkeel, ar_lig
+    private final int arabicOptions = Integer.getInteger(System.getProperty(PDF_ARABIC_OPTIONS), ArabicLigaturizer.ar_nothing);
 
     // Pdf font name if no encoding or if no embedded font is used
     private String fontName = FontFactory.TIMES;
@@ -327,6 +336,9 @@ public class PdfExporter extends ResultExporter {
             }
         }
 
+        cell.setArabicOptions(arabicOptions);
+        cell.setRunDirection(textDirection);
+        
         cell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
         cell.setUseDescender(true); // needed for a cell without padding
         cell.setMinimumHeight(MINIMUM_HEIGHT);  // needed if there is a row in which all cells are empty
