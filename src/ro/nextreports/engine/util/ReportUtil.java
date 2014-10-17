@@ -795,6 +795,27 @@ public class ReportUtil {
 		}	
 		return subreports;
 	}
+	
+	/**
+	 * Get detail band subreports for a report layout
+	 * @param reportLAyout current report layout
+	 * @return list of subreports from detail band
+	 */
+	public static List<Report> getDetailSubreports(ReportLayout reportLayout) {
+		List<Report> subreports = new ArrayList<Report>();
+
+		Band band = reportLayout.getDetailBand();
+		for (int i = 0, rows = band.getRowCount(); i < rows; i++) {
+			List<BandElement> list = band.getRow(i);
+			for (int j = 0, size = list.size(); j < size; j++) {
+				BandElement be = list.get(j);
+				if (be instanceof ReportBandElement) {
+					subreports.add(((ReportBandElement) be).getReport());
+				}
+			}
+		}
+		return subreports;
+	}
 
 	public static boolean isGroupBand(String bandName) {
 		if (bandName == null) {

@@ -70,6 +70,15 @@ public class ParametersBean {
 		}	
 	}
 	
+	public void addNotFoundSubreportParameters(List<QueryParameter> parameters) {
+		for (QueryParameter qp : parameters) {
+			qp.setSubreportParameter(true);
+			if (!params.containsKey(qp.getName())) {
+				params.put(qp.getName(), qp);
+			}
+		}	
+	}
+	
 	public void overwriteSubreportParametersValues(Map<String, Object> values) {
 		for (String paramName : values.keySet()) {
 			paramValues.put(paramName, values.get(paramName));

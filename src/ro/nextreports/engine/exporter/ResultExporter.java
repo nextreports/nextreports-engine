@@ -1172,8 +1172,15 @@ public abstract class ResultExporter {
                 // parameter name used in subreport must be the column alias from parent report !
                 if (!bean.isSubreport() && isDetail) {
                 	Map<String, QueryParameter> params = bean.getParametersBean().getSubreportParams();
+                	if (params.size() == 0) {
+                		// first time we have to look for subreports and add parameters of subreports that are not yet found in master report
+                		List<Report> subreports = ReportUtil.getDetailSubreports(bean.getReportLayout());
+                		for (Report subreport : subreports) {
+                			bean.getParametersBean().addNotFoundSubreportParameters(subreport.getParameters());
+                		}
+                	}                	
                 	for (QueryParameter qp : params.values()) {                								
-						Object pValue = getResult().nextValue(qp.getName());						
+						Object pValue = getResult().nextValue(qp.getName());
 						bean.getParametersBean().setParameterValue(qp.getName(), pValue);
                 	}
                 }
