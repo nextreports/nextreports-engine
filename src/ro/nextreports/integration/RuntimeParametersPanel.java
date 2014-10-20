@@ -252,7 +252,7 @@ public class RuntimeParametersPanel extends JPanel {
                 value = combo.getSelectedItem();
             }
         } else if (component instanceof JList) {
-            value = ((JList) component).getSelectedValues();
+            value = ((JList) component).getSelectedValuesList();
             if (((Object[]) value).length == 0) {
                 if (parameter.isMandatory()) {
                     throw new Exception("Value for parameter '" + parameter.getRuntimeName() + "' is not selected.");
