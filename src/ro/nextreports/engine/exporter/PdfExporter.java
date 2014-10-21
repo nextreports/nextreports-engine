@@ -213,9 +213,9 @@ public class PdfExporter extends ResultExporter {
     
     // other writing properties 
     // PdfWriter.RUN_DIRECTION_DEFAULT, PdfWriter.RUN_DIRECTION_NO_BIDI, PdfWriter.RUN_DIRECTION_LTR, PdfWriter.RUN_DIRECTION_RTL
-    private final int textDirection = Integer.getInteger(System.getProperty(PDF_DIRECTION), PdfWriter.RUN_DIRECTION_DEFAULT);
+    private final int textDirection = Integer.getInteger(PDF_DIRECTION, PdfWriter.RUN_DIRECTION_DEFAULT);
     // ar_nothing, ar_novowel, ar_composedtashkeel, ar_lig
-    private final int arabicOptions = Integer.getInteger(System.getProperty(PDF_ARABIC_OPTIONS), ArabicLigaturizer.ar_nothing);
+    private final int arabicOptions = Integer.getInteger(PDF_ARABIC_OPTIONS, ArabicLigaturizer.ar_nothing);
 
     // Pdf font name if no encoding or if no embedded font is used
     private String fontName = FontFactory.TIMES;
