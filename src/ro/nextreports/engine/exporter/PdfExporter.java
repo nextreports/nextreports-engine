@@ -626,6 +626,10 @@ public class PdfExporter extends ResultExporter {
         if (type == PRINT_DOCUMENT) {
         	writeHeader(datatable);
         }
+        // this is used in correlation with sepSplitRows(true) which is the default inside PdfPTable;
+        // by default splitLate is true and in case a subreport is bigger than a page, the subreport
+        // will be written starting from next page, leaving first page empty
+        datatable.setSplitLate(false);
         return datatable;
     }
 
