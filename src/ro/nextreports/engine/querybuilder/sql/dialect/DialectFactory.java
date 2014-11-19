@@ -50,6 +50,7 @@ public class DialectFactory {
     public static final String VERTICA = "Vertica Database";
     public static final String PERVASIVE = "Pervasive.SQL";
     public static final String TERADATA = "Teradata";
+    public static final String MSACCESS = "Ucanaccess";
 
     static {
         // add buit-in dialect mappers
@@ -63,7 +64,8 @@ public class DialectFactory {
         addDialect(CSV, CSVDialect.class.getName());
         addDialect(VERTICA, VerticaDialect.class.getName());
         addDialect(PERVASIVE, PervasiveDialect.class.getName());
-        addDialect(TERADATA, TeradataDialect.class.getName()); 
+        addDialect(TERADATA, TeradataDialect.class.getName());
+        addDialect(MSACCESS, MSAccessDialect.class.getName()); 
         addDialectsFromVMParameters();
     }
     
@@ -87,6 +89,8 @@ public class DialectFactory {
         // TODO workaround for firebird (databaseName='Firebird 2.0.LI-V2.0.3.12981 Firebird 2.0/tcp (decebal)/P10')
         if (databaseName.startsWith(FIREBIRD)) {
         	dialectName = FirebirdDialect.class.getName();
+        } else if (databaseName.startsWith(MSACCESS)) {
+        	dialectName = MSAccessDialect.class.getName();	
         } else {        	
         	DialectMapper mapper = MAPPERS.get(databaseName);        	
         	if (mapper == null) {
