@@ -274,6 +274,17 @@ public class ChartRunner implements Runner {
             NoDataFoundException, InterruptedException {
         return run(null);
     }
+    
+    /** Execute query: not supported for chart   
+   	 * 
+   	 * @return QueryResult object
+   	 * 
+   	 * @throws ReportRunnerException if Runner object is not correctly configured
+     * @throws InterruptedException if process was interrupted
+   	 */
+     public QueryResult executeQuery() throws ReportRunnerException, InterruptedException {
+    	 throw new UnsupportedOperationException();
+     }
 
     /**
 	 * Export the current chart to the specified output format

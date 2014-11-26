@@ -23,6 +23,7 @@ import ro.nextreports.engine.exporter.exception.NoDataFoundException;
 import ro.nextreports.engine.exporter.util.AlarmData;
 import ro.nextreports.engine.exporter.util.IndicatorData;
 import ro.nextreports.engine.exporter.util.TableData;
+import ro.nextreports.engine.queryexec.QueryResult;
 
 /**
  * User: mihai.panaitescu
@@ -30,6 +31,18 @@ import ro.nextreports.engine.exporter.util.TableData;
  * Time: 14:05:53
  */
 public interface Runner {
+	
+	/** Execute query
+	 *  This method is useful in case you are not interested about report layout, 
+	 *  but only query and you want to make your own business.
+	 * 
+	 * @return QueryResult object
+	 * 
+	 * @throws ReportRunnerException if Runner object is not correctly configured
+     * @throws InterruptedException if process was interrupted
+	 */
+	public QueryResult executeQuery() throws ReportRunnerException, InterruptedException;
+		
 
      /** Export to TABLE memory format
      *

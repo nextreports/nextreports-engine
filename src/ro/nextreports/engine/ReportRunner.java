@@ -273,6 +273,54 @@ public class ReportRunner implements Runner {
             NoDataFoundException {
         return run(null);
     }       
+    
+    /** Execute query
+	 *  This method is useful in case you are not interested about report layout, 
+	 *  but only query and you want to make your own business.
+	 * 
+	 * @return QueryResult object
+	 * 
+	 * @throws ReportRunnerException if Runner object is not correctly configured
+     * @throws InterruptedException if process was interrupted
+	 */
+    public QueryResult executeQuery() throws ReportRunnerException, InterruptedException {
+    	 if (connection == null) {
+             throw new ReportRunnerException("Connection is null!");
+         }
+         if (report == null) {
+             throw new ReportRunnerException("Report is null!");
+         }
+         
+         String sql = getSql();
+
+         // retrieves the report parameters
+         Map<String, QueryParameter> parameters = getReportParameters();
+
+         if (QueryUtil.restrictQueryExecution(sql)) {
+             throw new ReportRunnerException("You are not allowed to execute queries that modify the database!");
+         }
+
+         if (QueryUtil.isProcedureCall(sql)) {
+             if (!QueryUtil.isValidProcedureCall(sql, dialect)) {
+                 throw new ReportRunnerException("Invalid procedure call! Must be of form 'call (${P1}, ?)'");
+             }
+         }
+         
+         QueryResult queryResult = null;
+         try {        	        	        	
+             Query query = getQuery(sql);
+             QueryExecutor executor = new QueryExecutor(query, parameters, parameterValues, connection, count, true, csv);
+             executor.setMaxRows(0);
+             executor.setTimeout(queryTimeout);
+
+             queryResult = executor.execute();
+             
+             return queryResult;
+         } catch (Exception e) {
+             throw new ReportRunnerException(e);
+         }    
+
+    }
 
 
     /** Export the current report to the specified output format
@@ -305,54 +353,17 @@ public class ReportRunner implements Runner {
             throw new ReportRunnerException("DISPLAY FORMAT does not need an output stream. Use run() method instead.");
         }
         
-        if (connection == null) {
-            throw new ReportRunnerException("Connection is null!");
-        }
-        if (report == null) {
-            throw new ReportRunnerException("Report is null!");
-        }
         if (!formatAllowed(format)) {
             throw new ReportRunnerException("Unsupported format : " + format + " !");
-        }       
-
-        String sql = report.getSql();
-        if (sql == null) {
-            // get sql from SelectQuery object (report built with next reporter !)
-            sql = report.getQuery().toString();
-        }
-        if (sql == null) {
-            throw new ReportRunnerException("Report sql expression not found");
-        }
-
-        // retrieves the report parameters
-        Map<String, QueryParameter> parameters = new LinkedHashMap<String, QueryParameter>();
-        List<QueryParameter> parameterList = report.getParameters();
-        if (parameterList != null) {
-            for (QueryParameter param : parameterList) {
-                parameters.put(param.getName(), param);
-            }
-        }
-
-        if (QueryUtil.restrictQueryExecution(sql)) {
-            throw new ReportRunnerException("You are not allowed to execute queries that modify the database!");
-        }
-
-        if (QueryUtil.isProcedureCall(sql)) {
-            if (!QueryUtil.isValidProcedureCall(sql, dialect)) {
-                throw new ReportRunnerException("Invalid procedure call! Must be of form 'call (${P1}, ?)'");
-            }
-        }
-        
+        }           
+       
         QueryResult queryResult = null;
         try {        	        	        	
-            Query query = new Query(sql);
-            QueryExecutor executor = new QueryExecutor(query, parameters, parameterValues, connection, count, true, csv);
-            executor.setMaxRows(0);
-            executor.setTimeout(queryTimeout);
+           
+            queryResult = executeQuery();
 
-            queryResult = executor.execute();
-
-            ParametersBean bean = new ParametersBean(query, parameters, parameterValues);
+            String sql = getSql();
+            ParametersBean bean = new ParametersBean(getQuery(sql), getReportParameters(), parameterValues);
                         
             ReportLayout convertedLayout = ReportUtil.getDynamicReportLayout(connection, report.getLayout(), bean);
                         
@@ -375,6 +386,34 @@ public class ReportRunner implements Runner {
         		queryResult.close();
         	}
         }
+    }
+    
+    private String getSql() throws ReportRunnerException {
+    	String sql = report.getSql();
+        if (sql == null) {
+            // get sql from SelectQuery object (report built with next reporter !)
+            sql = report.getQuery().toString();
+        }
+        if (sql == null) {
+            throw new ReportRunnerException("Report sql expression not found");
+        } else {
+        	return sql;
+        }
+    }
+    
+    private Query getQuery(String sql) {
+    	return new Query(sql);
+    }
+    
+    private Map<String, QueryParameter> getReportParameters() {
+    	 Map<String, QueryParameter> parameters = new LinkedHashMap<String, QueryParameter>();
+         List<QueryParameter> parameterList = report.getParameters();
+         if (parameterList != null) {
+             for (QueryParameter param : parameterList) {
+                 parameters.put(param.getName(), param);
+             }
+         }
+         return parameters;
     }
 
     private boolean formatAllowed(String format) {

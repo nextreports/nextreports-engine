@@ -25,6 +25,7 @@ import java.util.Map;
 import ro.nextreports.engine.exporter.Alert;
 import ro.nextreports.engine.exporter.event.ExporterEventListener;
 import ro.nextreports.engine.exporter.exception.NoDataFoundException;
+import ro.nextreports.engine.queryexec.QueryResult;
 
 /** Utilities class to run a report using a fluent syntax
  * 
@@ -180,6 +181,19 @@ public class FluentReportRunner {
     public void run(OutputStream stream) throws ReportRunnerException, NoDataFoundException {
 		reportRunner.run(stream);
 	}
+    
+    /** Execute query
+	 *  This method is useful in case you are not interested about report layout, 
+	 *  but only query and you want to make your own business and not to call run method
+	 * 
+	 * @return QueryResult object
+	 * 
+	 * @throws ReportRunnerException if Runner object is not correctly configured
+     * @throws InterruptedException if process was interrupted
+	 */
+    public QueryResult executeQuery() throws ReportRunnerException, InterruptedException {
+    	return reportRunner.executeQuery();
+    }
 
     /** Stop the export process
      */
