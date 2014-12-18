@@ -1379,7 +1379,7 @@ public abstract class ResultExporter {
         // make sure to replace spaces in column names (as in designer expression evaluator)
         JexlContext checkContext = new MapContext();            
         for (Variable var : VariableFactory.getVariables()) {
-        	if (((this instanceof RtfExporter) || (this instanceof XlsExporter)) && Variable.PAGE_NO_VARIABLE.equals(var.getName())) {
+        	if (((this instanceof RtfExporter) || (this instanceof XlsExporter) || (this instanceof XlsxExporter)) && Variable.PAGE_NO_VARIABLE.equals(var.getName())) {
         		// RtfPageNumber must be added in RtfExporter -> let the variable as it is
         		checkContext.set("$V_" + var.getName(), "$V_" + var.getName());
         	} else if ( (this instanceof PdfExporter) && Variable.TOTAL_PAGE_NO_VARIABLE.equals(var.getName()) ) {

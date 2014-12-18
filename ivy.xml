@@ -48,6 +48,9 @@
         
         <!-- POI -->
         <dependency org="org.apache.poi" name="poi" rev="3.7" conf="excel, docx, allruntime"/>        
+        <dependency org="org.apache.poi" name="poi-ooxml" rev="3.7" conf="excel, docx, allruntime">
+            <exclude org="xml-apis"/>
+        </dependency>
         
         <!-- iText -->
         <dependency org="com.itextpdf" name="itextpdf" rev="5.0.6" conf="pdf, allruntime">

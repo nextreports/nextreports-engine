@@ -41,6 +41,7 @@ import ro.nextreports.engine.exporter.RtfExporter;
 import ro.nextreports.engine.exporter.TsvExporter;
 import ro.nextreports.engine.exporter.TxtExporter;
 import ro.nextreports.engine.exporter.XlsExporter;
+import ro.nextreports.engine.exporter.XlsxExporter;
 import ro.nextreports.engine.exporter.XmlExporter;
 import ro.nextreports.engine.exporter.event.ExporterEventListener;
 import ro.nextreports.engine.exporter.exception.NoDataFoundException;
@@ -73,6 +74,8 @@ public class ReportRunner implements Runner {
     public static final String PDF_FORMAT = "PDF";
     /** EXCEL output format */
     public static final String EXCEL_FORMAT = "EXCEL";
+    /** EXCEL XLSX output format */
+    public static final String EXCEL_XLSX_FORMAT = "EXCELX";
     /** HTML output format */
     public static final String HTML_FORMAT = "HTML";
     /** RTF output format */
@@ -88,7 +91,7 @@ public class ReportRunner implements Runner {
     /** XML output format */
     public static final String XML_FORMAT = "XML";
     /** Array of all output persistent formats */
-    public static final String[] FORMATS = { PDF_FORMAT, EXCEL_FORMAT, HTML_FORMAT, DOCX_FORMAT, RTF_FORMAT,
+    public static final String[] FORMATS = { PDF_FORMAT, EXCEL_FORMAT, EXCEL_XLSX_FORMAT, HTML_FORMAT, DOCX_FORMAT, RTF_FORMAT,
             CSV_FORMAT, TSV_FORMAT, TXT_FORMAT, XML_FORMAT };
 
     /** Memory table output format */
@@ -464,6 +467,8 @@ public class ReportRunner implements Runner {
             exporter = new TxtExporter(bean);
         } else if (EXCEL_FORMAT.equals(format)) {        	
             exporter = new XlsExporter(bean);
+        } else if (EXCEL_XLSX_FORMAT.equals(format)) {        	
+            exporter = new XlsxExporter(bean);    
         } else if (RTF_FORMAT.equals(format)) {
             exporter = new RtfExporter(bean);
         } else if (XML_FORMAT.equals(format)) {
