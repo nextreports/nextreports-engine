@@ -509,13 +509,18 @@ public class XlsxExporter extends ResultExporter {
                     if (ibe.isScaled()) {
                         realImageHeight = ibe.getHeight();
                     }
-                    short imageHeight = (short)(realImageHeight * POINTS_FOR_PIXEL/2.5);
+                    short imageHeight = (short)(realImageHeight * POINTS_FOR_PIXEL/2.5);                    
+                    boolean doResize = false;
                     if (imageHeight > height)  {
-                        xlsRow.setHeight(imageHeight);
+                        xlsRow.setHeight(imageHeight);                        
+                    } else {
+                    	doResize = true;
                     }
 
                     Picture picture = patriarch.createPicture(anchor, index);
-                    picture.resize();
+                    if (doResize) {
+                    	picture.resize();
+                    }
                     anchor.setAnchorType(2);
                 } catch (Exception ex) {
                     c.setCellType(XSSFCell.CELL_TYPE_STRING);
