@@ -33,7 +33,7 @@ public class TeradataDialect extends AbstractDialect {
 		registerColumnType("number", Types.NUMERIC);
 		registerColumnType("money", Types.NUMERIC);
 		registerColumnType("time", Types.TIME);
-		registerColumnType("time with timezone", Types.TIME);
+		registerColumnType("time with time zone", Types.TIME);
 		registerColumnType("interval", Types.TIME);
 	}
 
