@@ -250,6 +250,16 @@ public class StringUtil {
                 return sfd.format(d);
             }
         }
+                
+        if (val instanceof Timestamp) {
+            if (pattern == null) {                
+            	return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format((Timestamp)val);
+            } else {
+                Timestamp d = (Timestamp) val;
+                SimpleDateFormat sfd = new SimpleDateFormat(pattern);
+                return sfd.format(d);
+            }
+        }
         
         if (val instanceof Date) {
             if (pattern == null) {
@@ -257,15 +267,6 @@ public class StringUtil {
             } else {            	
                 SimpleDateFormat sfd = new SimpleDateFormat(pattern);
                 return sfd.format((Date) val);
-            }
-        }
-        if (val instanceof Timestamp) {
-            if (pattern == null) {                
-            	return DateFormat.getDateInstance().format((Timestamp)val);
-            } else {
-                Date d = (Timestamp) val;
-                SimpleDateFormat sfd = new SimpleDateFormat(pattern);
-                return sfd.format(d);
             }
         }
                 
