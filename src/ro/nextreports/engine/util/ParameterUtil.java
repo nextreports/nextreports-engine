@@ -1035,6 +1035,30 @@ public class ParameterUtil {
    public static Object getParameterValueFromString(String parameterClass, String value) throws Exception {
 	   return getParameterValueFromString(parameterClass, value, null);
    }
+   
+   /** Get parameter value from a string represenation using a pattern
+   *
+   * @param parameterClass parameter class
+   * @param value string value representation
+   * @param pattern value pattern
+   * @return parameter value from string representation using pattern
+   * @throws Exception if string value cannot be parse
+   */
+  public static Object getParameterValueFromStringWithPattern(String parameterClass, String value, String pattern) throws Exception {
+	  if (pattern == null) {
+		  return getParameterValueFromString(parameterClass, value);
+	  } else {
+		  if (QueryParameter.DATE_VALUE.equals(parameterClass) ||
+		      QueryParameter.TIME_VALUE.equals(parameterClass) ||
+			  QueryParameter.TIMESTAMP_VALUE.equals(parameterClass)) {
+			  
+			  SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+			  return getParameterValueFromString(parameterClass, value, sdf);
+		  } else {
+			  return getParameterValueFromString(parameterClass, value);
+		  }
+	  }
+  }
 
     /** Get parameter value from a string represenation
      *
@@ -1085,9 +1109,17 @@ public class ParameterUtil {
             		result = sdf.parse(value);                		            	
             	}
             } else if (QueryParameter.TIME_VALUE.equals(parameterClass)) {
-                result = Time.valueOf(value);
+            	if (sdf != null) {
+            		result = sdf.parse(value);         
+            	} else {
+            		result = Time.valueOf(value);
+            	}
             } else if (QueryParameter.TIMESTAMP_VALUE.equals(parameterClass)) {
-                result = Timestamp.valueOf(value);
+            	if (sdf != null) {
+            		result = sdf.parse(value);         
+            	} else {
+            		result = Timestamp.valueOf(value);
+            	}
             }
             return result;
         } catch (NumberFormatException ex) {
