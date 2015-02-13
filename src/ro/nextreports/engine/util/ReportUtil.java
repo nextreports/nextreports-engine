@@ -60,7 +60,6 @@ import ro.nextreports.engine.band.FunctionBandElement;
 import ro.nextreports.engine.band.ImageBandElement;
 import ro.nextreports.engine.band.ReportBandElement;
 import ro.nextreports.engine.exporter.util.ParametersBean;
-import ro.nextreports.engine.i18n.I18nLanguage;
 import ro.nextreports.engine.i18n.I18nString;
 import ro.nextreports.engine.queryexec.IdName;
 import ro.nextreports.engine.queryexec.QueryParameter;
@@ -1117,6 +1116,14 @@ public class ReportUtil {
 			names.add(nt.getName());
 		}
 		return names;
+	}
+	
+	public static List<String> getColumnTypes(List<NameType> columns) {
+		List<String> types = new ArrayList<String>();
+		for (NameType nt : columns) {
+			types.add(nt.getType());
+		}
+		return types;
 	}
 
 }
