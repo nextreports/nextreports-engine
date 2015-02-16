@@ -160,6 +160,8 @@ public class HtmlUtil {
 		if (be != null) {
 			if (!be.isWrapText()) {
 				css.append("white-space: nowrap; \n");
+			} else {
+				css.append("word-wrap: break-word; \n");
 			}
 			// if (be.getTextRotation() != 0) {
 			// css.append(getRotationStyle(be.getTextRotation()));
