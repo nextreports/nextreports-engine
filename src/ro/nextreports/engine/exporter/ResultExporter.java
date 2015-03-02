@@ -826,7 +826,7 @@ public abstract class ResultExporter {
                 return sb.toString();
             }
         } else {
-            return StringUtil.getValueAsString(object, bandElement.getPattern());
+            return StringUtil.getValueAsString(object, bandElement.getPattern(), null, qp.getValueClassName());
         }
     }
 

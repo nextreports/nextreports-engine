@@ -203,11 +203,15 @@ public class StringUtil {
     public static String getValueAsString(Object val, String pattern) {
     	return getValueAsString(val, pattern, null);
     }
-
+    
     public static String getValueAsString(Object val, String pattern, I18nLanguage lang) {
+    	return getValueAsString(val, pattern, lang, null);
+    }
+
+    public static String getValueAsString(Object val, String pattern, I18nLanguage lang, String parameterValueClass) {
         if (val == null) {
             return null;
-        }                
+        }                               
         
         if (val instanceof IdName) {
         	IdName in = (IdName)val;
@@ -263,7 +267,17 @@ public class StringUtil {
         
         if (val instanceof Date) {
             if (pattern == null) {
-            	return DateFormat.getDateInstance().format((Date)val);                
+            	if (parameterValueClass != null) {            		
+            		if (parameterValueClass.equals("java.sql.Time")) {
+            			return new SimpleDateFormat("HH:mm:ss").format((Date)val);
+            		} else if (parameterValueClass.equals("java.sql.Timestamp")) {
+            			return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format((Date)val);
+            		} else {
+            			return new SimpleDateFormat("yyyy-MM-dd").format((Date)val);
+            		}
+            	} else {
+            		return DateFormat.getDateInstance().format((Date)val);
+            	}
             } else {            	
                 SimpleDateFormat sfd = new SimpleDateFormat(pattern);
                 return sfd.format((Date) val);
