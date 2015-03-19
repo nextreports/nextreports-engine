@@ -74,7 +74,7 @@ public class HtmlUtil {
 		}
 		if (style.containsKey(StyleFormatConstants.BACKGROUND_COLOR)) {
 			Color val = (Color) style.get(StyleFormatConstants.BACKGROUND_COLOR);
-			if (needed || ((val.getRed() != 255) || (val.getGreen() != 255) || (val.getBlue() != 255)) ) {				
+			if ((val.getRed() != 255) || (val.getGreen() != 255) || (val.getBlue() != 255)) {				
 				css.append("background-color: rgb(").append(val.getRed()).append(",").append(val.getGreen()).append(",")
 						.append(val.getBlue()).append(") ;\n");
 			}
