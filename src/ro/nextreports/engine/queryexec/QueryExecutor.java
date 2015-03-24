@@ -143,7 +143,7 @@ public class QueryExecutor implements Runnable {
     }
 
     public QueryExecutor(Query query, Connection conn) throws QueryException {
-		this(query, null, null, conn);
+		this(query, new HashMap<String,QueryParameter>(), new HashMap<String,Object>(), conn);
 	}
 
 	public int getTimeout() {
@@ -851,6 +851,9 @@ public class QueryExecutor implements Runnable {
 			Map<String,Object> parameterValues) {
 
 		List<String> ignoredList = new ArrayList<String>();
+		if (parameters == null) {
+			return;
+		}
 		for (Iterator it = parameters.keySet().iterator(); it.hasNext();) {
 			String name = (String)it.next();
 			QueryParameter param = parameters.get(name);
