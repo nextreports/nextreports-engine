@@ -520,6 +520,25 @@ public class ParameterUtil {
 
         }
     }
+    
+    /**
+     * Get child dependent parameters
+     *
+     * @param report next report object
+     * @param parameterName current parameter name
+     * @return a map of all parameters that use the current parameter in theirs source definition
+     */
+    public static Map<String, QueryParameter> getChildDependentParameters(Report report, String  parameterName) {
+    	if (report == null) {
+    		return new HashMap<String, QueryParameter>();
+    	}
+    	for (QueryParameter qp : report.getParameters()) {
+    		if (qp.getName().equals(parameterName)) {
+    			return getChildDependentParameters(report.getParameters(), qp);
+    		}
+    	}
+    	return new HashMap<String, QueryParameter>();        
+    }
 
     /**
      * Get child dependent parameters
