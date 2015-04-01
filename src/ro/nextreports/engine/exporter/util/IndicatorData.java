@@ -33,6 +33,7 @@ public class IndicatorData implements Serializable {
 	private Color background;
 	private double value;
 	private boolean shadow;
+	private String pattern;
 	
 	public IndicatorData() {
 		super();		
@@ -127,6 +128,13 @@ public class IndicatorData implements Serializable {
 	public void setShadow(boolean shadow) {
 		this.shadow = shadow;
 	}
-	
+
+	public String getPattern() {
+		return pattern;
+	}
+
+	public void setPattern(String pattern) {
+		this.pattern = pattern;
+	}	
 				
 }

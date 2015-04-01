@@ -25,6 +25,7 @@ import java.util.Set;
 import ro.nextreports.engine.ReportLayout;
 import ro.nextreports.engine.band.Band;
 import ro.nextreports.engine.band.BandElement;
+import ro.nextreports.engine.band.FieldBandElement;
 import ro.nextreports.engine.exporter.util.IndicatorData;
 import ro.nextreports.engine.exporter.util.StyleFormatConstants;
 import ro.nextreports.engine.queryexec.QueryException;
@@ -87,7 +88,10 @@ public class IndicatorExporter extends ResultExporter {
                 		data.setValue(((BigDecimal)value).doubleValue());	
                 	} else {
                 		data.setValue((Double)value);
-                	}                	
+                	}                
+                	if (bandElement instanceof FieldBandElement) {
+                		data.setPattern(((FieldBandElement)bandElement).getPattern());
+                	}
                 	for (Alert alert : alerts) {                	
 						if (isAlert(alert, value)) {
 							executeAlert(alert, value, "");
