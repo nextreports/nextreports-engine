@@ -444,15 +444,15 @@ public class QueryExecutor implements Runnable {
 				}
             } 
 
-            if (QueryUtil.isProcedureCall(query.getText())) {
-                QueryParameter qp = parameters.get(paramName);
-                if (QueryParameter.MULTIPLE_SELECTION.equals(qp.getSelection())) {
-                    throw new QueryException("Do not allow parameters with multiple selection for procedure call.");
-                }
-//                if (!qp.isProcedureParameter()) {
-//                    throw new QueryException("Parameter must be of stored procedure type.");
+//            if (QueryUtil.isProcedureCall(query.getText())) {
+//                QueryParameter qp = parameters.get(paramName);
+//                if (QueryParameter.MULTIPLE_SELECTION.equals(qp.getSelection())) {
+//                    throw new QueryException("Do not allow parameters with multiple selection for procedure call.");
 //                }
-            }
+////                if (!qp.isProcedureParameter()) {
+////                    throw new QueryException("Parameter must be of stored procedure type.");
+////                }
+//            }
         }
 	}
 
@@ -522,13 +522,38 @@ public class QueryExecutor implements Runnable {
 				
 				if (QueryParameter.MULTIPLE_SELECTION.equals(parameter.getSelection())) {
 					Object[] multiParamValue = (Object[]) parameterValue;
-					for (int k = 0; k < multiParamValue.length; k++) {
-						setParameterValue(pstmt, parameter.getValueClass(), multiParamValue[k], i);
-						i ++;
-						n ++;
+					if (QueryUtil.isProcedureCall(query.getText())) {						
+						// a multiple parameter in procedure call -> value is the list of values
+						int index = i;
+						if ((outputParameterPosition != -1) && (outputParameterPosition <= i + 1)) {
+                            index = i + 1;
+                        }
+						StringBuilder sb= new StringBuilder();
+						for (int k = 0; k < multiParamValue.length; k++) {
+							Object v = multiParamValue[k];
+							if (v instanceof IdName) {
+								v = ((IdName)v).getId();
+							} else if (v instanceof String) {
+								sb.append("'");
+							}
+							sb.append(v);
+							if (v instanceof String) {
+								sb.append("'");
+							}
+							if (k < multiParamValue.length-1) {
+								sb.append(",");
+							}
+						}											
+						setParameterValue(pstmt, String.class, sb.toString(), index, true);
+					} else {
+						for (int k = 0; k < multiParamValue.length; k++) {
+							setParameterValue(pstmt, parameter.getValueClass(), multiParamValue[k], i);
+							i ++;
+							n ++;
+						}
+						i--;
+						n--;
 					}
-					i--;
-					n--;
 				} else {
                     int index = i;
                     // for procedure call if output parameter is before a query parameter
@@ -536,7 +561,7 @@ public class QueryExecutor implements Runnable {
                         if ((outputParameterPosition != -1) && (outputParameterPosition <= i + 1)) {
                             index = i + 1;
                         }
-                    }
+                    }                    
                     setParameterValue(pstmt, parameter.getValueClass(), parameterValue, index);
 				}
 			}
@@ -554,16 +579,30 @@ public class QueryExecutor implements Runnable {
             }            
         }
     }
-
+    
     private void setParameterValue(PreparedStatement pstmt, Class paramValueClass,
 			Object paramValue, int index) throws SQLException, QueryException {
+    	setParameterValue(pstmt, paramValueClass, paramValue, index, false);
+    }
+
+    private void setParameterValue(PreparedStatement pstmt, Class paramValueClass,
+			Object paramValue, int index, boolean isProcedureMultiple) throws SQLException, QueryException {
 
         // for "NOT IN (?)" setting null -> result is undeterminated
         // ParameterUtil.NULL was good only for list of strings (for NOT IN)!
         if (ParameterUtil.NULL.equals(paramValue)) {
             paramValue = null;
         }
-        if (paramValueClass.equals(Object.class)) {
+        
+        if (isProcedureMultiple) {
+        	// a multiple selection parameter used inside a procedure is seen as a single parameter 
+        	// with the value equals to the list of values
+        	if (paramValue == null) {
+				pstmt.setNull(index + 1, Types.VARCHAR);
+			} else {								
+				pstmt.setString(index + 1, (String)paramValue);
+			}	
+        } else if (paramValueClass.equals(Object.class)) {
 			if (paramValue == null) {
 				pstmt.setNull(index + 1, Types.JAVA_OBJECT);
 			} else {
@@ -797,15 +836,19 @@ public class QueryExecutor implements Runnable {
                     String paramName = chunk.getText();
 					QueryParameter param = parameters.get(paramName);					
 					if (QueryParameter.MULTIPLE_SELECTION.equals(param.getSelection())) {
-						Object[] paramValue = (Object[]) parameterValues.get(paramName);						
-						sb.append('(');
-						for (int j = 0; j < paramValue.length; j++) {
-							if (j > 0) {
-								sb.append(',');
+						if (QueryUtil.isProcedureCall(query.getText())) {		
+							sb.append("?");
+						} else {
+							Object[] paramValue = (Object[]) parameterValues.get(paramName);						
+							sb.append('(');
+							for (int j = 0; j < paramValue.length; j++) {
+								if (j > 0) {
+									sb.append(',');
+								}
+								sb.append('?');
 							}
-							sb.append('?');
+							sb.append(')');
 						}
-						sb.append(')');
 					} else {
 						sb.append("?");
 					}
@@ -813,14 +856,14 @@ public class QueryExecutor implements Runnable {
 				}
 				case QueryChunk.TEXT_TYPE:
                     if (chunk.getText().contains("?")) {
-                        outputParameterPosition = position;
+                        outputParameterPosition = position;                        
                     }
                 default: {
 					sb.append(chunk.getText());
 					break;
 				}
 			}
-		}
+		}        
         return sb.toString();
 	}
 
