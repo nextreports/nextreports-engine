@@ -41,10 +41,13 @@ import ro.nextreports.engine.util.StringUtil;
 public class ReportTableExporter extends ResultExporter implements TableExporter {
 
     private TableData data;
+    private boolean tableRawData;
     
     public ReportTableExporter(ExporterBean bean) {
     	super(bean);  
     	data = new TableData();
+    	data.setLanguage(I18nUtil.getLanguageByName(bean.getReportLayout(), bean.getLanguage()));
+    	this.tableRawData = bean.isReportTableExporterRawData();
     }
     
     protected void exportCell(String bandName, BandElement bandElement, Object value, int gridRow,
@@ -56,15 +59,18 @@ public class ReportTableExporter extends ResultExporter implements TableExporter
             Hyperlink hyperlink = ((HyperlinkBandElement) bandElement).getHyperlink();
             value = hyperlink.getText();
         }
-        String s = StringUtil.getValueAsString(value, getPattern(bandElement), I18nUtil.getLanguageByName(bean.getReportLayout(), bean.getLanguage()));
-
+        String s = StringUtil.getValueAsString(value, getPattern(bandElement), I18nUtil.getLanguageByName(bean.getReportLayout(), bean.getLanguage()));        
+        
         // only last row from header is put in memory
         if (ReportLayout.HEADER_BAND_NAME.equals(bandName)) {
             if ((hRows == 1) || (hRows == gridRow + 1)) {
                 data.getHeader().add(s);
+                data.getPattern().add(null);
             }
             return;
         }
+        
+        data.getPattern().set(column, getPattern(bandElement));
         
         Map<String, Object> style = buildCellStyleMap(bandElement, value, gridRow, column, colSpan);
         
@@ -78,8 +84,12 @@ public class ReportTableExporter extends ResultExporter implements TableExporter
         } else {
             rowData = data.getData().get(exporterRow-hRows);
             st = data.getStyle().get(exporterRow-hRows);
+        }      
+        if (tableRawData) {
+        	rowData.add(value); // formatted data is shown through renderer / dislayModel (see TableRendererPanel)
+        } else {
+        	rowData.add(s);
         }
-        rowData.add(s);
         st.add(style);
     }
 

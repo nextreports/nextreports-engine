@@ -121,6 +121,9 @@ public class ReportRunner implements Runner {
     private String templateName;
     private int sheetNumber;
     
+    // for TABLE_FORMAT we export raw data or formatted data
+    private boolean tableRawData = false;
+    
     private String language;
 
     /** Get database connection
@@ -439,6 +442,7 @@ public class ReportRunner implements Runner {
         	bean.setConnection(null);
         	bean.setQueryTimeout(0);
         	bean.setOut(new ByteArrayOutputStream());
+        	bean.setReportTableExporterRawData(tableRawData);
             exporter = new ReportTableExporter(bean);
         } else if (ALARM_FORMAT.equals(format)) {        	
         	bean.setConnection(null);
@@ -612,6 +616,14 @@ public class ReportRunner implements Runner {
 	 */
 	public void setLanguage(String language) {
 		this.language = language;
-	}		        
+	}
+
+	public boolean isTableRawData() {
+		return tableRawData;
+	}
+
+	public void setTableRawData(boolean tableRawData) {
+		this.tableRawData = tableRawData;
+	}	
     
 }

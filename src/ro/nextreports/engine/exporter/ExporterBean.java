@@ -38,6 +38,8 @@ public class ExporterBean {
 	private List<Alert> alerts;
 	private boolean isProcedure;
 	private String language;
+	// should we put raw data inside table (and use renderer to show formatted data)  or we should put formatted data
+	private boolean reportTableExporterRawData;
 	
 	public ExporterBean(Connection con, int queryTimeout, QueryResult result,
 			OutputStream out, ReportLayout reportLayout, ParametersBean pBean,
@@ -59,6 +61,7 @@ public class ExporterBean {
 		this.rawPrint = rawPrint;
 		this.alerts = alerts;
 		this.isProcedure = isProcedure;
+		this.reportTableExporterRawData = false;
 	}
 
 	public Connection getConnection() {
@@ -151,6 +154,14 @@ public class ExporterBean {
 
 	public void setLanguage(String language) {
 		this.language = language;
+	}
+	
+	public boolean isReportTableExporterRawData() {
+		return reportTableExporterRawData;
+	}
+
+	public void setReportTableExporterRawData(boolean reportTableExporterRawData) {
+		this.reportTableExporterRawData = reportTableExporterRawData;
 	}
 
 	@Override

@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.io.Serializable;
 
+import ro.nextreports.engine.i18n.I18nLanguage;
+
 /**
  * User: mihai.panaitescu
  * Date: 08-Apr-2010
@@ -30,21 +32,44 @@ public class TableData implements Serializable {
 
     private List<String> header;
     private List<List<Object>> data;
-    private List<List<Map<String, Object>>> style;
+    private List<List<Map<String, Object>>> style;   
+    
+    private I18nLanguage language;
+    private List<String> pattern;
     
     public TableData() {
     	 header = new ArrayList<String>();
     	 data = new ArrayList<List<Object>>();
-    	 style = new ArrayList<List<Map<String, Object>>>();
+    	 style = new ArrayList<List<Map<String, Object>>>();    
+    	 pattern = new ArrayList<String>();
     }
 
     public TableData(List<String> header, List<List<Object>> data, List<List<Map<String, Object>>> style) {
-        this.header = header;
+        this.header = header;  
+        for (int i=0, size=header.size(); i<size; i++) {
+        	this.pattern.add(null);
+        }
         this.data = data;
         this.style = style;        
     }
 
-    public List<String> getHeader() {
+    public I18nLanguage getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(I18nLanguage language) {
+		this.language = language;
+	}
+
+	public List<String> getPattern() {
+		return pattern;
+	}
+
+	public void setPattern(List<String> pattern) {
+		this.pattern = pattern;
+	}
+
+	public List<String> getHeader() {
         return header;
     }
 
@@ -57,7 +82,11 @@ public class TableData implements Serializable {
     }
 
 	public void setHeader(List<String> header) {
-		this.header = header;
+		this.header = header;	
+		this.pattern.clear();
+		for (int i=0, size=header.size(); i<size; i++) {
+        	this.pattern.add(null);
+        }
 	}
 
 	public void setData(List<List<Object>> data) {
