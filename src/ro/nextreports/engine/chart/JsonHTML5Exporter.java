@@ -178,6 +178,9 @@ public class JsonHTML5Exporter implements ChartExporter {
 			String msg = StringUtil.getI18nStringMultiple(chart.getTooltipMessage(), I18nUtil.getLanguageByName(chart, language));
 			nc.setMessage(msg);
 		}
+		
+		boolean startingFromZero = chart.getStartingFromZero() == null ? false : chart.getStartingFromZero();
+		nc.setStartingFromZero(startingFromZero);
 
         boolean showXLabel = chart.getXShowLabel() == null ? false : chart.getXShowLabel();
         boolean showYLabel = chart.getYShowLabel() == null ? false : chart.getYShowLabel();

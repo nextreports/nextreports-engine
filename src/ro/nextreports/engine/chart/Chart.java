@@ -78,6 +78,7 @@ public class Chart implements Serializable {
     private Boolean yShowGrid;
     private Boolean xShowLabel;
     private Boolean yShowLabel;
+    private Boolean startingFromZero;
     // showYValuesOnChart has meaning for image, not for flash
     private Boolean showYValuesOnChart;
     private Boolean showDualAxis;
@@ -123,6 +124,7 @@ public class Chart implements Serializable {
         this.yShowLabel = Boolean.TRUE;
         this.showYValuesOnChart = Boolean.FALSE;     
         this.showDualAxis = Boolean.FALSE;
+        this.startingFromZero = Boolean.FALSE;
         this.y2SeriesCount = 1;
         foregrounds.addAll(Arrays.asList(COLORS));        
         setType(new ChartType(ChartType.BAR, ChartType.STYLE_BAR_GLASS));
@@ -434,6 +436,14 @@ public class Chart implements Serializable {
 	public void setY2SeriesCount(Integer y2SeriesCount) {
 		this.y2SeriesCount = y2SeriesCount;
 	}
+	
+	public Boolean getStartingFromZero() {
+		return startingFromZero;
+	}
+
+	public void setStartingFromZero(Boolean startingFromZero) {
+		this.startingFromZero = startingFromZero;
+	}
 
 	public String getYTooltipPattern() {
 		return yTooltipPattern;
@@ -502,6 +512,7 @@ public class Chart implements Serializable {
         if (xPattern != null ? !xPattern.equals(chart.xPattern) : chart.xPattern != null) return false;
         if (xShowGrid != null ? !xShowGrid.equals(chart.xShowGrid) : chart.xShowGrid != null) return false;
         if (xShowLabel != null ? !xShowLabel.equals(chart.xShowLabel) : chart.xShowLabel != null) return false;
+        if (startingFromZero != null ? !startingFromZero.equals(chart.startingFromZero) : chart.startingFromZero != null) return false;
         if (yColor != null ? !yColor.equals(chart.yColor) : chart.yColor != null) return false;
         if (yColumns != null ? !yColumns.equals(chart.yColumns) : chart.yColumns != null) return false;
         if (yColumnsLegends != null ? !yColumnsLegends.equals(chart.yColumnsLegends) : chart.yColumnsLegends != null)
@@ -556,6 +567,7 @@ public class Chart implements Serializable {
         result = 31 * result + (xGridColor != null ? xGridColor.hashCode() : 0);
         result = 31 * result + (yGridColor != null ? yGridColor.hashCode() : 0);
         result = 31 * result + (xShowGrid != null ? xShowGrid.hashCode() : 0);
+        result = 31 * result + (startingFromZero != null ? startingFromZero.hashCode() : 0);
         result = 31 * result + (yShowGrid != null ? yShowGrid.hashCode() : 0);
         result = 31 * result + (xShowLabel != null ? xShowLabel.hashCode() : 0);
         result = 31 * result + (yShowLabel != null ? yShowLabel.hashCode() : 0);
@@ -607,6 +619,7 @@ public class Chart implements Serializable {
                 ", y2SeriesCount=" + y2SeriesCount +
                 ", tooltipMessage=" + tooltipMessage +
                 ", yTooltipPattern=" + yTooltipPattern +
+                ", startingFromZero=" + startingFromZero +
                 ", font=" + font +
                 ", xLabelFont=" + xLabelFont +
                 ", yLabelFont=" + yLabelFont +

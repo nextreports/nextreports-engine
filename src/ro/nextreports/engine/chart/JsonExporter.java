@@ -445,12 +445,15 @@ public class JsonExporter implements ChartExporter {
                 for (int i = 0; i < chartsNo; i++) {
                     addValue(computedValues[i], lastXValue, elementChart[i], i);                    
                     if (!isStacked) {
-                        min = Math.min(min.doubleValue(), computedValues[i].doubleValue());
+                        min = Math.min(min.doubleValue(), computedValues[i].doubleValue());                                            	
                         max = Math.max(max.doubleValue(), computedValues[i].doubleValue());
                     } else {
                         sum = sum.doubleValue() + computedValues[i].doubleValue();                        
                     }
                 }
+                if ((chart.getStartingFromZero() !=  null) && chart.getStartingFromZero() && (min.intValue() > 0)) {
+            		min = 0;
+            	}
                 if (isStacked) {
                     min = 0;
                     max = Math.max(max.doubleValue(), sum.doubleValue());
@@ -479,6 +482,9 @@ public class JsonExporter implements ChartExporter {
                     sum = sum.doubleValue() + value.doubleValue();
                 }
             }
+            if ((chart.getStartingFromZero() !=  null) && chart.getStartingFromZero() && (min.intValue() > 0)) {
+        		min = 0;
+        	}
             if (isStacked) {
                 min = 0;
                 max = Math.max(max.doubleValue(), sum.doubleValue());

@@ -56,6 +56,7 @@ public class NextChart {
 	private String message;
 	private int tickCount;
 	private boolean showTicks = true;
+	private boolean startingFromZero = false;
 	private NextChartTitle title;
 	private NextChartAxis xData;
 	private NextChartAxis yData;	
@@ -294,8 +295,16 @@ public class NextChart {
 
 	public void setShowTicks(boolean showTicks) {
 		this.showTicks = showTicks;
-	}
+	}		
 	
+	public boolean isStartingFromZero() {
+		return startingFromZero;
+	}
+
+	public void setStartingFromZero(boolean startingFromZero) {
+		this.startingFromZero = startingFromZero;
+	}
+
 	public NextNumberFormat getTooltipPattern() {
 		return tooltipPattern;
 	}

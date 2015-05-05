@@ -1169,6 +1169,9 @@ public class JFreeChartExporter implements ChartExporter {
 	                    }
 	                }       
             	}
+            	if ((chart.getStartingFromZero() !=  null) && chart.getStartingFromZero() && (min.intValue() > 0)) {
+            		min = 0;
+            	}
                 if (isStacked) {
                     min = 0;
                     max = Math.max(max.doubleValue(), sum.doubleValue());                    
@@ -1202,7 +1205,10 @@ public class JFreeChartExporter implements ChartExporter {
                 } else {
                 	sum = sum.doubleValue() + value.doubleValue();
                 }
-            }   
+            } 
+            if ((chart.getStartingFromZero() !=  null) && chart.getStartingFromZero() && (min.intValue() > 0)) {
+        		min = 0;
+        	}
             if (isStacked) {
                 min = 0;
                 max = Math.max(max.doubleValue(), sum.doubleValue());
