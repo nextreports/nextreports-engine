@@ -388,6 +388,7 @@ public class ChartRunner implements Runner {
                Map<String, Object> parameterValues, QueryResult qr, OutputStream stream) {
         if (TABLE_FORMAT.equals(format)) {
             exporter = new ChartTableExporter(qr, chart, language);
+            ((ChartTableExporter)exporter).setShowStrings(true);
         } else if (IMAGE_FORMAT.equals(format)) {
         	if (imagePath == null) {
         		imagePath = ".";

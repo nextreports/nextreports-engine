@@ -42,6 +42,9 @@ public class ChartTableExporter implements ChartExporter, TableExporter {
     
     private TableData data;   
     private String language;
+    // some columns may be strings (like 5th in bubble chart) and by default computed values is 1
+    // but inside server 'Save To Excel' we want to show the actual string
+    private boolean showStrings;
 
     public ChartTableExporter(QueryResult result, Chart chart, String language) {
         this.result = result;
@@ -50,8 +53,16 @@ public class ChartTableExporter implements ChartExporter, TableExporter {
         data = new TableData();
         data.setStyle(null);
     }
+    
+    public boolean isShowStrings() {
+		return showStrings;
+	}
 
-    public boolean export() throws QueryException, NoDataFoundException {
+	public void setShowStrings(boolean showStrings) {
+		this.showStrings = showStrings;
+	}
+
+	public boolean export() throws QueryException, NoDataFoundException {
         testForData();
         createData();
         return true;
@@ -142,7 +153,11 @@ public class ChartTableExporter implements ChartExporter, TableExporter {
                 data.getData().add(rowData);
                 rowData.add(lastXValue);
                 for (int i = 0; i < chartsNo; i++) {
-                    rowData.add(computedValues[i]);
+                	if (showStrings && !(objects[i] instanceof Number)) {
+                		rowData.add(objects[i]);
+                	} else {
+                		rowData.add(computedValues[i]);
+                	}
                 }
                 lastXValue = getStringValue(xColumn, xPattern);
             }
