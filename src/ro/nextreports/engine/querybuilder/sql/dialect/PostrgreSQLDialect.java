@@ -52,6 +52,7 @@ public class PostrgreSQLDialect extends AbstractDialect {
         registerColumnType("character(>1, *)", Types.VARCHAR);
         registerColumnType("char(>1, *)", Types.VARCHAR);
         registerColumnType("varchar", Types.VARCHAR);
+        registerColumnType("bpchar", Types.CHAR);
         registerColumnType("json", Types.VARCHAR);
         registerColumnType("real", Types.FLOAT);
         registerColumnType("float4", Types.FLOAT);
