@@ -17,6 +17,7 @@
 package ro.nextreports.engine.exporter.util;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.io.Serializable;
@@ -36,6 +37,9 @@ public class TableData implements Serializable {
     
     private I18nLanguage language;
     private List<String> pattern;
+    
+    public static int SEARCH_TO_TOP = 1;  // all elements are kept and search elements are moved to top of the list
+    public static int SEARCH_ONLY = 2;    // only search elements are kept in the list
     
     public TableData() {
     	 header = new ArrayList<String>();
@@ -95,6 +99,86 @@ public class TableData implements Serializable {
 
 	public void setStyle(List<List<Map<String, Object>>> style) {
 		this.style = style;
+	}
+	
+	private void moveRowToPosition(int rowIndex, int position) {
+		if (data != null) {
+			if (data.size() > rowIndex) {				
+				List<Object> rowToMove = data.get(rowIndex);
+				data.remove(rowIndex);
+				data.add(position, rowToMove);
+				
+				if (style != null) {
+					List<Map<String, Object>> styleToMove = style.get(rowIndex);
+					style.remove(rowIndex);
+					style.add(position, styleToMove);
+				}
+			}
+		}
+	}
+	
+	public void search(List<Object> tableFilter) {
+		search(tableFilter, SEARCH_ONLY);
+	}
+	
+	public void search(List<Object> tableFilter, int algorithm) {
+		int position = 0;
+		if ((tableFilter != null) && !hasOnlyNullValues(tableFilter)) {
+			if (algorithm == SEARCH_TO_TOP) {
+				for (int i=0, size=data.size(); i<size; i++) {
+					List<Object> row = data.get(i);
+					boolean found = true;
+					for (int j=0, no = tableFilter.size(); j<no; j++) {
+						Object t = tableFilter.get(j);
+						if (t != null) {
+							Object o = row.get(j);						
+							if (t != null) {	
+								if ((o == null)|| !o.toString().toLowerCase().contains(t.toString().toLowerCase())) {
+									found = false;
+									break;
+								}								
+							}
+						}
+					}
+					if (found) {
+						moveRowToPosition(i, position);
+						position++;
+					}					
+				}
+			} else {
+				for (Iterator<List<Object>> it = data.iterator(); it.hasNext();) {
+					List<Object> row = it.next();
+					boolean kept = true;
+					for (int j=0, no = tableFilter.size(); j<no; j++) {
+						Object t = tableFilter.get(j);
+						if (t != null) {
+							Object o = row.get(j);						
+							if ((o == null) || !o.toString().toLowerCase().contains(t.toString().toLowerCase())) {							
+								kept = false;
+								break;
+							}
+						}
+					}
+					if (!kept) {
+						it.remove();
+					}
+				}
+			}
+		}
+	}
+	
+	private boolean hasOnlyNullValues(List<Object> list) {
+		if (list == null) {
+			return true;
+		}
+		boolean result = true;
+		for (Object obj : list) {
+			if (obj != null) {
+				result = false;
+				break;
+			}
+		}
+		return result;
 	}
         
 }
