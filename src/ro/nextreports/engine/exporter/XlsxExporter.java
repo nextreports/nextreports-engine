@@ -104,7 +104,6 @@ public class XlsxExporter extends ResultExporter {
     	} else {
     		wb = new XSSFWorkbook();
     	}
-    	createFontsAndStyles();
     }
 
     protected void finishExport() {    	
@@ -134,17 +133,6 @@ public class XlsxExporter extends ResultExporter {
 				}
 			}
 		}		
-    }
-
-    private void createFontsAndStyles() {
-        int cols = bean.getReportLayout().getColumnCount();
-        int rows = bean.getReportLayout().getRowCount();        
-        styles = new XSSFCellStyle[rows][cols];
-        for (int i=0; i<rows; i++) {
-            for (int j=0; j<cols; j++) {                
-                styles[i][j] = wb.createCellStyle();
-            }
-        }
     }
     
 	private void createSummaryInformation(String title) {
@@ -237,41 +225,52 @@ public class XlsxExporter extends ResultExporter {
     private StringBuilder headerS = new StringBuilder();
     private StringBuilder footerS = new StringBuilder();
     private XSSFCellStyle subreportCellStyle;
-        
-    //@todo possible to use just condFonts and put all from fonts[][] inside the map
+            
     // reuse fonts and styles
     // there is a maximum number of unique fonts in a workbook (512)
     // there is a maximum number of cell formats (4000)
-    //private HSSFFont[][] fonts;
-    private XSSFCellStyle[][] styles;
-    // cache fonts used by formatting conditions
+    private Map<Integer, XSSFCellStyle> styles = new HashMap<Integer, XSSFCellStyle>();
+    // styles used by formatting conditions
+    private Map<Integer, XSSFCellStyle> condStyles = new HashMap<Integer, XSSFCellStyle>();
+    
+    
     private Map<Integer, XSSFFont> fonts = new HashMap<Integer, XSSFFont>();
+    // fonts used by formatting conditions
     private Map<Integer, XSSFFont> condFonts = new HashMap<Integer, XSSFFont>();
     
     private Border border;
 
     private XSSFCellStyle buildBandElementStyle(BandElement bandElement, Object value, int gridRow, int gridColumn, int colSpan) {
         Map<String, Object> style = buildCellStyleMap(bandElement, value, gridRow, gridColumn, colSpan);
-        XSSFCellStyle cellStyle;
+        XSSFCellStyle cellStyle = null;
         XSSFFont cellFont = null;
         int fontKey = -1;
+        int styleKey = -1;
         // we have to create new fonts and styles if some formatting conditions are met  
         // also for subreports we may have a subreportCellStyle passed by ReportBandElement 
         boolean cacheFont = false;
         boolean cacheAllFont = false;
+        boolean cacheStyle = false;
+        boolean cacheAllStyle = false;
         if ((modifiedStyle[gridRow][gridColumn]) || bean.isSubreport()) {
         	fontKey = getFontKey(style);
         	if (fontKey != -1) {
         		cellFont = condFonts.get(fontKey);        		
-        	}
-            cellStyle = wb.createCellStyle();
+        	}            
             if (cellFont == null) {
             	cellFont = wb.createFont();
             	cacheFont = true;
             }	
+            styleKey = getStyleKey(style, bandElement);
+            if (styleKey != -1) {
+            	cellStyle = condStyles.get(styleKey);
+            }
+            if (cellStyle == null) {
+            	cellStyle = wb.createCellStyle();
+            	cacheStyle = true;
+            }
             modifiedStyle[gridRow][gridColumn] = false;
-        } else {
-            cellStyle = styles[gridRow][gridColumn];
+        } else {            
             fontKey = getFontKey(style);
         	if (fontKey != -1) {        		
         		cellFont = fonts.get(fontKey);        		
@@ -279,7 +278,15 @@ public class XlsxExporter extends ResultExporter {
         	if ((cellFont == null) && (bandElement != null)) {        		
             	cellFont = wb.createFont();            	
             	cacheAllFont = true;
-            }	           
+            }
+        	styleKey = getStyleKey(style, bandElement);
+            if (styleKey != -1) {
+            	cellStyle = styles.get(styleKey);
+            }
+            if (cellStyle == null) {
+            	cellStyle = wb.createCellStyle();
+            	cacheAllStyle = true;
+            }     
         }
 
         // HSSFPalette cellPal = wb.getCustomPalette();        
@@ -446,6 +453,13 @@ public class XlsxExporter extends ResultExporter {
         }
         
         cellStyle = updateSubreportBandElementStyle(cellStyle, bandElement, value, gridRow, gridColumn, colSpan);
+        
+        if (cacheStyle && (styleKey != -1)) {
+        	condStyles.put(styleKey, cellStyle);
+        }
+        if (cacheAllStyle && (styleKey != -1)) {
+        	styles.put(styleKey, cellStyle);        	
+        }
 
         return cellStyle;
     }
@@ -937,6 +951,100 @@ public class XlsxExporter extends ResultExporter {
         	String val = (String) style.get(StyleFormatConstants.FONT_STYLE_KEY);
         	hashCode += val.hashCode();
         }
+        return hashCode;
+    }
+    
+    private int getStyleKey(Map<String, Object> style, BandElement bandElement) {    	
+    	int hashCode = getFontKey(style);   	
+    	if (style.containsKey(StyleFormatConstants.BACKGROUND_COLOR)) {
+    		if (hashCode == -1) {
+    			hashCode = 31;
+    		}
+            Color val = (Color) style.get(StyleFormatConstants.BACKGROUND_COLOR);
+            hashCode += val.hashCode();
+        }
+        if (style.containsKey(StyleFormatConstants.HORIZONTAL_ALIGN_KEY)) {
+        	if (hashCode == -1) {
+    			hashCode = 31;
+    		}
+            String val = (String) style.get(StyleFormatConstants.HORIZONTAL_ALIGN_KEY);
+            hashCode += val.hashCode();
+        }
+        if (style.containsKey(StyleFormatConstants.VERTICAL_ALIGN_KEY)) {
+        	if (hashCode == -1) {
+    			hashCode = 31;
+    		}
+        	String val = (String) style.get(StyleFormatConstants.VERTICAL_ALIGN_KEY);
+            hashCode += val.hashCode();
+        }
+        if (style.containsKey(StyleFormatConstants.BORDER_LEFT)) {
+        	if (hashCode == -1) {
+    			hashCode = 31;
+    		}
+        	Float val = (Float) style.get(StyleFormatConstants.BORDER_LEFT);
+        	hashCode += val.hashCode();
+        }
+        if (style.containsKey(StyleFormatConstants.BORDER_RIGHT)) {
+        	if (hashCode == -1) {
+    			hashCode = 31;
+    		}
+        	Float val = (Float) style.get(StyleFormatConstants.BORDER_RIGHT);
+        	hashCode += val.hashCode();
+        }
+        if (style.containsKey(StyleFormatConstants.BORDER_TOP)) {
+        	if (hashCode == -1) {
+    			hashCode = 31;
+    		}
+        	Float val = (Float) style.get(StyleFormatConstants.BORDER_TOP);
+        	hashCode += val.hashCode();
+        }
+        if (style.containsKey(StyleFormatConstants.BORDER_BOTTOM)) {
+        	if (hashCode == -1) {
+    			hashCode = 31;
+    		}
+        	Float val = (Float) style.get(StyleFormatConstants.BORDER_BOTTOM);
+        	hashCode += val.hashCode();
+        }        
+        if (style.containsKey(StyleFormatConstants.BORDER_LEFT_COLOR)) {
+        	if (hashCode == -1) {
+    			hashCode = 31;
+    		}
+        	Color val = (Color) style.get(StyleFormatConstants.BORDER_LEFT_COLOR);
+        	hashCode += val.hashCode();
+        }
+        if (style.containsKey(StyleFormatConstants.BORDER_RIGHT_COLOR)) {
+        	if (hashCode == -1) {
+    			hashCode = 31;
+    		}
+        	Color val = (Color) style.get(StyleFormatConstants.BORDER_RIGHT_COLOR);
+        	hashCode += val.hashCode();
+        }
+        if (style.containsKey(StyleFormatConstants.BORDER_TOP_COLOR)) {
+        	if (hashCode == -1) {
+    			hashCode = 31;
+    		}
+        	Color val = (Color) style.get(StyleFormatConstants.BORDER_TOP_COLOR);
+        	hashCode += val.hashCode();
+        }
+        if (style.containsKey(StyleFormatConstants.BORDER_BOTTOM_COLOR)) {
+        	if (hashCode == -1) {
+    			hashCode = 31;
+    		}
+        	Color val = (Color) style.get(StyleFormatConstants.BORDER_BOTTOM_COLOR);
+        	hashCode += val.hashCode();
+        }
+        if (style.containsKey(StyleFormatConstants.PATTERN)) {
+        	if (hashCode == -1) {
+    			hashCode = 31;
+    		}
+        	String val = (String) style.get(StyleFormatConstants.PATTERN);
+        	hashCode += val.hashCode();
+        }
+        
+        if (bandElement != null) {
+        	hashCode += bandElement.isWrapText() ? 19 : 41;
+        }	
+        
         return hashCode;
     }
     
