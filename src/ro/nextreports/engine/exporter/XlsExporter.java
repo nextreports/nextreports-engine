@@ -992,6 +992,7 @@ public class XlsExporter extends ResultExporter {
         return hashCode;
     }
     
+    // all properties of same type like Color or Font must have different hashCodes!
     private int getStyleKey(Map<String, Object> style, BandElement bandElement) {    	
     	int hashCode = getFontKey(style);   	
     	if (style.containsKey(StyleFormatConstants.BACKGROUND_COLOR)) {
@@ -999,7 +1000,7 @@ public class XlsExporter extends ResultExporter {
     			hashCode = 31;
     		}
             Color val = (Color) style.get(StyleFormatConstants.BACKGROUND_COLOR);
-            hashCode += val.hashCode();
+            hashCode += val.hashCode() * 3;
         }
         if (style.containsKey(StyleFormatConstants.HORIZONTAL_ALIGN_KEY)) {
         	if (hashCode == -1) {
@@ -1019,28 +1020,28 @@ public class XlsExporter extends ResultExporter {
         	if (hashCode == -1) {
     			hashCode = 31;
     		}
-        	Float val = (Float) style.get(StyleFormatConstants.BORDER_LEFT) * 11;
+        	Float val = (Float) style.get(StyleFormatConstants.BORDER_LEFT) * 23;
         	hashCode += val.hashCode();
         }
         if (style.containsKey(StyleFormatConstants.BORDER_RIGHT)) {
         	if (hashCode == -1) {
     			hashCode = 31;
     		}
-        	Float val = (Float) style.get(StyleFormatConstants.BORDER_RIGHT) * 13;
+        	Float val = (Float) style.get(StyleFormatConstants.BORDER_RIGHT) * 29;
         	hashCode += val.hashCode();
         }
         if (style.containsKey(StyleFormatConstants.BORDER_TOP)) {
         	if (hashCode == -1) {
     			hashCode = 31;
     		}
-        	Float val = (Float) style.get(StyleFormatConstants.BORDER_TOP) * 17;
+        	Float val = (Float) style.get(StyleFormatConstants.BORDER_TOP) * 31;
         	hashCode += val.hashCode();
         }
         if (style.containsKey(StyleFormatConstants.BORDER_BOTTOM)) {
         	if (hashCode == -1) {
     			hashCode = 31;
     		}
-        	Float val = (Float) style.get(StyleFormatConstants.BORDER_BOTTOM) * 19;
+        	Float val = (Float) style.get(StyleFormatConstants.BORDER_BOTTOM) * 37;
         	hashCode += val.hashCode();
         }        
         if (style.containsKey(StyleFormatConstants.BORDER_LEFT_COLOR)) {
@@ -1048,28 +1049,28 @@ public class XlsExporter extends ResultExporter {
     			hashCode = 31;
     		}
         	Color val = (Color) style.get(StyleFormatConstants.BORDER_LEFT_COLOR);
-        	hashCode += val.hashCode();
+        	hashCode += val.hashCode() * 5;
         }
         if (style.containsKey(StyleFormatConstants.BORDER_RIGHT_COLOR)) {
         	if (hashCode == -1) {
     			hashCode = 31;
     		}
         	Color val = (Color) style.get(StyleFormatConstants.BORDER_RIGHT_COLOR);
-        	hashCode += val.hashCode();
+        	hashCode += val.hashCode() * 7;
         }
         if (style.containsKey(StyleFormatConstants.BORDER_TOP_COLOR)) {
         	if (hashCode == -1) {
     			hashCode = 31;
     		}
         	Color val = (Color) style.get(StyleFormatConstants.BORDER_TOP_COLOR);
-        	hashCode += val.hashCode();
+        	hashCode += val.hashCode() * 11;
         }
         if (style.containsKey(StyleFormatConstants.BORDER_BOTTOM_COLOR)) {
         	if (hashCode == -1) {
     			hashCode = 31;
     		}
         	Color val = (Color) style.get(StyleFormatConstants.BORDER_BOTTOM_COLOR);
-        	hashCode += val.hashCode();
+        	hashCode += val.hashCode() * 13;
         }
         if (style.containsKey(StyleFormatConstants.PATTERN)) {
         	if (hashCode == -1) {
