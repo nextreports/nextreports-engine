@@ -981,28 +981,28 @@ public class XlsxExporter extends ResultExporter {
         	if (hashCode == -1) {
     			hashCode = 31;
     		}
-        	Float val = (Float) style.get(StyleFormatConstants.BORDER_LEFT);
+        	Float val = (Float) style.get(StyleFormatConstants.BORDER_LEFT) * 11;
         	hashCode += val.hashCode();
         }
         if (style.containsKey(StyleFormatConstants.BORDER_RIGHT)) {
         	if (hashCode == -1) {
     			hashCode = 31;
     		}
-        	Float val = (Float) style.get(StyleFormatConstants.BORDER_RIGHT);
+        	Float val = (Float) style.get(StyleFormatConstants.BORDER_RIGHT) * 13;
         	hashCode += val.hashCode();
         }
         if (style.containsKey(StyleFormatConstants.BORDER_TOP)) {
         	if (hashCode == -1) {
     			hashCode = 31;
     		}
-        	Float val = (Float) style.get(StyleFormatConstants.BORDER_TOP);
+        	Float val = (Float) style.get(StyleFormatConstants.BORDER_TOP) * 17;
         	hashCode += val.hashCode();
         }
         if (style.containsKey(StyleFormatConstants.BORDER_BOTTOM)) {
         	if (hashCode == -1) {
     			hashCode = 31;
     		}
-        	Float val = (Float) style.get(StyleFormatConstants.BORDER_BOTTOM);
+        	Float val = (Float) style.get(StyleFormatConstants.BORDER_BOTTOM) * 19;
         	hashCode += val.hashCode();
         }        
         if (style.containsKey(StyleFormatConstants.BORDER_LEFT_COLOR)) {
