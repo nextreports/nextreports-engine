@@ -38,6 +38,8 @@ public class TableData implements Serializable {
     private I18nLanguage language;
     private List<String> pattern;
     
+    private List<Integer> excludedColumns;
+    
     public static int SEARCH_TO_TOP = 1;  // all elements are kept and search elements are moved to top of the list
     public static int SEARCH_ONLY = 2;    // only search elements are kept in the list
     
@@ -100,7 +102,15 @@ public class TableData implements Serializable {
 	public void setStyle(List<List<Map<String, Object>>> style) {
 		this.style = style;
 	}
-	
+		
+	public List<Integer> getExcludedColumns() {
+		return excludedColumns;
+	}
+
+	public void setExcludedColumns(List<Integer> excludedColumns) {
+		this.excludedColumns = excludedColumns;
+	}
+
 	private void moveRowToPosition(int rowIndex, int position) {
 		if (data != null) {
 			if (data.size() > rowIndex) {				
