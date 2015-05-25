@@ -69,8 +69,10 @@ public class ReportTableExporter extends ResultExporter implements TableExporter
             }
             return;
         }
-        
-        data.getPattern().set(column, getPattern(bandElement));
+               
+        if (ReportLayout.DETAIL_BAND_NAME.equals(bandName)) {
+        	data.getPattern().set(column, getPattern(bandElement));        	
+        }
         
         Map<String, Object> style = buildCellStyleMap(bandElement, value, gridRow, column, colSpan);
         
