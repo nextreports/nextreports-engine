@@ -171,9 +171,11 @@ public abstract class ResultExporter {
     protected int newRowCount = 1;    
     protected int exporterRow = 0;
     protected int pageRow = 0;
+    protected int headerRow = 0;
     protected int pageNo = 0;
     protected int totalPageNo = 0;    
     protected VariableBandElement totalPageNoVbe;    
+    private boolean startNewPage = true;
     protected int resultSetRow = 0;    
     private boolean start = false;
 
@@ -659,7 +661,7 @@ public abstract class ResultExporter {
         for (ReportGroup reportGroup : groups) {
             GroupCache gc = new GroupCache();
             gc.setGroup(reportGroup);
-            gc.setStart(true);
+            gc.setStart(true);           
             gc.setHgBand(bean.getReportLayout().getBand(ReportLayout.GROUP_HEADER_BAND_NAME_PREFIX + reportGroup.getName()));
             Band fgBand = bean.getReportLayout().getBand(ReportLayout.GROUP_FOOTER_BAND_NAME_PREFIX + reportGroup.getName());
             gc.setFgBand(fgBand);
@@ -1146,9 +1148,20 @@ public abstract class ResultExporter {
                 if (newRow) {                       	
                 	int gridRow = getReportLayout().getGridRow(band.getName(), i);                	
                 	RowElement re = getRowElement(getReportLayout(), gridRow);
-                	// if new page is put for the first row in the layout, we should not create a new page
-                	if (re.isStartOnNewPage() && !start) {                		
-                		createNewPage();
+                	// if new page is put for the first row in the layout, we should not create a new page                	
+                	if (re.isStartOnNewPage() && !start ) {                		
+                		if (!startNewPage) {
+                			// if header on every page, must not use header rows inside pageRow count              			
+                			if (pageRow - headerRow > 0) {                				
+                				createNewPage();
+                			}
+                		} else {
+                			// we create new page excepting only for first group
+                			if (!(ReportLayout.GROUP_HEADER_BAND_NAME_PREFIX + "1").equals(band.getName())) {
+                				createNewPage();
+                			}
+                			startNewPage = false;
+                		}
                 	}
                 }
                 Object value = getBandElementValue(fCache, gc, staticBand, hasFunction, usePrevious, bandElement);
@@ -1200,6 +1213,9 @@ public abstract class ResultExporter {
             if (!isPageHeaderFooter) {
             	exporterRow++;
             	if (!hideAll) {
+            		if (ReportLayout.HEADER_BAND_NAME.equals(band.getName())) {
+        				headerRow++;
+        			}
             		pageRow++;
             	}            	
                 start = false;                	
@@ -1647,7 +1663,8 @@ public abstract class ResultExporter {
 
     private void createNewPage() {
         pageRow = 0;
-        newPage();
+        headerRow = 0;
+        newPage();        
     }
 
     protected void newPage() {
