@@ -446,6 +446,8 @@ public class XlsxExporter extends ResultExporter {
             String pattern = (String) style.get(StyleFormatConstants.PATTERN);
             XSSFDataFormat format = wb.createDataFormat();
             cellStyle.setDataFormat(format.getFormat(pattern));
+        } else {
+        	cellStyle.setDataFormat((short)0);
         }
 
         if (bandElement != null) {
@@ -921,132 +923,88 @@ public class XlsxExporter extends ResultExporter {
     	return  (float)pixels  / getDPI() ;
     }
     
-    private int getFontKey(Map<String, Object> style) {    	
-    	int hashCode = -1;    	
+    private int getFontKey(Map<String, Object> style) {  
+    	final int prime = 31;
+		int hashCode = 1;
+    	    	
     	if (style.containsKey(StyleFormatConstants.FONT_FAMILY_KEY)) {
-    		if (hashCode == -1) {
-    			hashCode = 31;
-    		}
+    		
             String val = (String) style.get(StyleFormatConstants.FONT_FAMILY_KEY);
-            hashCode += val.hashCode();
+            hashCode = prime*hashCode + val.hashCode();
         }
-        if (style.containsKey(StyleFormatConstants.FONT_SIZE)) {
-        	if (hashCode == -1) {
-    			hashCode = 31;
-    		}
+        if (style.containsKey(StyleFormatConstants.FONT_SIZE)) {        	
             Float val = (Float) style.get(StyleFormatConstants.FONT_SIZE);
-            hashCode += val.hashCode();
+            hashCode = prime*hashCode + val.hashCode();
         }
         if (style.containsKey(StyleFormatConstants.FONT_COLOR)) {
-        	if (hashCode == -1) {
-    			hashCode = 31;
-    		}
             Color val = (Color) style.get(StyleFormatConstants.FONT_COLOR);
-            hashCode += val.hashCode();
+            hashCode = prime*hashCode + val.hashCode();
         }
-        if (style.containsKey(StyleFormatConstants.FONT_STYLE_KEY)) {
-        	if (hashCode == -1) {
-    			hashCode = 31;
-    		}
+        if (style.containsKey(StyleFormatConstants.FONT_STYLE_KEY)) {        
         	String val = (String) style.get(StyleFormatConstants.FONT_STYLE_KEY);
-        	hashCode += val.hashCode();
+        	hashCode = prime*hashCode + val.hashCode();
         }
         return hashCode;
     }
     
-    private int getStyleKey(Map<String, Object> style, BandElement bandElement) {    	
+ // all properties of same type like Color or Font must have different hashCodes!
+    private int getStyleKey(Map<String, Object> style, BandElement bandElement) {  
+    	final int prime = 31;
     	int hashCode = getFontKey(style);   	
-    	if (style.containsKey(StyleFormatConstants.BACKGROUND_COLOR)) {
-    		if (hashCode == -1) {
-    			hashCode = 31;
-    		}
+    	if (style.containsKey(StyleFormatConstants.BACKGROUND_COLOR)) {    		
             Color val = (Color) style.get(StyleFormatConstants.BACKGROUND_COLOR);
-            hashCode += val.hashCode() * 3;
+            hashCode = prime*hashCode + val.hashCode() * 3;
         }
-        if (style.containsKey(StyleFormatConstants.HORIZONTAL_ALIGN_KEY)) {
-        	if (hashCode == -1) {
-    			hashCode = 31;
-    		}
+        if (style.containsKey(StyleFormatConstants.HORIZONTAL_ALIGN_KEY)) {        	
             String val = (String) style.get(StyleFormatConstants.HORIZONTAL_ALIGN_KEY);
-            hashCode += val.hashCode();
+            hashCode = prime*hashCode +  + val.hashCode();
         }
-        if (style.containsKey(StyleFormatConstants.VERTICAL_ALIGN_KEY)) {
-        	if (hashCode == -1) {
-    			hashCode = 31;
-    		}
+        if (style.containsKey(StyleFormatConstants.VERTICAL_ALIGN_KEY)) {        
         	String val = (String) style.get(StyleFormatConstants.VERTICAL_ALIGN_KEY);
-            hashCode += val.hashCode();
+            hashCode = prime*hashCode + val.hashCode();
         }
-        if (style.containsKey(StyleFormatConstants.BORDER_LEFT)) {
-        	if (hashCode == -1) {
-    			hashCode = 31;
-    		}
+        if (style.containsKey(StyleFormatConstants.BORDER_LEFT)) {        	
         	Float val = (Float) style.get(StyleFormatConstants.BORDER_LEFT) * 23;
-        	hashCode += val.hashCode();
+        	hashCode = prime*hashCode + val.hashCode();
         }
-        if (style.containsKey(StyleFormatConstants.BORDER_RIGHT)) {
-        	if (hashCode == -1) {
-    			hashCode = 31;
-    		}
+        if (style.containsKey(StyleFormatConstants.BORDER_RIGHT)) {        
         	Float val = (Float) style.get(StyleFormatConstants.BORDER_RIGHT) * 29;
-        	hashCode += val.hashCode();
+        	hashCode = prime*hashCode + val.hashCode();
         }
-        if (style.containsKey(StyleFormatConstants.BORDER_TOP)) {
-        	if (hashCode == -1) {
-    			hashCode = 31;
-    		}
+        if (style.containsKey(StyleFormatConstants.BORDER_TOP)) {        	
         	Float val = (Float) style.get(StyleFormatConstants.BORDER_TOP) * 31;
-        	hashCode += val.hashCode();
+        	hashCode = prime*hashCode + val.hashCode();
         }
-        if (style.containsKey(StyleFormatConstants.BORDER_BOTTOM)) {
-        	if (hashCode == -1) {
-    			hashCode = 31;
-    		}
+        if (style.containsKey(StyleFormatConstants.BORDER_BOTTOM)) {        	
         	Float val = (Float) style.get(StyleFormatConstants.BORDER_BOTTOM) * 37;
-        	hashCode += val.hashCode();
+        	hashCode = prime*hashCode + val.hashCode();
         }        
-        if (style.containsKey(StyleFormatConstants.BORDER_LEFT_COLOR)) {
-        	if (hashCode == -1) {
-    			hashCode = 31;
-    		}
+        if (style.containsKey(StyleFormatConstants.BORDER_LEFT_COLOR)) {        	
         	Color val = (Color) style.get(StyleFormatConstants.BORDER_LEFT_COLOR);
-        	hashCode += val.hashCode() * 5;
+        	hashCode = prime*hashCode + val.hashCode() * 5;
         }
-        if (style.containsKey(StyleFormatConstants.BORDER_RIGHT_COLOR)) {
-        	if (hashCode == -1) {
-    			hashCode = 31;
-    		}
+        if (style.containsKey(StyleFormatConstants.BORDER_RIGHT_COLOR)) {        	
         	Color val = (Color) style.get(StyleFormatConstants.BORDER_RIGHT_COLOR);
-        	hashCode += val.hashCode() * 7;
+        	hashCode = prime*hashCode + val.hashCode() * 7;
         }
-        if (style.containsKey(StyleFormatConstants.BORDER_TOP_COLOR)) {
-        	if (hashCode == -1) {
-    			hashCode = 31;
-    		}
+        if (style.containsKey(StyleFormatConstants.BORDER_TOP_COLOR)) {        
         	Color val = (Color) style.get(StyleFormatConstants.BORDER_TOP_COLOR);
-        	hashCode += val.hashCode() * 11;
+        	hashCode = prime*hashCode +  val.hashCode() * 11;
         }
-        if (style.containsKey(StyleFormatConstants.BORDER_BOTTOM_COLOR)) {
-        	if (hashCode == -1) {
-    			hashCode = 31;
-    		}
+        if (style.containsKey(StyleFormatConstants.BORDER_BOTTOM_COLOR)) {        	
         	Color val = (Color) style.get(StyleFormatConstants.BORDER_BOTTOM_COLOR);
-        	hashCode += val.hashCode() * 13;
+        	hashCode = prime*hashCode + val.hashCode() * 13;
         }
-        if (style.containsKey(StyleFormatConstants.PATTERN)) {
-        	if (hashCode == -1) {
-    			hashCode = 31;
-    		}
-        	String val = (String) style.get(StyleFormatConstants.PATTERN);
-        	hashCode += val.hashCode();
+        if (style.containsKey(StyleFormatConstants.PATTERN)) {        	
+        	String val = (String) style.get(StyleFormatConstants.PATTERN);        	
+        	hashCode = prime*hashCode + val.hashCode() * 17;
         }
         
         if (bandElement != null) {
-        	hashCode += bandElement.isWrapText() ? 19 : 41;
+        	hashCode = prime*hashCode + (bandElement.isWrapText() ? 19 : 41);
         }	
-        
         return hashCode;
-    }
+    }    
     
     public XSSFSheet getSubreportSheet() {
     	return xlsSheet;
