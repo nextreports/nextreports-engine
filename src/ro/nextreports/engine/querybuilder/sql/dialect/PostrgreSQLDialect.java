@@ -67,6 +67,7 @@ public class PostrgreSQLDialect extends AbstractDialect {
         registerColumnType("oid", Types.BLOB);
         registerColumnType("numeric", Types.NUMERIC);
         registerColumnType("interval", Types.TIME);
+        registerColumnType("money", Types.DECIMAL);
     }
 
     public String getCurrentDate() throws DialectException {
