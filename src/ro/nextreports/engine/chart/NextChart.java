@@ -66,6 +66,8 @@ public class NextChart {
 	private boolean dualYaxis;
 	private NextChartLegend y2Legend;
 	private int y2Count;
+	private String styleGridX;
+	private String styleGridY;
 		
 	// function doClick(value){ console.log('Call from function : ' + value);}
 	private String onClick;
@@ -343,6 +345,22 @@ public class NextChart {
 
 	public void setOnClick(String onClick) {
 		this.onClick = onClick;
+	}
+	
+	public String getStyleGridX() {
+		return styleGridX;
+	}
+
+	public void setStyleGridX(String styleGridX) {
+		this.styleGridX = styleGridX;
+	}
+
+	public String getStyleGridY() {
+		return styleGridY;
+	}
+
+	public void setStyleGridY(String styleGridY) {
+		this.styleGridY = styleGridY;
 	}
 
 	public String toJson() {

@@ -147,6 +147,8 @@ public class JsonHTML5Exporter implements ChartExporter {
         }             
         
         nc.setAlpha(getAlpha(chart.getTransparency()));
+        
+        setGridStyle();
 				
         if (chart.getxAxisColor() != null) {
         	nc.setColorXaxis(ColorUtil.getHexColor(chart.getxAxisColor()));
@@ -241,6 +243,27 @@ public class JsonHTML5Exporter implements ChartExporter {
         createChart(showXLabel, showYLabel);
         
         return nc.toJson();
+    }
+    
+    private String convertGridStyleFromByte(byte style) {
+    	String styleGrid = "line";
+    	switch (style) {
+    		case Chart.LINE_STYLE_DOT:
+    			styleGrid = "dot";
+    			break;
+    		case Chart.LINE_STYLE_DASH:
+    			styleGrid = "dash";
+    			break;
+    		case Chart.LINE_STYLE_LINE:
+    		default:
+    			styleGrid = "line";
+    	}
+    	return styleGrid;    	
+    }
+    
+    private void setGridStyle() {    	
+    	nc.setStyleGridX(convertGridStyleFromByte(chart.getStyleGridX()));
+        nc.setStyleGridY(convertGridStyleFromByte(chart.getStyleGridY()));
     }
 
       
@@ -575,7 +598,7 @@ public class JsonHTML5Exporter implements ChartExporter {
         } else {
         	nc.setLabelOrientation(NextChart.Orientation.horizontal);
         }
-    }
+    }    
 
     private float getAlpha(byte transparency) {
         switch (transparency) {

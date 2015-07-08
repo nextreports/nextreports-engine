@@ -49,6 +49,11 @@ public class Chart implements Serializable {
     public static transient final byte LOW_TRANSPARENCY = 2;
     public static transient final byte AVG_TRANSPARENCY = 3;
     public static transient final byte HIGH_TRANSPARENCY = 4;
+    
+    // grid line style
+    public static transient final byte LINE_STYLE_LINE = 1;
+    public static transient final byte LINE_STYLE_DOT = 2;
+    public static transient final byte LINE_STYLE_DASH = 3;
 
     private String name;
     private String version;
@@ -90,6 +95,8 @@ public class Chart implements Serializable {
     private Font yLabelFont;
     private List<String> i18nkeys;
     private List<I18nLanguage> languages;
+    private byte styleGridX;
+    private byte styleGridY;
 
     public static transient Color[] COLORS = new Color[] {
             new Color(0, 0, 204),
@@ -126,6 +133,8 @@ public class Chart implements Serializable {
         this.showDualAxis = Boolean.FALSE;
         this.startingFromZero = Boolean.FALSE;
         this.y2SeriesCount = 1;
+        this.styleGridX = LINE_STYLE_LINE;
+        this.styleGridY = LINE_STYLE_LINE;
         foregrounds.addAll(Arrays.asList(COLORS));        
         setType(new ChartType(ChartType.BAR, ChartType.STYLE_BAR_GLASS));
     }
@@ -437,6 +446,22 @@ public class Chart implements Serializable {
 		this.y2SeriesCount = y2SeriesCount;
 	}
 	
+	public byte getStyleGridX() {
+		return styleGridX;
+	}
+	
+	public void setStyleGridX(byte styleGridX) {
+		this.styleGridX = styleGridX;
+	}
+	
+	public byte getStyleGridY() {
+		return styleGridY;
+	}
+	
+	public void setStyleGridY(byte styleGridY) {
+		this.styleGridY = styleGridY;
+	}
+	
 	public Boolean getStartingFromZero() {
 		return startingFromZero;
 	}
@@ -535,7 +560,9 @@ public class Chart implements Serializable {
         if (yAxisColor != null ? !yAxisColor.equals(chart.yAxisColor) : chart.yAxisColor != null) return false;
         if (tooltipMessage != null ? !tooltipMessage.equals(chart.tooltipMessage) : chart.tooltipMessage != null) return false;
         if (i18nkeys != null ? !i18nkeys.equals(chart.i18nkeys) : chart.i18nkeys != null) return false;
-        if (languages != null ? !languages.equals(chart.languages) : chart.languages != null) return false;        
+        if (languages != null ? !languages.equals(chart.languages) : chart.languages != null) return false;     
+        if (styleGridX != chart.styleGridX) return false;
+        if (styleGridY != chart.styleGridY) return false;
 
         return true;
     }
@@ -581,6 +608,8 @@ public class Chart implements Serializable {
         result = 31 * result + (tooltipMessage != null ? tooltipMessage.hashCode() : 0);
         result = 31 * result + (i18nkeys != null ? i18nkeys.hashCode() : 0);
         result = 31 * result + (languages != null ? languages.hashCode() : 0);
+        result = 31 * result + styleGridX;
+        result = 31 * result + styleGridY;
         return result;
     }
 
@@ -614,6 +643,8 @@ public class Chart implements Serializable {
                 ", yShowGrid=" + yShowGrid +
                 ", xShowLabel=" + xShowLabel +
                 ", yShowLabel=" + yShowLabel +
+                ", styleGridX=" + styleGridX +
+                ", styleGridY=" + styleGridY +
                 ", showYValuesOnChart=" + showYValuesOnChart +
                 ", showDualAxis=" + showDualAxis +
                 ", y2SeriesCount=" + y2SeriesCount +
