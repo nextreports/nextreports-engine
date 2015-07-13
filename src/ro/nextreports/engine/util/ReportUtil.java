@@ -59,6 +59,7 @@ import ro.nextreports.engine.band.ForReportBandElement;
 import ro.nextreports.engine.band.FunctionBandElement;
 import ro.nextreports.engine.band.ImageBandElement;
 import ro.nextreports.engine.band.ReportBandElement;
+import ro.nextreports.engine.chart.Chart;
 import ro.nextreports.engine.exporter.util.ParametersBean;
 import ro.nextreports.engine.i18n.I18nString;
 import ro.nextreports.engine.queryexec.IdName;
@@ -797,7 +798,7 @@ public class ReportUtil {
 	
 	/**
 	 * Get detail band subreports for a report layout
-	 * @param reportLAyout current report layout
+	 * @param reportLayout current report layout
 	 * @return list of subreports from detail band
 	 */
 	public static List<Report> getDetailSubreports(ReportLayout reportLayout) {
@@ -814,6 +815,27 @@ public class ReportUtil {
 			}
 		}
 		return subreports;
+	}
+	
+	/**
+	 * Get detail band charts for a report layout
+	 * @param reportLayout current report layout
+	 * @return list of charts from detail band
+	 */
+	public static List<Chart> getDetailCharts(ReportLayout reportLayout) {
+		List<Chart> charts = new ArrayList<Chart>();
+
+		Band band = reportLayout.getDetailBand();
+		for (int i = 0, rows = band.getRowCount(); i < rows; i++) {
+			List<BandElement> list = band.getRow(i);
+			for (int j = 0, size = list.size(); j < size; j++) {
+				BandElement be = list.get(j);
+				if (be instanceof ChartBandElement) {
+					charts.add(((ChartBandElement) be).getChart());
+				}
+			}
+		}
+		return charts;
 	}
 
 	public static boolean isGroupBand(String bandName) {

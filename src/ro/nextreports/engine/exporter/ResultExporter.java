@@ -1191,6 +1191,11 @@ public abstract class ResultExporter {
                 		for (Report subreport : subreports) {
                 			bean.getParametersBean().addNotFoundSubreportParameters(subreport.getParameters());
                 		}
+                		// similar for charts
+                		List<Chart> charts = ReportUtil.getDetailCharts(bean.getReportLayout());
+                		for (Chart chart : charts) {
+                			bean.getParametersBean().addNotFoundSubreportParameters(chart.getReport().getParameters());
+                		}
                 	}                	
                 	for (QueryParameter qp : params.values()) {                								
 						Object pValue = getResult().nextValue(qp.getName());
@@ -1787,6 +1792,8 @@ public abstract class ResultExporter {
         runner.setChart(chart);
         runner.setConnection(bean.getConnection());
         runner.setQueryTimeout(bean.getQueryTimeout());
+        // put subreport parameters
+     	bean.getParametersBean().addSubreportParameters(chart.getReport().getParameters());
         runner.setParameterValues(bean.getParametersBean().getParamValues());        
         runner.setImagePath(imageChartPath);  
         I18nLanguage lang = I18nUtil.getLanguageByName(bean.getReportLayout(), bean.getLanguage());
