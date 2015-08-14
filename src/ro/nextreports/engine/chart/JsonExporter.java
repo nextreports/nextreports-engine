@@ -736,7 +736,7 @@ public class JsonExporter implements ChartExporter {
                              boolean showXLabel, boolean showYLabel) throws QueryException {
         byte type = chart.getType().getType();
         Element[] charts = new Element[0];
-        if (ChartType.BAR == type) {
+        if ((ChartType.BAR == type) || (ChartType.NEGATIVE_BAR == type)) {
             charts = createBarChart(xAxis, yAxis, showXLabel, showYLabel);
         } else if (ChartType.HORIZONTAL_BAR == type) {
             charts = createHorizontalBarChart(xAxis, yAxis, showXLabel, showYLabel);

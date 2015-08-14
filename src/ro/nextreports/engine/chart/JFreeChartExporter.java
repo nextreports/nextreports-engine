@@ -152,7 +152,7 @@ public class JFreeChartExporter implements ChartExporter {
 		JFreeChart jfreechart = null;
         if (ChartType.LINE == type) {
         	jfreechart = createLineChart();
-        } else if (ChartType.BAR == type) {
+        } else if ((ChartType.BAR == type) || (ChartType.NEGATIVE_BAR == type)) {
         	jfreechart = createBarChart(false, false);
         } else if (ChartType.BAR_COMBO == type) {
         	jfreechart = createBarChart(false, false, true);	

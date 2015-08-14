@@ -39,6 +39,7 @@ public class ChartType implements Serializable {
     public static transient final byte BAR_COMBO = 60;
     public static transient final byte STACKED_BAR_COMBO = 61;
     public static transient final byte BUBBLE = 70;
+    public static transient final byte NEGATIVE_BAR = 80;
 
     // style for all types
     public static transient final byte STYLE_NORMAL = 1;

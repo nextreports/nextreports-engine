@@ -470,7 +470,9 @@ public class JsonHTML5Exporter implements ChartExporter {
     private void setType() {
         byte type = chart.getType().getType();        
         if ((ChartType.BAR == type) || (ChartType.BAR_COMBO == type)) {
-            nc.setType(NextChart.Type.bar);           	
+            nc.setType(NextChart.Type.bar);
+        } else if (ChartType.NEGATIVE_BAR == type) {
+        	nc.setType(NextChart.Type.nbar);  	
         } else if (ChartType.HORIZONTAL_BAR == type) {
         	nc.setType(NextChart.Type.hbar);
         } else if ((ChartType.STACKED_BAR == type) || (ChartType.STACKED_BAR_COMBO == type)) {

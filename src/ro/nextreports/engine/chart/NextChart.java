@@ -28,7 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class NextChart {
 	
-	public static enum Type { bar, stackedbar, hbar, hstackedbar, line, area, pie, barcombo, stackedbarcombo, bubble };
+	public static enum Type { bar, nbar, stackedbar, hbar, hstackedbar, line, area, pie, barcombo, stackedbarcombo, bubble };
 	public static enum Style { normal, glass, cylinder, dome, parallelepiped, soliddot, hollowdot, anchordot, bowdot, stardot };
 	public static enum Orientation { horizontal, vertical, diagonal, halfdiagonal };
 	public static enum Alignment { left, center, right };
