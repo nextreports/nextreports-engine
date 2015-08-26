@@ -358,7 +358,7 @@ public class JFreeChartExporter implements ChartExporter {
         final HashMap<String, String> formatValues = createChart(plot.getRangeAxis(), charts);
                 
         // in x axis does not contain number values , values are strings representing one unit 
-        if (!integerXValue) {
+        if (!integerXValue) {        	
         	((NumberAxis)plot.getDomainAxis()).setTickUnit(new NumberTickUnit(1));
         	((NumberAxis)plot.getDomainAxis()).setNumberFormatOverride(new DecimalFormat(){
     			@Override
@@ -370,7 +370,11 @@ public class JFreeChartExporter implements ChartExporter {
     				return result.append(s);
     			}        	
             });
-        }                  
+        }    
+        
+        // need integer tick units, otherwise values will look like doubles with thousands separator and decimal point
+        final NumberAxis rangeAxis = (NumberAxis) plot.getDomainAxis();
+		rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
         
         return jfreechart;
                
@@ -494,6 +498,7 @@ public class JFreeChartExporter implements ChartExporter {
 		plot.setForegroundAlpha(transparency);
 		BarRenderer renderer = (BarRenderer) plot.getRenderer();
         renderer.setDrawBarOutline(false);
+        renderer.setItemMargin(0); // no gap between bars in same category
         DecimalFormat decimalformat;
         DecimalFormat percentageFormat;
         if (chart.getYTooltipPattern() == null) {
@@ -1160,7 +1165,7 @@ public class JFreeChartExporter implements ChartExporter {
                 	max = Math.max(max.doubleValue(), computedValues[0].doubleValue());
             	} else {   
 	                for (int i = 0; i < chartsNo; i++) {                  	
-	                    addValue(charts[i], n, lastXValue, computedValues[i], formatValues);   
+	                    addValue(charts[i], n, lastXValue, computedValues[i], formatValues, chartsNo);   
 	                    if (!isStacked) {
 	                    	min = Math.min(min.doubleValue(), computedValues[i].doubleValue());
 	                    	max = Math.max(max.doubleValue(), computedValues[i].doubleValue());
@@ -1198,7 +1203,7 @@ public class JFreeChartExporter implements ChartExporter {
         	}
             for (int i = 0; i < chartsNo; i++) {
                 Number value = (Number) functions[i].getComputedValue();                
-                addValue(charts[i], n, lastXValue, value, formatValues);   
+                addValue(charts[i], n, lastXValue, value, formatValues, chartsNo);   
                 if (!isStacked) {
                 	min = Math.min(min.doubleValue(), value.doubleValue());
                 	max = Math.max(max.doubleValue(), value.doubleValue());
@@ -1222,7 +1227,7 @@ public class JFreeChartExporter implements ChartExporter {
     }
 	
 	// take care if no function is set : every value is in a differnet category (we use an incremental integer : serie)
-	private void addValue(Object chartSerie, Number x, String lastXValue, Number y, HashMap<String, String> formatValues) {			
+	private void addValue(Object chartSerie, Number x, String lastXValue, Number y, HashMap<String, String> formatValues, int chartsNo) {			
 		if (chart.getType().isLine()) {					
 		   ((XYSeries)chartSerie).add(x, y);
 		} else if (isLineCombo) {			
@@ -1230,7 +1235,7 @@ public class JFreeChartExporter implements ChartExporter {
 		} else if (!chart.getType().isPie()) {
 						
 			GFunction function = FunctionFactory.getFunction(chart.getYFunction());
-			if (!AbstractGFunction.NOOP.equals(function.getName())) {
+			if (!AbstractGFunction.NOOP.equals(function.getName()) || (chartsNo > 1)) {
 				barDataset.setValue(y, (String)chartSerie, lastXValue);
 			} else {			
 				int serie = 0;
