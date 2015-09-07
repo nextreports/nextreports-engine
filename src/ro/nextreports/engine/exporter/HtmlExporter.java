@@ -340,6 +340,27 @@ public class HtmlExporter extends ResultExporter {
         return v;
     }    
     
+    // even if HTML is not a paged document we need to take care for print page breaks "page-break-before: always"
+    // tables need to be broken in order to force a page break. 
+    protected void newPage() {
+		if (!bean.isSubreport()) {
+			try {
+				stream.print("</table>\n");
+				stream.println("<p style=\"page-break-before: always\"></p>\n");
+				if (bean.getReportLayout().isUseSize()) {
+		            stream.print("<table>");
+		        } else {
+		            stream.print("<table style='width:100%'>");
+		        }
+				if (bean.getReportLayout().isHeaderOnEveryPage()) {					
+					printHeaderBand();					
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+    
 //    private String getRotationStyle(short angle) {
 //    	StringBuilder sb = new StringBuilder();
 //    	if (angle == -90) {
