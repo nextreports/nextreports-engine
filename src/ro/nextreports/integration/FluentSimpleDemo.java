@@ -24,6 +24,7 @@ import java.sql.Connection;
 import ro.nextreports.engine.FluentReportRunner;
 import ro.nextreports.engine.Report;
 import ro.nextreports.engine.ReportRunner;
+import ro.nextreports.engine.context.JDBCConnectionContext;
 import ro.nextreports.engine.exporter.event.ExporterEvent;
 import ro.nextreports.engine.exporter.event.ExporterEventListener;
 import ro.nextreports.engine.exporter.event.ExporterObject;
@@ -57,11 +58,17 @@ public class FluentSimpleDemo extends AbstractDemo {
                 }
             }
         };
+        
+        JDBCConnectionContext connectionContext = new JDBCConnectionContext();
+        connectionContext.setConnection(connection);
+        connectionContext.setQueryTimeout(60);
+        connectionContext.setCsv(false);
 
         long time = System.currentTimeMillis();
 		FluentReportRunner.report(report)
-    		.connectTo(connection)
-    		.withQueryTimeout(60) // optional
+    		//.connectTo(connection)
+    		//.withQueryTimeout(60) // optional
+			.connectTo(connectionContext)
     		.withParameterValues(DemoUtil.createDemoParameterValues()) // optional (for no parameters)
     		.formatAs(ReportRunner.HTML_FORMAT)
             .computeCount(true)
@@ -73,7 +80,7 @@ public class FluentSimpleDemo extends AbstractDemo {
 
 	@Override
 	protected OutputStream getOutputStream() throws IOException {		
-		return new FileOutputStream("test.hml");
+		return new FileOutputStream("test.html");
 	}
 	
 

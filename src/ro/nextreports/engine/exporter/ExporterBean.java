@@ -23,12 +23,13 @@ import java.util.List;
 import ro.nextreports.engine.ReportLayout;
 import ro.nextreports.engine.exporter.util.ParametersBean;
 import ro.nextreports.engine.queryexec.QueryResult;
+import ro.nextreports.engine.queryexec.XResult;
 
 public class ExporterBean {	
 
 	private Connection con;
 	private int queryTimeout;
-	private QueryResult result;
+	private XResult result;	
 	private OutputStream out; 
 	private ReportLayout reportLayout; 
 	private ParametersBean pBean;
@@ -41,13 +42,13 @@ public class ExporterBean {
 	// should we put raw data inside table (and use renderer to show formatted data)  or we should put formatted data
 	private boolean reportTableExporterRawData;
 	
-	public ExporterBean(Connection con, int queryTimeout, QueryResult result,
+	public ExporterBean(Connection con, int queryTimeout, XResult result,
 			OutputStream out, ReportLayout reportLayout, ParametersBean pBean,
 			String fileName, boolean rawPrint, boolean isProcedure) {
 		this(con, queryTimeout, result, out, reportLayout, pBean, fileName, rawPrint, null, isProcedure);
 	}
 	
-	public ExporterBean(Connection con, int queryTimeout, QueryResult result,
+	public ExporterBean(Connection con, int queryTimeout, XResult result,
 			OutputStream out, ReportLayout reportLayout, ParametersBean pBean,
 			String fileName, boolean rawPrint, List<Alert> alerts, boolean isProcedure) {
 		super();
@@ -62,7 +63,7 @@ public class ExporterBean {
 		this.alerts = alerts;
 		this.isProcedure = isProcedure;
 		this.reportTableExporterRawData = false;
-	}
+	}	
 
 	public Connection getConnection() {
 		return con;
@@ -80,7 +81,7 @@ public class ExporterBean {
 		this.queryTimeout = queryTimeout;
 	}	
 
-	public QueryResult getResult() {
+	public XResult getResult() {		
 		return result;
 	}
 	

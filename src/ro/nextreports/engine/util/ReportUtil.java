@@ -981,7 +981,13 @@ public class ReportUtil {
         ReportLayout convertedLayout = ReportUtil.getReportLayoutForHeaderFunctions(layout);
         // IMPORTANT: must take for report layout at the end because we save some transient data 
         // (see getForReportLayout: newReport.getGeneratedParamValues().put(columnName, in.getId());
-        ReportLayout forConvertedLayout = ReportUtil.getForReportLayout(con, convertedLayout, pBean);
+        ReportLayout forConvertedLayout;
+        // FOR report has an sql query, so in case of data set we cannot have a FOR report
+        if (con != null) {
+        	forConvertedLayout = ReportUtil.getForReportLayout(con, convertedLayout, pBean);
+        } else {
+        	forConvertedLayout = convertedLayout;
+        }
         return forConvertedLayout;
 	}
 	

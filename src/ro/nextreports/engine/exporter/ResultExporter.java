@@ -108,12 +108,14 @@ import ro.nextreports.engine.exporter.util.variable.Variable;
 import ro.nextreports.engine.exporter.util.variable.VariableFactory;
 import ro.nextreports.engine.i18n.I18nLanguage;
 import ro.nextreports.engine.i18n.I18nUtil;
+import ro.nextreports.engine.queryexec.DataSetResult;
 import ro.nextreports.engine.queryexec.IdName;
 import ro.nextreports.engine.queryexec.Query;
 import ro.nextreports.engine.queryexec.QueryException;
 import ro.nextreports.engine.queryexec.QueryExecutor;
 import ro.nextreports.engine.queryexec.QueryParameter;
 import ro.nextreports.engine.queryexec.QueryResult;
+import ro.nextreports.engine.queryexec.XResult;
 import ro.nextreports.engine.util.PrefixSuffix;
 import ro.nextreports.engine.util.QueryUtil;
 import ro.nextreports.engine.util.ReportUtil;
@@ -290,8 +292,8 @@ public abstract class ResultExporter {
         if (this instanceof FirstCrossingExporter) {
         	// after FirstCrossing go to the beginning of the result set
         	try {
-				bean.getResult().getResultSet().beforeFirst();
-			} catch (SQLException ex) {
+        		bean.getResult().beforeFirst();
+			} catch (Exception ex) {
 				LOG.error(ex.getMessage(), ex);
 			}
         }               
@@ -307,8 +309,12 @@ public abstract class ResultExporter {
         bean.setOut(out);
     }
 
-    public QueryResult getResult() {
+    public XResult getResult() {
         return bean.getResult();
+    }
+    
+    public boolean isDataSet() {
+    	return (getResult() instanceof DataSetResult);
     }
 
     public void setResult(QueryResult result) {
@@ -732,13 +738,13 @@ public abstract class ResultExporter {
     // for ResultSet TYPE-FORWRD_ONLY (like Csv, SQLite) getResult().isEmpty does not work, so
     // we also test in printContentBands to throw NoDataFoundException
     private void testForData() throws QueryException, NoDataFoundException {
-        // for procedure call we do not know the row count (is -1)    	    	
-        if (this.getOut() == null || this.getResult() == null
-                || getResult().getColumnCount() <= 0
-                || getResult().getRowCount() == 0 
-                || getResult().isEmpty() ) {                        	
-            throw new NoDataFoundException();
-        }
+	        // for procedure call we do not know the row count (is -1)    	    	
+	        if (this.getOut() == null || this.getResult() == null
+	                || getResult().getColumnCount() <= 0
+	                || getResult().getRowCount() == 0 
+	                || getResult().isEmpty() ) {                        	
+	            throw new NoDataFoundException();
+	        }
     }
 
     protected PrintStream createPrintStream() throws QueryException {
@@ -832,8 +838,8 @@ public abstract class ResultExporter {
         }
     }
 
-    private boolean printContentBands() throws QueryException, NoDataFoundException {    	
-        int cols = getResult().getColumnCount();
+    private boolean printContentBands() throws QueryException, NoDataFoundException {    
+    	int cols = getResult().getColumnCount();
         List<String> expNames = ReportUtil.getExpressionsNames(bean.getReportLayout());
         int expNo = expNames.size();
         previousRow = new Object[cols + expNo];
@@ -869,7 +875,7 @@ public abstract class ResultExporter {
                 if (resultSetRow > 0) {
                     printFooterGroupBands();                    
                 }
-                printHeaderGroupBands();                
+                printHeaderGroupBands();                      
                 printDetailBand();                
             }
             resultSetRow++;

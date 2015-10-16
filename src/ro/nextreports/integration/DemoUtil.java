@@ -39,7 +39,7 @@ import ro.nextreports.engine.util.ReportUtil;
 public class DemoUtil {
 
 	// from version 5.3 nextreports data is kept in USER_HOME folder
-    public static final String NEXTREPORTS_HOME = "D:\\Programs\\NextReports 4.0";
+    public static final String NEXTREPORTS_HOME = "C:\\Users\\mihai.panaitescu\\.nextreports-8.2";
     
     public static DemoDefinition def = DemoDefinitionFactory.get(DemoDefinitionFactory.DERBY_DB);
    

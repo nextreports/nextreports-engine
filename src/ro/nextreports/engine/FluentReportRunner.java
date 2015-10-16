@@ -22,6 +22,7 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 
+import ro.nextreports.engine.context.XConnectionContext;
 import ro.nextreports.engine.exporter.Alert;
 import ro.nextreports.engine.exporter.event.ExporterEventListener;
 import ro.nextreports.engine.exporter.exception.NoDataFoundException;
@@ -51,6 +52,7 @@ public class FluentReportRunner {
 
     /** Set the connection to database
      *
+     * @deprecated use connectTo(XConnectionContext connectionContext) instead
      * @param connection database connection
      * @return FluentReportRunner object with database connection set
      */
@@ -59,8 +61,19 @@ public class FluentReportRunner {
 		return this;
 	}
     
+    /** Set the connection 
+    *
+    * @param connectionContext connection context
+    * @return FluentReportRunner object with database connection context set
+    */
+   public FluentReportRunner connectTo(XConnectionContext connectionContext) {
+		reportRunner.setConnectionContext(connectionContext);
+		return this;
+	}
+    
     /** Set the connection to csv file
     *
+    * @deprecated use connectTo(XConnectionContext connectionContext) instead
     * @param connection csv file connection
     * @return FluentReportRunner object with csv file connection set
     */
@@ -71,6 +84,7 @@ public class FluentReportRunner {
 
     /** Set the query timeout
      *
+     * @deprecated use connectTo(XConnectionContext connectionContext) instead
      * @param queryTimeout database execution query timeout in seconds
      * @return FluentReportRunner object with query timeout set
      */

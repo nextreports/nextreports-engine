@@ -19,6 +19,8 @@ package ro.nextreports.engine.util;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.FileReader;
 import java.io.InputStream;
@@ -26,6 +28,8 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.net.URI;
+import java.nio.file.Paths;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.ArrayList;
@@ -48,6 +52,7 @@ import ro.nextreports.engine.i18n.I18nLanguage;
 import ro.nextreports.engine.i18n.I18nString;
 import ro.nextreports.engine.i18n.I18nUtil;
 import ro.nextreports.engine.queryexec.IdName;
+import ro.nextreports.integration.dataset.JsonDemo;
 
 
 /**
@@ -497,6 +502,32 @@ public class StringUtil {
 			index = s.indexOf(I18nString.MARKUP);
 		}		
 		return result;
+	}
+	
+	public static boolean isUrl(String path) {
+		String regex = "^((https?|ftp)://|(www|ftp)\\.)[a-z0-9-]+(\\.[a-z0-9-]+)+([/?].*)?$";
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(path);
+		return m.find(); 		    
+	}
+	
+	public static InputStream getInputStream(String path) throws Exception {
+		InputStream is;
+    	if (StringUtil.isUrl(path)) {
+    		is = URI.create(path).toURL().openStream();
+    	} else {
+    		try {
+    			is = new FileInputStream(Paths.get(path).toFile());
+    		} catch (FileNotFoundException ex) {
+    			is = JsonDemo.class.getClassLoader().getResourceAsStream(path);
+    		}
+    	}
+        if (is == null) {
+        	System.err.println("File " + path + " not found.");
+        } else {
+        	System.out.println("File " + path + " found.");
+        }
+        return is;
 	}
 
 }

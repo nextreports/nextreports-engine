@@ -26,6 +26,9 @@ import java.sql.Connection;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
+import ro.nextreports.engine.context.DataSetConnectionContext;
+import ro.nextreports.engine.context.JDBCConnectionContext;
+import ro.nextreports.engine.context.XConnectionContext;
 import ro.nextreports.engine.exporter.AlarmExporter;
 import ro.nextreports.engine.exporter.Alert;
 import ro.nextreports.engine.exporter.CsvExporter;
@@ -51,10 +54,12 @@ import ro.nextreports.engine.exporter.util.IndicatorData;
 import ro.nextreports.engine.exporter.util.ParametersBean;
 import ro.nextreports.engine.exporter.util.TableData;
 import ro.nextreports.engine.querybuilder.sql.dialect.Dialect;
+import ro.nextreports.engine.queryexec.DataSetResult;
 import ro.nextreports.engine.queryexec.Query;
 import ro.nextreports.engine.queryexec.QueryExecutor;
 import ro.nextreports.engine.queryexec.QueryParameter;
 import ro.nextreports.engine.queryexec.QueryResult;
+import ro.nextreports.engine.queryexec.XResult;
 import ro.nextreports.engine.util.DialectUtil;
 import ro.nextreports.engine.util.QueryUtil;
 import ro.nextreports.engine.util.ReportUtil;
@@ -103,6 +108,7 @@ public class ReportRunner implements Runner {
     /** Memory display output format */
     public static final String DISPLAY_FORMAT = "DISPLAY";
     
+    private XConnectionContext connectionContext;
     private Connection connection;
     private Dialect dialect;
     private Report report;
@@ -115,7 +121,7 @@ public class ReportRunner implements Runner {
     private List<ExporterEventListener> listenerList = new ArrayList<ExporterEventListener>();
     private String chartImagePath;
     private List<Alert> alerts;
-    private boolean csv = false;
+    private boolean csv = false;    
     
     // to write excel in a existing template, in a specific sheet (other sheets may contain calculations on data sheet)
     private String templateName;
@@ -125,8 +131,12 @@ public class ReportRunner implements Runner {
     private boolean tableRawData = false;
     
     private String language;
-
-    /** Get database connection
+        
+    private boolean isDataSet() {
+		return connectionContext instanceof DataSetConnectionContext;
+	}
+	
+	/** Get database connection
      *
      * @return database connection
      */
@@ -327,6 +337,14 @@ public class ReportRunner implements Runner {
          }    
 
     }
+    
+    private DataSetResult createDataSetResult() throws Exception {    	
+    	if (connectionContext == null) {
+    		throw new IllegalArgumentException("DataSet context cannot be null!");
+    	}
+    	DataSetConnectionContext dsContext = (DataSetConnectionContext)connectionContext;    	
+        return new DataSetResult(dsContext.getDataSet(), -1, 0);
+    }
 
 
     /** Export the current report to the specified output format
@@ -361,36 +379,49 @@ public class ReportRunner implements Runner {
         
         if (!formatAllowed(format)) {
             throw new ReportRunnerException("Unsupported format : " + format + " !");
-        }           
-       
-        QueryResult queryResult = null;
-        try {        	        	        	
-           
-            queryResult = executeQuery();
-
-            String sql = getSql();
-            ParametersBean bean = new ParametersBean(getQuery(sql), getReportParameters(), parameterValues);
-                        
-            ReportLayout convertedLayout = ReportUtil.getDynamicReportLayout(connection, report.getLayout(), bean);
-                        
-            boolean isProcedure = QueryUtil.isProcedureCall(sql);
-            
-            ExporterBean eb = new ExporterBean(connection, queryTimeout, queryResult, stream, convertedLayout, 
-					 bean, report.getBaseName(), false, alerts, isProcedure);
-            if (language != null) {            	
-            	eb.setLanguage(language);
-            }
-            createExporter(eb);
-
-            return exporter.export();
-        } catch (NoDataFoundException e) {
-            throw e;
+        }
+        
+        XResult result = null;
+        String sql;
+        try { 
+	        if (isDataSet()) {        	
+	        	result = createDataSetResult(); 
+	        	sql = null;        	        	
+	        } else {       	       		              	        	        		           
+		        result = executeQuery();
+		        sql = getSql();		       
+	    	}
         } catch (Exception e) {
             throw new ReportRunnerException(e);
-        } finally {
-        	if (queryResult != null) {
-        		queryResult.close();
-        	}
+        } 
+        
+        if (result != null) {
+        	try {        	        	        	
+ 	          
+	            ParametersBean bean = new ParametersBean(getQuery(sql), getReportParameters(), parameterValues);
+	                        
+	            ReportLayout convertedLayout = ReportUtil.getDynamicReportLayout(connection, report.getLayout(), bean);
+	                        
+	            boolean isProcedure = QueryUtil.isProcedureCall(sql);
+	            
+	            ExporterBean eb = new ExporterBean(connection, queryTimeout, result, stream, convertedLayout, 
+						 bean, report.getBaseName(), false, alerts, isProcedure);
+	            if (language != null) {            	
+	            	eb.setLanguage(language);
+	            }
+	            createExporter(eb);
+	
+	            return exporter.export();
+	        	
+	        } catch (NoDataFoundException e) {
+	            throw e;
+	        } catch (Exception e) {
+	            throw new ReportRunnerException(e);
+	        } finally {	        	
+	        	result.close();	        	
+	        }
+        } else {
+        	return false;
         }
     }
     
@@ -624,6 +655,26 @@ public class ReportRunner implements Runner {
 
 	public void setTableRawData(boolean tableRawData) {
 		this.tableRawData = tableRawData;
+	}
+
+	public XConnectionContext getConnectionContext() {
+		return connectionContext;
+	}
+
+	/** Set connection context (JDBCConnectionContext, DataSetConnectionContext)
+    *
+    * @param connectionContext connection context   
+    */
+	public void setConnectionContext(XConnectionContext connectionContext) {
+		this.connectionContext = connectionContext;
+		if (connectionContext instanceof JDBCConnectionContext) {
+			JDBCConnectionContext cc = (JDBCConnectionContext) connectionContext;
+			setConnection(cc.getConnection(), cc.isCsv());
+			this.queryTimeout = cc.getQueryTimeout();
+			this.csv = cc.isCsv();
+		}
 	}	
+	
+	
     
 }

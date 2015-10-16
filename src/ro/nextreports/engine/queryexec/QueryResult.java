@@ -25,7 +25,7 @@ import java.util.Map;
 /**
  * @author Decebal Suiu
  */
-public class QueryResult {
+public class QueryResult implements XResult {
 
     private ResultSet resultSet;
     private int numberOfRows;
@@ -219,6 +219,14 @@ public class QueryResult {
 			e.printStackTrace();
 		}
 		return false;
+	}
+	
+	public void beforeFirst() throws Exception {
+		try {
+			resultSet.beforeFirst();
+		} catch (SQLException e) {			
+			throw new Exception(e);
+		}
 	}
     
 }

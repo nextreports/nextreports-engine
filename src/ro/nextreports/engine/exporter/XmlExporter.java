@@ -39,6 +39,7 @@ import ro.nextreports.engine.band.ReportBandElement;
 import ro.nextreports.engine.band.VariableBandElement;
 import ro.nextreports.engine.queryexec.QueryException;
 import ro.nextreports.engine.queryexec.QueryResult;
+import ro.nextreports.engine.queryexec.XResult;
 import ro.nextreports.engine.util.StringUtil;
 
 /**
@@ -106,7 +107,7 @@ public class XmlExporter extends ResultExporter {
     }
 
     protected void printRawRecord() throws QueryException {
-        QueryResult qr = getResult();
+        XResult qr = getResult();
         int columns = qr.getColumnCount();
         stream.print("\t<" + RECORD_TAG + ">");
         stream.print(lineSeparator);
