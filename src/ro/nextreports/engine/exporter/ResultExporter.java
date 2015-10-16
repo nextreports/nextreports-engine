@@ -1183,7 +1183,9 @@ public abstract class ResultExporter {
                 // subreports with parameters can be used only inside detail band
                 // we must update values for subreport parameters
                 // parameter name used in subreport must be the column alias from parent report !
-                if (!bean.isSubreport() && isDetail) {
+                //
+                // !!! we may have a subreport with parameters inside another subreport, so we always try yo add parameters from subreports
+                if (isDetail) {
                 	Map<String, QueryParameter> params = bean.getParametersBean().getSubreportParams();
                 	if (params.size() == 0) {
                 		// first time we have to look for subreports and add parameters of subreports that are not yet found in master report
@@ -1197,9 +1199,17 @@ public abstract class ResultExporter {
                 			bean.getParametersBean().addNotFoundSubreportParameters(chart.getReport().getParameters());
                 		}
                 	}                	
-                	for (QueryParameter qp : params.values()) {                								
-						Object pValue = getResult().nextValue(qp.getName());
-						bean.getParametersBean().setParameterValue(qp.getName(), pValue);
+                	for (QueryParameter qp : params.values()) {                								                		
+                		try {
+                			Object pValue = getResult().nextValue(qp.getName());
+                			bean.getParametersBean().setParameterValue(qp.getName(), pValue);
+                		} catch (QueryException ex) {
+                			// we throw exception only for first master
+                			// for a subreport which has other subreports we don't
+                			if (!bean.isSubreport()) {
+                				throw ex;
+                			}
+                		}
                 	}
                 }
                 
