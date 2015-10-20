@@ -1146,18 +1146,23 @@ public abstract class ResultExporter {
                 	newRowCount = Math.max(newRowCount, bandElement.getRowSpan());
                 }
                 if (newRow) {                       	
-                	int gridRow = getReportLayout().getGridRow(band.getName(), i);                	
+                	int gridRow = getReportLayout().getGridRow(band.getName(), i);
                 	RowElement re = getRowElement(getReportLayout(), gridRow);
                 	// if new page is put for the first row in the layout, we should not create a new page                	
-                	if (re.isStartOnNewPage() && !start ) {                		
+                	if (re.isStartOnNewPage() && !start ) {
                 		if (!startNewPage) {
                 			// if header on every page, must not use header rows inside pageRow count              			
-                			if (pageRow - headerRow > 0) {                				
+                			if (getReportLayout().isHeaderOnEveryPage()) {
+                				if (pageRow - headerRow > 0) {                				
+                					createNewPage();
+                				}
+                			} else {
                 				createNewPage();
                 			}
                 		} else {
-                			// we create new page excepting only for first group
-                			if (!(ReportLayout.GROUP_HEADER_BAND_NAME_PREFIX + "1").equals(band.getName())) {
+                			// we create new page excepting only for first group or in case there are no header rows
+                			if ( (getReportLayout().getHeaderBand().getRowCount() == 0) ||
+                			    !(ReportLayout.GROUP_HEADER_BAND_NAME_PREFIX + "1").equals(band.getName())) {
                 				createNewPage();
                 			}
                 			startNewPage = false;
