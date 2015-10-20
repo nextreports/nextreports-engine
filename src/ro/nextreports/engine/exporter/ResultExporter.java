@@ -1956,7 +1956,13 @@ public abstract class ResultExporter {
 		return getSubreportExporterBean(subreport, false);
 	}
     
-	protected ExporterBean getSubreportExporterBean(Report subreport, boolean rowCount) throws Exception {		
+    private boolean isSpecialParam(QueryParameter param) {
+    	boolean hasDefaultSource = (param.getDefaultSource() != null) && !"".equals(param.getDefaultSource().trim());
+        boolean hasSource = (param.getSource() != null) && !"".equals(param.getSource().trim());
+        return hasDefaultSource || hasSource || param.isHidden();
+    }
+    
+	protected ExporterBean getSubreportExporterBean(Report subreport, boolean rowCount) throws Exception {				
 		String sql = ReportUtil.getSql(subreport);
 		Query query = new Query(sql);
 		// put subreport parameters
@@ -1964,6 +1970,21 @@ public abstract class ResultExporter {
 		// for reports inside ForReportBandElement we must overwrite parameter values
 		// see ReportUtil.getForReportLayout where generated parameters are set
 		bean.getParametersBean().overwriteSubreportParametersValues(subreport.getGeneratedParamValues());
+		
+		// update values for subreport parameters
+		// must do it before call QueryExecutor (in its constructor we test for values existence)
+		for (QueryParameter qp : bean.getParametersBean().getParams().values()) {                								                		
+    		try {
+    			if (!bean.getParametersBean().getParamValues().containsKey(qp.getName()) && !isSpecialParam(qp)) {
+	    			Object pValue = getResult().nextValue(qp.getName());
+	    			bean.getParametersBean().setParameterValue(qp.getName(), pValue);
+    			}
+    		} catch (QueryException ex) {
+    			// nothing to do
+    			// we just give a chance to complete the values 
+    			// if fails a new chance will be given in printBand method
+    		}
+    	}
 		QueryExecutor executor = new QueryExecutor(query, bean.getParametersBean().getParams(), bean.getParametersBean()
 				.getParamValues(), bean.getConnection(), rowCount);
 		executor.setMaxRows(0);
