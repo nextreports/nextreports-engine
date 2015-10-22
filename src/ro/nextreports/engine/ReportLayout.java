@@ -92,6 +92,7 @@ public class ReportLayout implements Serializable {
     
 
     private boolean headerOnEveryPage;
+    private boolean showEmptyData;
     
     private List<String> i18nkeys;
     private List<I18nLanguage> languages;
@@ -215,8 +216,16 @@ public class ReportLayout implements Serializable {
     public void setHeaderOnEveryPage(boolean headerOnEveryPage) {
         this.headerOnEveryPage = headerOnEveryPage;
     }
+    
+    public boolean isShowEmptyData() {
+		return showEmptyData;
+	}
 
-    public Band getDetailBand() {
+	public void setShowEmptyData(boolean showEmptyData) {
+		this.showEmptyData = showEmptyData;
+	}
+
+	public Band getDetailBand() {
         return detailBand;
     }
     
@@ -471,6 +480,7 @@ public class ReportLayout implements Serializable {
         ReportLayout that = (ReportLayout) o;
 
         if (headerOnEveryPage != that.headerOnEveryPage) return false;
+        if (showEmptyData != that.showEmptyData) return false;
         if (orientation != that.orientation) return false;
         if (reportType != that.reportType) return false;
         if (useSize != that.useSize) return false;
@@ -519,6 +529,7 @@ public class ReportLayout implements Serializable {
         result = 31 * result + templateSheet;
         result = 31 * result + (sheetNames != null ? sheetNames.hashCode() : 0);
         result = 31 * result + (headerOnEveryPage ? 1 : 0);
+        result = 31 * result + (showEmptyData ? 1 : 0);
         result = 31 * result + (pagePadding != null ? pagePadding.hashCode() : 0);
         result = 31 * result + (backgroundImage != null ? backgroundImage.hashCode() : 0);
         result = 31 * result + (paperSize != null ? paperSize.hashCode() : 0);

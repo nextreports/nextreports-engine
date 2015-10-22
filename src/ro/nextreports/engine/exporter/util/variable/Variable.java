@@ -34,6 +34,7 @@ public interface Variable {
     public final static String PAGE_NO_VARIABLE = "PAGE_NO";
     public final static String TOTAL_PAGE_NO_VARIABLE = "TOTAL_PAGE_NO";
     public final static String REPORT_NAME_VARIABLE = "REPORT_NAME";
+    public final static String EMPTY_DATA_VARIABLE = "EMPTY_DATA";
     
 
     public String getName();

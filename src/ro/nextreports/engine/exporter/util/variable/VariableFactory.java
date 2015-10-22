@@ -37,6 +37,7 @@ public class VariableFactory {
         list.add(new ReportNameVariable());
         list.add(new RowVariable());
         list.add(new UserVariable());
+        list.add(new EmptyDataVariable());
         return list;
     }
 

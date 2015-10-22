@@ -100,6 +100,7 @@ import ro.nextreports.engine.exporter.util.StyleFormatConstants;
 import ro.nextreports.engine.exporter.util.function.FunctionFactory;
 import ro.nextreports.engine.exporter.util.function.FunctionUtil;
 import ro.nextreports.engine.exporter.util.function.GFunction;
+import ro.nextreports.engine.exporter.util.variable.EmptyDataVariable;
 import ro.nextreports.engine.exporter.util.variable.GroupRowVariable;
 import ro.nextreports.engine.exporter.util.variable.PageNoVariable;
 import ro.nextreports.engine.exporter.util.variable.RowVariable;
@@ -178,6 +179,10 @@ public abstract class ResultExporter {
     private boolean startNewPage = true;
     protected int resultSetRow = 0;    
     private boolean start = false;
+    
+    // empty data
+    private boolean isEmpty = false;
+    private boolean printRowsForEmptyData = false;
 
     // how many times the first group appears
     // the number of rows for a band is kept in the outter group :
@@ -736,8 +741,11 @@ public abstract class ResultExporter {
         if (this.getOut() == null || this.getResult() == null
                 || getResult().getColumnCount() <= 0
                 || getResult().getRowCount() == 0 
-                || getResult().isEmpty() ) {                        	
-            throw new NoDataFoundException();
+                || getResult().isEmpty() ) {     
+        	
+        	if (!bean.getReportLayout().isShowEmptyData()) {
+        		throw new NoDataFoundException();
+        	}
         }
     }
 
@@ -794,6 +802,8 @@ public abstract class ResultExporter {
         	parameters.put(TotalPageNoVariable.TOTAL_PAGE_NO_PARAM, getTotalPageNo());
         } else if (Variable.REPORT_NAME_VARIABLE.equals(var.getName())) {
         	parameters.put(Variable.REPORT_NAME_VARIABLE, bean.getFileName());
+        } else if (Variable.EMPTY_DATA_VARIABLE.equals(var.getName())) {
+        	parameters.put(EmptyDataVariable.EMPTY_DATA_PARAM, isEmpty);
         }
         return var.getCurrentValue(parameters);
     }
@@ -838,7 +848,7 @@ public abstract class ResultExporter {
         int expNo = expNames.size();
         previousRow = new Object[cols + expNo];
         int k = 0;
-        boolean isEmpty = true;
+        isEmpty = true;
         while (getResult().hasNext()) {        	        	
             
         	isEmpty = false;
@@ -889,7 +899,11 @@ public abstract class ResultExporter {
         }
         
         if (isEmpty) {
-        	throw new NoDataFoundException();
+        	if (!bean.getReportLayout().isShowEmptyData()) {
+        		throw new NoDataFoundException();
+        	} else {        		       
+        		printDetailBandForEmptyData();
+        	}
         }
 
         // footer for last groups
@@ -1027,6 +1041,13 @@ public abstract class ResultExporter {
     protected void printPageFooterBand() throws QueryException {
         printBand(null, getReportLayout().getPageFooterBand(), false);
     }
+    
+    // print those rows in detail band defined for empty data with hide expression ($EMPTY_DATA_VARIABLE == false)
+    private void printDetailBandForEmptyData() throws QueryException {
+    	printRowsForEmptyData = true;
+        printBand(null, null, false);
+        printRowsForEmptyData = false;
+    }
 
     private void printDetailBand() throws QueryException {
         printBand(null, null, false);
@@ -1100,10 +1121,14 @@ public abstract class ResultExporter {
             boolean hideAll = false;
             int count = 0;
             boolean rowWithHideExpression = false;
+            boolean hideExpressionForEmptyData = false;
             for (int j = 0; j < cols; j++) {
                 BandElement bandElement = band.getElementAt(i, j);
                 if ((bandElement != null) && (bandElement.getHideWhenExpression() != null)) {
                    rowWithHideExpression = true;
+                   if (hideExpressionForEmptyData(bandElement.getHideWhenExpression())) {
+                	   hideExpressionForEmptyData = true; 
+                   }
                 }
             }
             if (rowWithHideExpression) {
@@ -1124,6 +1149,10 @@ public abstract class ResultExporter {
                 if (count == cols) {
                     hideAll = true;
                 }
+            }
+            
+            if (printRowsForEmptyData && !hideExpressionForEmptyData) {
+            	continue;
             }
             
             for (int j = 0; j < cols; j++) {
@@ -2128,6 +2157,15 @@ public abstract class ResultExporter {
 			return "";
 		}
 		return obj.toString();
+	}
+	
+	private boolean hideExpressionForEmptyData(String expression) {
+		if (expression == null) {
+			return false;
+		}
+		String  exp = "$V_EMPTY_DATA==false";
+		String e = expression.replaceAll("\\s+","");
+		return (e.equals(exp));
 	}
        
 }
