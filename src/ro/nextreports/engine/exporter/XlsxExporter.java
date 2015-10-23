@@ -775,31 +775,37 @@ public class XlsxExporter extends ResultExporter {
             Border border = xlsRegion.getBorder();
             xlsSheet.addMergedRegion(region);
 
-            if (border != null) {
-                short xlsBottomBorder = getXlsBorderValue(border.getBottom());
-                if (xlsBottomBorder > 0) {
-                    RegionUtil.setBorderBottom(xlsBottomBorder, region, xlsSheet, wb);
-                    RegionUtil.setBottomBorderColor(ExcelColorSupport.getNearestColor(border.getBottomColor()), 
-                    		region, xlsSheet, wb);
-                }
-                short xlsTopBorder = getXlsBorderValue(border.getTop());
-                if (xlsTopBorder > 0) {
-                    RegionUtil.setBorderTop(xlsTopBorder,region, xlsSheet, wb);
-                    RegionUtil.setTopBorderColor(ExcelColorSupport.getNearestColor(border.getTopColor()), 
-                    		region, xlsSheet, wb);
-                }
-                short xlsLeftBorder = getXlsBorderValue(border.getLeft());
-                if (xlsLeftBorder > 0) {
-                    RegionUtil.setBorderLeft(xlsLeftBorder, region, xlsSheet, wb);
-                    RegionUtil.setLeftBorderColor(ExcelColorSupport.getNearestColor(border.getLeftColor()), 
-                    		region, xlsSheet, wb);
-                }
-                short xlsRightBorder = getXlsBorderValue(border.getRight());
-                if (xlsRightBorder > 0) {
-                    RegionUtil.setBorderRight(xlsRightBorder, region, xlsSheet, wb);
-                    RegionUtil.setRightBorderColor(ExcelColorSupport.getNearestColor(border.getRightColor()), 
-                    		region, xlsSheet, wb);
-                }
+            try {
+	            if (border != null) {
+	                short xlsBottomBorder = getXlsBorderValue(border.getBottom());
+	                if (xlsBottomBorder > 0) {
+	                    RegionUtil.setBorderBottom(xlsBottomBorder, region, xlsSheet, wb);
+	                    RegionUtil.setBottomBorderColor(ExcelColorSupport.getNearestColor(border.getBottomColor()), 
+	                    		region, xlsSheet, wb);
+	                }
+	                short xlsTopBorder = getXlsBorderValue(border.getTop());
+	                if (xlsTopBorder > 0) {
+	                    RegionUtil.setBorderTop(xlsTopBorder,region, xlsSheet, wb);
+	                    RegionUtil.setTopBorderColor(ExcelColorSupport.getNearestColor(border.getTopColor()), 
+	                    		region, xlsSheet, wb);
+	                }
+	                short xlsLeftBorder = getXlsBorderValue(border.getLeft());
+	                if (xlsLeftBorder > 0) {
+	                    RegionUtil.setBorderLeft(xlsLeftBorder, region, xlsSheet, wb);
+	                    RegionUtil.setLeftBorderColor(ExcelColorSupport.getNearestColor(border.getLeftColor()), 
+	                    		region, xlsSheet, wb);
+	                }
+	                short xlsRightBorder = getXlsBorderValue(border.getRight());
+	                if (xlsRightBorder > 0) {
+	                    RegionUtil.setBorderRight(xlsRightBorder, region, xlsSheet, wb);
+	                    RegionUtil.setRightBorderColor(ExcelColorSupport.getNearestColor(border.getRightColor()), 
+	                    		region, xlsSheet, wb);
+	                }
+	            }
+            } catch (Throwable t) {
+            	// report with subreport and borders crashes in XSSF poi
+            	// just log the error and let the report be generated (for now)
+            	LOG.error(t.getMessage(), t);            	
             }
 
         }
@@ -947,7 +953,7 @@ public class XlsxExporter extends ResultExporter {
         return hashCode;
     }
     
- // all properties of same type like Color or Font must have different hashCodes!
+    // all properties of same type like Color or Font must have different hashCodes!
     private int getStyleKey(Map<String, Object> style, BandElement bandElement) {  
     	final int prime = 31;
     	int hashCode = getFontKey(style);   	
@@ -957,7 +963,7 @@ public class XlsxExporter extends ResultExporter {
         }
         if (style.containsKey(StyleFormatConstants.HORIZONTAL_ALIGN_KEY)) {        	
             String val = (String) style.get(StyleFormatConstants.HORIZONTAL_ALIGN_KEY);
-            hashCode = prime*hashCode +  + val.hashCode();
+            hashCode = prime*hashCode + val.hashCode();
         }
         if (style.containsKey(StyleFormatConstants.VERTICAL_ALIGN_KEY)) {        
         	String val = (String) style.get(StyleFormatConstants.VERTICAL_ALIGN_KEY);
