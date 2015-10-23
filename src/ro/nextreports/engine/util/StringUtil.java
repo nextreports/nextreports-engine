@@ -498,5 +498,9 @@ public class StringUtil {
 		}		
 		return result;
 	}
+	
+	public static String replaceSpaces(String s, String replacement) {
+		return s.replaceAll("\\s+", replacement);
+	}
 
 }

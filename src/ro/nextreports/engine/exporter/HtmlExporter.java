@@ -182,7 +182,7 @@ public class HtmlExporter extends ResultExporter {
         } else {
             sb.append("class='");
             if (bean.isSubreport()) {
-            	sb.append(bean.getFileName()).append("_");
+            	sb.append(StringUtil.replaceSpaces(bean.getFileName(), "_")).append("_");
             }
             sb.append(bandName).append(i).append("_").append(j).append("'");
         }
@@ -318,7 +318,7 @@ public class HtmlExporter extends ResultExporter {
                 for (int j = 0; j < cols; j++) {
                     BandElement be = band.getElementAt(i, j);
                     int colSpan = (be == null) ? 1 : be.getColSpan();
-                    retval.append(" .").append(rbe.getReport().getBaseName()).append("_");                                        
+                    retval.append(" .").append(StringUtil.replaceSpaces(rbe.getReport().getBaseName(), "_")).append("_");                                        
                     retval.append(band.getName()).append(i).append("_").append(j).append(" \n{").
                             append(renderCssCode(be, i, j, colSpan)).append(" } \n");
                     // add recursive the style for subreports in other subreports
