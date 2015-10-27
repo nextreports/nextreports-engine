@@ -162,6 +162,7 @@ public class HtmlUtil {
 				css.append("white-space: nowrap; \n");
 			} else {
 				css.append("word-wrap: break-word; \n");
+				css.append("line-height: " + be.getPercentLineSpacing() + "%; \n");
 			}
 			// if (be.getTextRotation() != 0) {
 			// css.append(getRotationStyle(be.getTextRotation()));

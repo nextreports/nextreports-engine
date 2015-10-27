@@ -435,7 +435,8 @@ public class PdfExporter extends ResultExporter {
 				cell.setNoWrap(true);
 				if (bandElement != null) {
 					if (bandElement.isWrapText()) {
-						cell.setNoWrap(false);
+						cell.setNoWrap(false);						
+						cell.setLeading(0, (float)bandElement.getPercentLineSpacing()/100);
 					}
 				}
 			}

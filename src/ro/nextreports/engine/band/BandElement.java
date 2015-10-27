@@ -57,6 +57,8 @@ public class BandElement implements Serializable {
     protected String htmlAccScope;
 
     private boolean wrapText;
+    // line spacing if wrapText=true (100% is default)
+    private int percentLineSpacing; 
     private boolean repeatedValue;
     private String hideWhenExpression;
     private short textRotation;
@@ -190,8 +192,16 @@ public class BandElement implements Serializable {
     public void setWrapText(boolean wrapText) {
         this.wrapText = wrapText;
     }
-        
-    public short getTextRotation() {
+                
+    public int getPercentLineSpacing() {
+		return percentLineSpacing;
+	}
+
+	public void setPercentLineSpacing(int percentLineSpacing) {
+		this.percentLineSpacing = percentLineSpacing;
+	}
+
+	public short getTextRotation() {
 		return textRotation;
 	}
 
@@ -231,6 +241,9 @@ public class BandElement implements Serializable {
       if (colSpan == 0) {
           colSpan = 1;
       }
+      if (percentLineSpacing == 0) {
+    	  percentLineSpacing = 100;
+      }
       
       return this;
     }         
@@ -248,6 +261,7 @@ public class BandElement implements Serializable {
         if (rowSpan != that.rowSpan) return false;
         if (verticalAlign != that.verticalAlign) return false;
         if (wrapText != that.wrapText) return false;
+        if (percentLineSpacing != that.percentLineSpacing) return false;
         if (textRotation != that.textRotation) return false;
         if (background != null ? !background.equals(that.background) : that.background != null) return false;
         if (border != null ? !border.equals(that.border) : that.border != null) return false;
@@ -281,6 +295,7 @@ public class BandElement implements Serializable {
         result = 31 * result + (htmlAccId != null ? htmlAccId.hashCode() : 0);
         result = 31 * result + (htmlAccScope != null ? htmlAccScope.hashCode() : 0);
         result = 31 * result + (wrapText ? 1 : 0);
+        result = 31 * result + percentLineSpacing;
         result = 31 * result + textRotation;
         result = 31 * result + (repeatedValue ? 1 : 0);
         result = 31 * result + (hideWhenExpression != null ? hideWhenExpression.hashCode() : 0);

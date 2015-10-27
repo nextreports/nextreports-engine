@@ -505,7 +505,7 @@ public class DocxExporter extends ResultExporter {
 	
 	private void addHyperlinkTableCell(Tr tableRow, BandElement be, Hyperlink link, int width, Map<String, Object> style, int horizontalMergedCells, String verticalMergedVal) {
 		org.docx4j.wml.P.Hyperlink hyp = newHyperlink(wordMLPackage.getMainDocumentPart(), link.getText(), link.getUrl());
-		P paragraph = createParagraph();		
+		P paragraph = createParagraph(be);		
 		paragraph.getContent().add(hyp);
 		addTableCell(tableRow, be, paragraph, width, style, horizontalMergedCells, verticalMergedVal, false);
 	}
@@ -589,7 +589,7 @@ public class DocxExporter extends ResultExporter {
 	}
 	
 	private void addCellStyle(Tc tableCell, BandElement be, String content, Map<String, Object> style) {
-		P paragraph = createParagraph();
+		P paragraph = createParagraph(be);
 		addCellStyle(tableCell, be, content, paragraph, style);
 	}
 	
@@ -1026,10 +1026,17 @@ public class DocxExporter extends ResultExporter {
 	
 	// create paraghraph with no space after
 	private P createParagraph() {
+		return createParagraph(null);
+	}	
+	
+	private P createParagraph(BandElement be) {
 		P paragraph = factory.createP();
 		PPr pPr = factory.createPPr();
 		Spacing spacing = new Spacing();
-		spacing.setAfter(BigInteger.ZERO);
+		if ((be!= null) && be.isWrapText() && (be.getPercentLineSpacing() > 100)) {			
+			spacing.setLine( BigInteger.valueOf( (be.getFont().getSize() * be.getPercentLineSpacing())/2) );
+		} 
+		spacing.setAfter(BigInteger.ZERO);		
 		pPr.setSpacing(spacing);
 		paragraph.setPPr(pPr);
 		return paragraph;
