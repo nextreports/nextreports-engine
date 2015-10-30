@@ -83,6 +83,7 @@ import ro.nextreports.engine.band.ImageBandElement;
 import ro.nextreports.engine.band.ImageColumnBandElement;
 import ro.nextreports.engine.band.Padding;
 import ro.nextreports.engine.band.ParameterBandElement;
+import ro.nextreports.engine.band.ReportBandElement;
 import ro.nextreports.engine.band.RowElement;
 import ro.nextreports.engine.band.VariableBandElement;
 import ro.nextreports.engine.chart.Chart;
@@ -1219,7 +1220,7 @@ public abstract class ResultExporter {
                 // parameter name used in subreport must be the column alias from parent report !
                 //
                 // !!! we may have a subreport with parameters inside another subreport, so we always try yo add parameters from subreports
-                if (isDetail) {
+                if (isDetail && (bandElement instanceof ReportBandElement)) {
                 	Map<String, QueryParameter> params = bean.getParametersBean().getSubreportParams();
                 	if (params.size() == 0) {
                 		// first time we have to look for subreports and add parameters of subreports that are not yet found in master report
@@ -1232,17 +1233,16 @@ public abstract class ResultExporter {
                 		for (Chart chart : charts) {
                 			bean.getParametersBean().addNotFoundSubreportParameters(chart.getReport().getParameters());
                 		}
-                	}                	
+                	}
                 	for (QueryParameter qp : params.values()) {                								                		
                 		try {
                 			Object pValue = getResult().nextValue(qp.getName());
                 			bean.getParametersBean().setParameterValue(qp.getName(), pValue);
                 		} catch (QueryException ex) {
-                			// we throw exception only for first master
-                			// for a subreport which has other subreports we don't
+                			// if parameter is in third level (report->subreport->subreport:param) it won't be found in first level report
                 			if (!bean.isSubreport()) {
                 				throw ex;
-                			}
+                			}                			
                 		}
                 	}
                 }
