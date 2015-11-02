@@ -1227,7 +1227,7 @@ public abstract class ResultExporter {
                 		} catch (QueryException ex) {
                 			// if parameter is in third level (report->subreport->subreport:param) it won't be found in first level report
                 			if (!bean.isSubreport()) {
-                				throw ex;
+                				throw new QueryException("Invalid column for parameter: " + qp.getName(), ex);
                 			}                			
                 		}
                 	}
