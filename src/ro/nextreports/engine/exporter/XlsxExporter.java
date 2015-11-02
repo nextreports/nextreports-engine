@@ -216,7 +216,7 @@ public class XlsxExporter extends ResultExporter {
 
     ///// EXCEL stuff
     private int page = 1;
-    private int fragmentsize = 65000;
+    private int fragmentsize = 1000000;
     private XSSFWorkbook wb;
     private XSSFSheet xlsSheet = null;
     private XSSFRow xlsRow = null;
