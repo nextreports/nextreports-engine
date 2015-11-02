@@ -1199,28 +1199,14 @@ public abstract class ResultExporter {
                 		}
                 	}
                 }
-                Object value = getBandElementValue(fCache, gc, staticBand, hasFunction, usePrevious, bandElement);
-
-                // hide when expression
-                if (!hideAll && hide[j]) {
-                    value = null;
-                }
-
-                int rowSpan = 1, colSpan = 1;
-                if (bandElement != null) {
-                    rowSpan = bandElement.getRowSpan();
-                    colSpan = bandElement.getColSpan();
-                }
-
-                int gridRow = getReportLayout().getGridRow(band.getName(), i);
-                boolean isImage = bandElement instanceof ImageBandElement;
+                
                 
                 // subreports with parameters can be used only inside detail band
                 // we must update values for subreport parameters
                 // parameter name used in subreport must be the column alias from parent report !
                 //
                 // !!! we may have a subreport with parameters inside another subreport, so we always try yo add parameters from subreports
-                if (isDetail && (bandElement instanceof ReportBandElement)) {
+                if (isDetail && ((bandElement instanceof ReportBandElement) || (bandElement instanceof ChartBandElement))) {
                 	Map<String, QueryParameter> params = bean.getParametersBean().getSubreportParams();
                 	if (params.size() == 0) {
                 		// first time we have to look for subreports and add parameters of subreports that are not yet found in master report
@@ -1246,6 +1232,22 @@ public abstract class ResultExporter {
                 		}
                 	}
                 }
+                
+                Object value = getBandElementValue(fCache, gc, staticBand, hasFunction, usePrevious, bandElement);
+
+                // hide when expression
+                if (!hideAll && hide[j]) {
+                    value = null;
+                }
+
+                int rowSpan = 1, colSpan = 1;
+                if (bandElement != null) {
+                    rowSpan = bandElement.getRowSpan();
+                    colSpan = bandElement.getColSpan();
+                }
+
+                int gridRow = getReportLayout().getGridRow(band.getName(), i);
+                boolean isImage = bandElement instanceof ImageBandElement;
                 
                 if (!hideAll) {
                     exportCell(band.getName(), bandElement, value, gridRow, i, j, cols, rowSpan, colSpan, isImage);                    
@@ -1838,6 +1840,22 @@ public abstract class ResultExporter {
         runner.setQueryTimeout(bean.getQueryTimeout());
         // put subreport parameters
      	bean.getParametersBean().addSubreportParameters(chart.getReport().getParameters());
+     	
+		// update values for subchart parameters
+		// must do it before call QueryExecutor (in its constructor we test for values existence)
+		for (QueryParameter qp : bean.getParametersBean().getParams().values()) {
+			try {
+				if (!bean.getParametersBean().getParamValues().containsKey(qp.getName()) && !isSpecialParam(qp)) {
+					Object pValue = getResult().nextValue(qp.getName());
+					bean.getParametersBean().setParameterValue(qp.getName(), pValue);
+				}
+			} catch (QueryException ex) {
+				// nothing to do
+				// we just give a chance to complete the values
+				// if fails a new chance will be given in printBand method
+			}
+		}
+     	
         runner.setParameterValues(bean.getParametersBean().getParamValues());        
         runner.setImagePath(imageChartPath);  
         I18nLanguage lang = I18nUtil.getLanguageByName(bean.getReportLayout(), bean.getLanguage());
