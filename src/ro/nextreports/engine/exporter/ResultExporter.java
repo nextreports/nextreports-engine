@@ -1870,7 +1870,10 @@ public abstract class ResultExporter {
             runner.run();
             image = runner.getChartImageName();
             bandElement.setImage(image);
-        } catch (Exception e) {          
+        } catch (Exception e) {    
+        	// if there is an exception we must reset image name (not generated) on band element
+        	// otherwise the last one generated will be used, which is false!
+        	bandElement.setImage("not_generated");
             e.printStackTrace();            
         }   
     }
