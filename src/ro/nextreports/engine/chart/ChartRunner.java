@@ -357,14 +357,14 @@ public class ChartRunner implements Runner {
 			}
 		}
 
-		QueryResult queryResult =  null;
+		QueryExecutor executor =  null;
 		try {
 			Query query = new Query(sql);
-			QueryExecutor executor = new QueryExecutor(query, parameters, parameterValues, connection, true, true, csv);
+			executor = new QueryExecutor(query, parameters, parameterValues, connection, true, true, csv);
 			executor.setMaxRows(0);
 			executor.setTimeout(queryTimeout);
 
-			queryResult = executor.execute();
+			QueryResult queryResult = executor.execute();
 
 			createExporter(query, parameters, parameterValues, queryResult, stream);
             return exporter.export();
@@ -378,8 +378,8 @@ public class ChartRunner implements Runner {
             throw new ReportRunnerException(e);
 		} finally {
 			resetStaticColumnsAfterRun();
-        	if (queryResult != null) {
-        		queryResult.close();
+        	if (executor != null) {
+        		executor.close();
         	}
         }
 	}

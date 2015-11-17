@@ -1066,5 +1066,13 @@ public class QueryExecutor implements Runnable {
 		
 		return "select count(*) from " + query.substring(index + 4);  						
 	}
+	
+	public void close() {
+		if (resultWrapper.resultSet != null) {
+			ConnectionUtil.closeResultSet(resultWrapper.resultSet);
+		} else if (inputWrapper.statement != null) {
+			ConnectionUtil.closeStatement(inputWrapper.statement);
+		}
+	}
 
 }
