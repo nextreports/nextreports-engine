@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
@@ -173,7 +174,7 @@ public class JFreeChartExporter implements ChartExporter {
         } 
         try {        	
         	if ((chartImageName == null) || "".equals(chartImageName.trim())) {
-        		chartImageName = "chart_" + System.currentTimeMillis() + ".jpg";
+        		chartImageName = "chart_" + UUID.randomUUID() + ".jpg";
         	} 
             ChartUtilities.saveChartAsJPEG(new File(path + File.separator + chartImageName), jfreechart, width, height);
         } catch (IOException e) {
