@@ -1067,11 +1067,21 @@ public class QueryExecutor implements Runnable {
 		return "select count(*) from " + query.substring(index + 4);  						
 	}
 	
-	public void close() {
-		if (resultWrapper.resultSet != null) {
-			ConnectionUtil.closeResultSet(resultWrapper.resultSet);
-		} else if (inputWrapper.statement != null) {
-			ConnectionUtil.closeStatement(inputWrapper.statement);
+	public void close() {		
+		ConnectionUtil.closeResultSet(resultWrapper.resultSet);		
+		ConnectionUtil.closeStatement(inputWrapper.statement);
+		closeCursors();
+	}
+	
+	public void closeCursors() {
+		// try to release open cursors which remained opened because we reuse 
+		// the connection!!!
+		if (conn != null) {
+			try {
+				conn.commit();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

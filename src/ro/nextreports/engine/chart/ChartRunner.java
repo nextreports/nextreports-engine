@@ -380,7 +380,7 @@ public class ChartRunner implements Runner {
 			resetStaticColumnsAfterRun();
         	if (executor != null) {
         		executor.close();
-        	}
+        	}        	
         }
 	}
 	

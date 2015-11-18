@@ -38,7 +38,7 @@ public class QueryExecDemo {
     private static Connection conn;
     
     public static void main(String[] args) {   
-    	QueryResult result = null;
+    	QueryExecutor executor = null;
         try {
             SqlFile sqlFile = new SqlFile("demo.sql");
             String sql = sqlFile.getSqlList().get(0);
@@ -62,8 +62,8 @@ public class QueryExecDemo {
             Map<String,Object> values = new HashMap<String,Object>();
 //            values.put(param.getName(), new Integer(1000));
             values.put(param.getName(), "M%");
-            QueryExecutor executor = new QueryExecutor(query, parameters, values, conn);
-            result = executor.execute();
+            executor = new QueryExecutor(query, parameters, values, conn);
+            QueryResult result = executor.execute();
             System.out.println("columns = " + result.getColumnCount());
             //System.out.println("rows = " + result.getRowCount());
             QueryResultPrinter.printResult(result);
@@ -71,8 +71,8 @@ public class QueryExecDemo {
             e.printStackTrace();
             System.exit(1);
         } finally {
-        	if (result !=  null) {
-        		result.close();
+        	if (executor !=  null) {
+        		executor.close();
         	}
         }
     }

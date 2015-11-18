@@ -2040,16 +2040,24 @@ public abstract class ResultExporter {
     			// if fails a new chance will be given in printBand method
     		}
     	}
-		QueryExecutor executor = new QueryExecutor(query, bean.getParametersBean().getParams(), bean.getParametersBean()
-				.getParamValues(), bean.getConnection(), rowCount);
-		executor.setMaxRows(0);
-		executor.setTimeout(bean.getQueryTimeout());
-		QueryResult queryResult = executor.execute();
-		boolean isProcedure = QueryUtil.isProcedureCall(sql);
-		ExporterBean eb = new ExporterBean(bean.getConnection(), bean.getQueryTimeout(), queryResult, bean.getOut(),
-				subreport.getLayout(), bean.getParametersBean(), subreport.getBaseName(), false, isProcedure);
-		eb.setSubreport(true);
-		return eb;
+		QueryExecutor executor = null;
+		try {
+			executor = new QueryExecutor(query, bean.getParametersBean().getParams(), bean.getParametersBean()
+					.getParamValues(), bean.getConnection(), rowCount);
+			executor.setMaxRows(0);
+			executor.setTimeout(bean.getQueryTimeout());
+			QueryResult queryResult = executor.execute();
+			boolean isProcedure = QueryUtil.isProcedureCall(sql);
+			ExporterBean eb = new ExporterBean(bean.getConnection(), bean.getQueryTimeout(), queryResult, bean.getOut(),
+					subreport.getLayout(), bean.getParametersBean(), subreport.getBaseName(), false, isProcedure);
+			eb.setSubreport(true);
+			return eb;
+		} finally {
+			if (executor != null) {
+				executor.closeCursors();
+			}
+		}
+		
 	}
 	
 	private VariableBandElement getTotalPageNoVbe(ReportLayout layout) {

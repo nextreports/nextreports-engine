@@ -294,24 +294,31 @@ public class QueryUtil {
 	}
 
 	public QueryResult executeQueryFromFile(String file) throws Exception {
-		String sql = getSqlFromFile(file);
-		Query query = new Query(sql);
-		// String[] parameterNames = query.getParameterNames();
-
-		Map<String, QueryParameter> parameters = new HashMap<String, QueryParameter>();
-		// QueryParameter param = new QueryParameter("name", "",
-		// QueryParameter.STRING_VALUE);
-		// parameters.put(param.getName(), param);
-		Map<String, Object> values = new HashMap<String, Object>();
-		// values.put(param.getName(), new Integer(1000));
-		// values.put(param.getName(), "M%");
-		QueryExecutor executor = new QueryExecutor(query, parameters, values, con);
-		QueryResult result = executor.execute();
-		// System.out.println("columns = " + result.getColumnCount());
-		// System.out.println("rows = " + result.getRowCount());
-		// QueryResultPrinter.printResult(result);
-
-		return result;
+		QueryExecutor executor = null;
+		try {
+			String sql = getSqlFromFile(file);
+			Query query = new Query(sql);
+			// String[] parameterNames = query.getParameterNames();
+	
+			Map<String, QueryParameter> parameters = new HashMap<String, QueryParameter>();
+			// QueryParameter param = new QueryParameter("name", "",
+			// QueryParameter.STRING_VALUE);
+			// parameters.put(param.getName(), param);
+			Map<String, Object> values = new HashMap<String, Object>();
+			// values.put(param.getName(), new Integer(1000));
+			// values.put(param.getName(), "M%");
+			executor = new QueryExecutor(query, parameters, values, con);
+			QueryResult result = executor.execute();
+			// System.out.println("columns = " + result.getColumnCount());
+			// System.out.println("rows = " + result.getRowCount());
+			// QueryResultPrinter.printResult(result);
+	
+			return result;
+		} finally {
+			if (executor != null) {
+				executor.closeCursors();
+			}
+		}
 	}
 
 	// public static void main(String[] args) {
@@ -390,13 +397,13 @@ public class QueryUtil {
 
 		List<IdName> values = new ArrayList<IdName>();
 				
-		QueryResult qr = null;
+		QueryExecutor executor = null;
 		try {
 			Query query = new Query(sql);
-			QueryExecutor executor = new QueryExecutor(query, map, vals, con, false, false, false);
+			executor = new QueryExecutor(query, map, vals, con, false, false, false);
 			executor.setTimeout(10000);
 			executor.setMaxRows(0);
-			qr = executor.execute();
+			QueryResult qr = executor.execute();
 
 			// one or two columns in manual select source
 			// for (int i = 0; i < count; i++) {
@@ -414,8 +421,8 @@ public class QueryUtil {
 			ex.printStackTrace();
 			throw new Exception(ex);
 		} finally {
-			if (qr != null) {
-				qr.close();
+			if (executor != null) {
+				executor.close();
 			}
 		}		
 		return values;

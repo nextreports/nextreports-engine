@@ -354,13 +354,13 @@ public class ParameterUtil {
            	
     	List<IdName> values = new ArrayList<IdName>();    	
 		if (qp.isManualSource()) {
-			QueryResult qr = null;
+			QueryExecutor executor = null;			
 			try {								
 				Query query = new Query(qp.getSource());
-				QueryExecutor executor = new QueryExecutor(query, map, vals, con, false, false, false);
+				executor = new QueryExecutor(query, map, vals, con, false, false, false);
 				executor.setTimeout(10000);
 				executor.setMaxRows(0);
-				qr = executor.execute();
+				QueryResult qr = executor.execute();
 				// int count = qr.getRowCount();
 
 				// one or two columns in manual select source
@@ -379,8 +379,8 @@ public class ParameterUtil {
 				ex.printStackTrace();
 				throw new Exception(ex);
 			} finally {
-				if (qr != null) {
-					qr.close();
+				if (executor != null) {
+					executor.close();
 				}
 			}
 		} else {
@@ -431,15 +431,15 @@ public class ParameterUtil {
             objVals.put(key, s);            
         }
 
-        QueryResult qr = null;
+        QueryExecutor executor = null;
         try {
             List<IdName> values = new ArrayList<IdName>();
             
             Query query = new Query(qp.getSource());
-            QueryExecutor executor = new QueryExecutor(query, map, objVals, con, false, false, false);
+            executor = new QueryExecutor(query, map, objVals, con, false, false, false);
             executor.setTimeout(10000);
             executor.setMaxRows(0);
-            qr = executor.execute();
+            QueryResult qr = executor.execute();
             //int count = qr.getRowCount();
 
             // one or two columns in manual select source
@@ -459,8 +459,8 @@ public class ParameterUtil {
             ex.printStackTrace();
             throw new Exception(ex);
         } finally {
-        	if (qr != null)  {
-        		qr.close();
+        	if (executor != null)  {
+        		executor.close();
         	}
         }
     }
