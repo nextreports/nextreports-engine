@@ -51,6 +51,9 @@ public class TableData implements Serializable {
     }
 
     public TableData(List<String> header, List<List<Object>> data, List<List<Map<String, Object>>> style) {
+    	if (header ==  null) {
+    		header = new ArrayList<String>();
+    	}
         this.header = header;  
         for (int i=0, size=header.size(); i<size; i++) {
         	this.pattern.add(null);
