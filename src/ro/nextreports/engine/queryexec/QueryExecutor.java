@@ -1078,7 +1078,9 @@ public class QueryExecutor implements Runnable {
 		// the connection!!!
 		if (conn != null) {
 			try {
-				conn.commit();
+				if (!conn.getAutoCommit()) {
+					conn.commit();
+				}
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
