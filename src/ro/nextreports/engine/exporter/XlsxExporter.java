@@ -1007,7 +1007,7 @@ public class XlsxExporter extends ResultExporter {
         }
         
         if (bandElement != null) {
-        	hashCode = prime*hashCode + (bandElement.isWrapText() ? 19 : 41);
+        	hashCode = prime*hashCode + bandElement.hashCode();
         }	
         return hashCode;
     }    
