@@ -7,6 +7,8 @@ import ro.nextreports.engine.util.ProcUtil;
 // At the foundations this driver uses hsqldb (see getSqlChecker)
 // Info: http://ucanaccess.sourceforge.net/site.html
 public class MSAccessDialect extends AbstractDialect {
+	
+	public static final String DRIVER_CLASS = "net.ucanaccess.jdbc.UcanaccessDriver";
 
     public MSAccessDialect() {
     	super();
