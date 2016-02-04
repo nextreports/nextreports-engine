@@ -40,6 +40,7 @@ public class SQLiteDialect extends AbstractDialect {
         registerColumnType("double", Types.DOUBLE);        
         registerColumnType("decimal", Types.DECIMAL);
         registerColumnType("char", Types.CHAR);
+        registerColumnType("character", Types.VARCHAR);
         registerColumnType("varchar", Types.VARCHAR);
         registerColumnType("longvarchar", Types.LONGVARCHAR);
         registerColumnType("date", Types.DATE);

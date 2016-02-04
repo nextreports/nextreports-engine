@@ -128,6 +128,7 @@ public abstract class AbstractDialect implements Dialect {
     
     protected void registerDefaultJavaTypes() {
     	registerJavaType(Types.BIT, Boolean.class.getName());
+    	registerJavaType(Types.BOOLEAN, Boolean.class.getName());
     	registerJavaType(Types.TINYINT, Byte.class.getName());
     	registerJavaType(Types.SMALLINT, Short.class.getName());
 //    	registerJavaType(Types.CHAR, Character.class.getName());

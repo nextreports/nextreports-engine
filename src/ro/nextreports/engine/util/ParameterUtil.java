@@ -202,6 +202,7 @@ public class ParameterUtil {
                 IdName in = new IdName();
                 switch (typeCode) {
                     case Types.BIT:
+                    case Types.BOOLEAN:
                         in.setId(rs.getBoolean(1));
                         break;
                     case Types.SMALLINT:
@@ -235,7 +236,7 @@ public class ParameterUtil {
                         break;
                     default:
                         //in.setId(rs.getObject(1));
-                        throw new SQLException("NEXTREPORTS -> getColumnValues: type for value cannot be Serialized.");
+                        throw new SQLException("NEXTREPORTS -> getColumnValues: type ='" + typeCode +   "' for value cannot be Serialized.");
                 }
                 setName(shownColumnName, in, rs, typeCode2);
                 values.add(in);
