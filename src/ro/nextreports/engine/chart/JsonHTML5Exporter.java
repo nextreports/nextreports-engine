@@ -413,9 +413,9 @@ public class JsonHTML5Exporter implements ChartExporter {
     }       
    
 
-    private void addValue(Number value, String text, int position) {        	          
+    private void addValue(Number value, String text, int position) {
         if (ChartType.isCombo(chart.getType().getType())) {
-        	if ((position == nc.getData().size()) && (nc.getData().size() > 1)) {
+        	if ((position == nc.getData().size()) && (nc.getData().size() >= 1)) {
         		nc.getLineData().get(0).add(value); 
         	} else {
         		nc.getData().get(position).add(value);  
