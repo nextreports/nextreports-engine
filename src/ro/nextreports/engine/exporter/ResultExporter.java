@@ -1856,8 +1856,12 @@ public abstract class ResultExporter {
 			}
 		}
      	
-        runner.setParameterValues(bean.getParametersBean().getParamValues());        
-        runner.setImagePath(imageChartPath);  
+        runner.setParameterValues(bean.getParametersBean().getParamValues()); 
+        String localPath = imageChartPath;
+        if (localPath == null) {
+        	localPath = bean.getImageChartPath();
+        }        
+        runner.setImagePath(localPath);  
         I18nLanguage lang = I18nUtil.getLanguageByName(bean.getReportLayout(), bean.getLanguage());
         if (lang != null) {
         	runner.setLanguage(lang.getName());
@@ -1870,7 +1874,7 @@ public abstract class ResultExporter {
             runner.run();
             image = runner.getChartImageName();
             bandElement.setImage(image);
-        } catch (Exception e) {    
+        } catch (Exception e) {
         	// if there is an exception we must reset image name (not generated) on band element
         	// otherwise the last one generated will be used, which is false!
         	bandElement.setImage("not_generated");
@@ -2050,6 +2054,7 @@ public abstract class ResultExporter {
 			boolean isProcedure = QueryUtil.isProcedureCall(sql);
 			ExporterBean eb = new ExporterBean(bean.getConnection(), bean.getQueryTimeout(), queryResult, bean.getOut(),
 					subreport.getLayout(), bean.getParametersBean(), subreport.getBaseName(), false, isProcedure);
+			eb.setImageChartPath(imageChartPath);
 			eb.setSubreport(true);
 			return eb;
 		} finally {

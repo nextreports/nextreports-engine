@@ -40,6 +40,7 @@ public class ExporterBean {
 	private String language;
 	// should we put raw data inside table (and use renderer to show formatted data)  or we should put formatted data
 	private boolean reportTableExporterRawData;
+	private String imageChartPath;
 	
 	public ExporterBean(Connection con, int queryTimeout, QueryResult result,
 			OutputStream out, ReportLayout reportLayout, ParametersBean pBean,
@@ -162,6 +163,14 @@ public class ExporterBean {
 
 	public void setReportTableExporterRawData(boolean reportTableExporterRawData) {
 		this.reportTableExporterRawData = reportTableExporterRawData;
+	}	
+
+	public String getImageChartPath() {
+		return imageChartPath;
+	}
+
+	public void setImageChartPath(String imageChartPath) {
+		this.imageChartPath = imageChartPath;
 	}
 
 	@Override
