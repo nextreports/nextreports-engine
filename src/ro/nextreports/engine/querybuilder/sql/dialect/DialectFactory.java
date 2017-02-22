@@ -51,6 +51,7 @@ public class DialectFactory {
     public static final String PERVASIVE = "Pervasive.SQL";
     public static final String TERADATA = "Teradata";
     public static final String MSACCESS = "Ucanaccess";
+    public static final String HSQLDB = "HSQL Database Engine";
 
     static {
         // add buit-in dialect mappers
@@ -66,6 +67,7 @@ public class DialectFactory {
         addDialect(PERVASIVE, PervasiveDialect.class.getName());
         addDialect(TERADATA, TeradataDialect.class.getName());
         addDialect(MSACCESS, MSAccessDialect.class.getName()); 
+        addDialect(HSQLDB, HSQLDBDialect.class.getName()); 
         addDialectsFromVMParameters();
     }
     
