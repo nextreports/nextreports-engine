@@ -17,3 +17,4 @@ src/ro/nextreports/engine/.cvsignore
 # IntelliJ IDEA #
 .idea/
 *.iml
+/.settings/
