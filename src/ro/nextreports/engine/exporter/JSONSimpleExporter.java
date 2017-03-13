@@ -39,6 +39,7 @@ import ro.nextreports.engine.util.StringUtil;
 public class JSONSimpleExporter extends ResultExporter {
 
 	private PrintStream stream;
+
 	private char separator = ',';
 
 	/**
@@ -51,7 +52,7 @@ public class JSONSimpleExporter extends ResultExporter {
 	 * line separator to use. We use Windows style for all platforms since csv
 	 * is a Windows format file.
 	 */
-	private static final String lineSeparator = "], \r\n";
+	private static final String lineSeparator = "]} \r\n";
 
 	/**
 	 * true if there has was a field previously written to this line, meaning
@@ -69,6 +70,7 @@ public class JSONSimpleExporter extends ResultExporter {
 	 * writing them.
 	 */
 	private final boolean trim = true;
+	private boolean isFirstRow;
 
 	public JSONSimpleExporter(ExporterBean bean) {
 		super(bean);
@@ -82,6 +84,7 @@ public class JSONSimpleExporter extends ResultExporter {
 	protected void initExport() throws QueryException {
 		stream = createPrintStream();
 		stream.print("{" + quote + "rows" + quote + " : [");
+		isFirstRow = true;
 	}
 
 	protected void finishExport() {
@@ -167,7 +170,13 @@ public class JSONSimpleExporter extends ResultExporter {
 			p.print(separator);
 		} else {
 			// first character
-			p.print("[");
+			//do not put at first row?
+			if (isFirstRow){
+				p.print("{\"row\": [");
+				isFirstRow = false;
+			} else {
+				p.print(",{\"row\": [");
+			}
 		}
 		if (trim) {
 			s = s.trim();
@@ -225,5 +234,7 @@ public class JSONSimpleExporter extends ResultExporter {
 			stream.close();
 		}
 	}
-
+	public PrintStream getStream() {
+		return stream;
+	}
 }
