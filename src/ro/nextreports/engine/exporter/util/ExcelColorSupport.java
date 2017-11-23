@@ -19,6 +19,7 @@ package ro.nextreports.engine.exporter.util;
 import java.awt.Color;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.poi.hssf.util.HSSFColor;
 
@@ -37,7 +38,7 @@ public final class ExcelColorSupport {
     /**
      * the pre-defined excel color triplets.
      */
-    private static Hashtable triplets;
+    private static Map<String, HSSFColor> triplets;
 
 
     /**
