@@ -7,6 +7,9 @@ import java.util.TreeSet;
 
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.streaming.SXSSFCell;
+import org.apache.poi.xssf.streaming.SXSSFRow;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -25,7 +28,7 @@ public class XlsxUtil {
 	 * @param sheet the sheet that is copied
 	 * @return column number
 	 */
-	public static int copyToSheet(XSSFSheet parentSheet, int parentSheetRow, int parentSheetColumn, XSSFSheet sheet) {
+	public static int copyToSheet(SXSSFSheet parentSheet, int parentSheetRow, int parentSheetColumn, SXSSFSheet sheet) {
 		return copyToSheet(parentSheet, parentSheetRow, parentSheetColumn, sheet, true);
 	}
 
@@ -39,12 +42,12 @@ public class XlsxUtil {
 	 * @param copyStyle true to copy the style
 	 * @return column number
 	 */
-	public static int copyToSheet(XSSFSheet parentSheet, int parentSheetRow, int parentSheetColumn, XSSFSheet sheet, boolean copyStyle) {
+	public static int copyToSheet(SXSSFSheet parentSheet, int parentSheetRow, int parentSheetColumn, SXSSFSheet sheet, boolean copyStyle) {
 		int maxColumnNum = 0;
 		Map<Integer, CellStyle> styleMap = (copyStyle) ? new HashMap<Integer, CellStyle>() : null;
 		for (int i = sheet.getFirstRowNum(); i <= sheet.getLastRowNum(); i++) {
-			XSSFRow srcRow = sheet.getRow(i);
-			XSSFRow destRow;
+			SXSSFRow srcRow = sheet.getRow(i);
+			SXSSFRow destRow;
 			// subreport is not the first cell in a row
 			if ((parentSheetColumn > 0) && (i == sheet.getFirstRowNum())) {
 				destRow = parentSheet.getRow(parentSheetRow);
@@ -70,8 +73,7 @@ public class XlsxUtil {
 	/**
 	 * Copy a row from a sheet to another sheet
 	 * 
-	 * 
-	 * @param srcSheet the sheet to copy
+	 *  @param srcSheet the sheet to copy
 	 * @param destSheet the sheet to copy into
 	 * @param parentSheetRow the row inside destSheet where we start to copy
 	 * @param parentSheetColumn the column inside destSheet where we start to copy
@@ -80,17 +82,17 @@ public class XlsxUtil {
 	 * @param styleMap style map
 	 *       
 	 */
-	public static void copyRow(XSSFSheet srcSheet, XSSFSheet destSheet, int parentSheetRow, int parentSheetColumn, XSSFRow srcRow, XSSFRow destRow,
-			Map<Integer, CellStyle> styleMap) {
+	public static void copyRow(SXSSFSheet srcSheet, SXSSFSheet destSheet, int parentSheetRow, int parentSheetColumn, SXSSFRow srcRow, SXSSFRow destRow,
+							   Map<Integer, CellStyle> styleMap) {
 		// manage a list of merged zone in order to not insert two times a
 		// merged zone
 		Set<CellRangeAddressWrapper> mergedRegions = new TreeSet<CellRangeAddressWrapper>();
 		destRow.setHeight(srcRow.getHeight());
 		// pour chaque row
 		for (int j = srcRow.getFirstCellNum(); j <= srcRow.getLastCellNum(); j++) {
-			XSSFCell oldCell = srcRow.getCell(j); // ancienne cell			
+			SXSSFCell oldCell = srcRow.getCell(j); // ancienne cell
 			if (oldCell != null) {				
-				XSSFCell newCell = destRow.createCell(parentSheetColumn + j);				
+				SXSSFCell newCell = destRow.createCell(parentSheetColumn + j);
 				copyCell(oldCell, newCell, styleMap);
 				
 				CellRangeAddress mergedRegion = getMergedRegion(srcSheet, srcRow.getRowNum(), (short) oldCell.getColumnIndex());
@@ -115,12 +117,11 @@ public class XlsxUtil {
 
 	/**
 	 * Copy a cell to another cell
-	 * 
-	 * @param oldCell cell to be copied
+	 *  @param oldCell cell to be copied
 	 * @param newCell cell to be created
 	 * @param styleMap style map
 	 */
-	public static void copyCell(XSSFCell oldCell, XSSFCell newCell, Map<Integer, CellStyle> styleMap) {
+	public static void copyCell(SXSSFCell oldCell, SXSSFCell newCell, Map<Integer, CellStyle> styleMap) {
 		if (styleMap != null) {			
 			if (oldCell.getSheet().getWorkbook() == newCell.getSheet().getWorkbook()) {
 				newCell.setCellStyle(oldCell.getCellStyle());
@@ -160,7 +161,7 @@ public class XlsxUtil {
 
 	}
 	
-	public static CellRangeAddress getMergedRegion(XSSFSheet sheet, int rowNum, short cellNum) {
+	public static CellRangeAddress getMergedRegion(SXSSFSheet sheet, int rowNum, short cellNum) {
 		for (int i = 0; i < sheet.getNumMergedRegions(); i++) {
 			CellRangeAddress merged = sheet.getMergedRegion(i);
 			if (merged.isInRange(rowNum, cellNum)) {
