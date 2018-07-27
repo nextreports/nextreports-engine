@@ -161,9 +161,19 @@ public class XlsxExporter extends ResultExporter {
 	}
 
     protected void flush() {
+        if (resultSetRow % FLUSH_ROWS == 0) {
+            flushNow();
+        }
     }
 
     protected void flushNow() {
+        try {
+            xlsSheet.flushRows();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            LOG.error("Flush XLSX error.", e);
+        }
     }
 
 
