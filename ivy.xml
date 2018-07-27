@@ -47,8 +47,8 @@
         <dependency org="com.fasterxml.jackson.core" name="jackson-databind" rev="2.3.0" conf="chart, allruntime"/>        
         
         <!-- POI -->
-        <dependency org="org.apache.poi" name="poi" rev="3.7" conf="excel, docx, allruntime"/>        
-        <dependency org="org.apache.poi" name="poi-ooxml" rev="3.7" conf="excel, docx, allruntime">
+        <dependency org="org.apache.poi" name="poi" rev="3.17" conf="excel, docx, allruntime"/>
+        <dependency org="org.apache.poi" name="poi-ooxml" rev="3.17" conf="excel, docx, allruntime">
             <exclude org="xml-apis"/>
         </dependency>
         
